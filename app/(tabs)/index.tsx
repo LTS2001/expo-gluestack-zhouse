@@ -5,6 +5,7 @@ import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { Button, ButtonText } from '@/components/ui/button';
 
 export default function HomeScreen() {
   return (
@@ -16,6 +17,9 @@ export default function HomeScreen() {
           style={styles.reactLogo}
         />
       }>
+      <Button className='self-start'>
+        <ButtonText>你厉害</ButtonText>
+      </Button>
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">Welcome!</ThemedText>
         <HelloWave />
