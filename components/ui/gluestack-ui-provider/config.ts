@@ -153,6 +153,11 @@ export const config = {
     '--color-indicator-primary': '55 55 55',
     '--color-indicator-info': '83 153 236',
     '--color-indicator-error': '185 28 28',
+
+    /* theme color */
+    '--theme-primary': '#f2a536',
+    '--theme-secondary': '#ffc641',
+    '--theme-tertiary': '#d5bb13',
   }),
   dark: vars({
     '--color-primary-0': '166 166 166',
@@ -305,5 +310,10 @@ export const config = {
     '--color-indicator-primary': '247 247 247',
     '--color-indicator-info': '161 199 245',
     '--color-indicator-error': '232 70 69',
+
+    /* theme color */
+    '--theme-primary': '#c1842b',
+    '--theme-secondary': '#ffc641',
+    '--theme-tertiary': '#d5bb13',
   }),
 };
