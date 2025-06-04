@@ -17,7 +17,6 @@
     "@gluestack-ui/divider": "^0.1.10",
     "@gluestack-ui/fab": "^0.1.28",
     "@gluestack-ui/form-control": "^0.1.19",
-    "@gluestack-ui/icon": "^0.1.27",
     "@gluestack-ui/image": "^0.1.17",
     "@gluestack-ui/input": "^0.1.38",
     "@gluestack-ui/link": "^0.1.29",
@@ -58,7 +57,6 @@
     "react-native-reanimated": "~3.17.5",
     "react-native-safe-area-context": "5.4.1",
     "react-native-screens": "~4.10.0",
-    "react-native-toast-message": "^2.3.0",
     "react-native-web": "~0.20.0",
     "react-native-webview": "13.13.5",
     "tailwindcss": "3.4.17"

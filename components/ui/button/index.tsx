@@ -1,15 +1,14 @@
 'use client';
-import React from 'react';
+import { AntDesign } from '@expo/vector-icons';
 import { createButton } from '@gluestack-ui/button';
+import type { VariantProps } from '@gluestack-ui/nativewind-utils';
 import { tva } from '@gluestack-ui/nativewind-utils/tva';
 import {
-  withStyleContext,
   useStyleContext,
+  withStyleContext,
 } from '@gluestack-ui/nativewind-utils/withStyleContext';
-import { cssInterop } from 'nativewind';
+import React from 'react';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
-import type { VariantProps } from '@gluestack-ui/nativewind-utils';
-import { PrimitiveIcon, UIIcon } from '@gluestack-ui/icon';
 
 const SCOPE = 'BUTTON';
 
@@ -20,20 +19,7 @@ const UIButton = createButton({
   Text,
   Group: View,
   Spinner: ActivityIndicator,
-  Icon: UIIcon,
-});
-
-cssInterop(PrimitiveIcon, {
-  className: {
-    target: 'style',
-    nativeStyleToProp: {
-      height: true,
-      width: true,
-      fill: true,
-      color: 'classNameColor',
-      stroke: true,
-    },
-  },
+  Icon: AntDesign,
 });
 
 const buttonStyle = tva({
@@ -335,56 +321,45 @@ const ButtonText = React.forwardRef<
 
 const ButtonSpinner = UIButton.Spinner;
 
-type IButtonIcon = React.ComponentPropsWithoutRef<typeof UIButton.Icon> &
-  VariantProps<typeof buttonIconStyle> & {
-    className?: string | undefined;
-    as?: React.ElementType;
-    height?: number;
-    width?: number;
-  };
+type IButtonIcon = React.ComponentPropsWithoutRef<typeof UIButton.Icon> & {
+  name: keyof typeof AntDesign.glyphMap; // 添加 name 属性类型
+  size?: number;
+  color?: string;
+  className?: string;
+};
 
 const ButtonIcon = React.forwardRef<
   React.ComponentRef<typeof UIButton.Icon>,
   IButtonIcon
->(function ButtonIcon({ className, size, ...props }, ref) {
+>(function ButtonIcon({ className, size, color, name, ...props }, ref) {
   const {
     variant: parentVariant,
     size: parentSize,
     action: parentAction,
   } = useStyleContext(SCOPE);
 
-  if (typeof size === 'number') {
-    return (
-      <UIButton.Icon
-        ref={ref}
-        {...props}
-        className={buttonIconStyle({ class: className })}
-        size={size}
-      />
-    );
-  } else if (
-    (props.height !== undefined || props.width !== undefined) &&
-    size === undefined
-  ) {
-    return (
-      <UIButton.Icon
-        ref={ref}
-        {...props}
-        className={buttonIconStyle({ class: className })}
-      />
-    );
-  }
+  // 根据父级大小设置图标大小
+  const iconSize = size || {
+    xs: 14,
+    sm: 16,
+    md: 18,
+    lg: 20,
+    xl: 22
+  }[parentSize as keyof typeof buttonIconStyle.variants.size] || 18;
+
   return (
     <UIButton.Icon
+      name={name}
+      size={iconSize}
+      color={color}
       {...props}
       className={buttonIconStyle({
         parentVariants: {
-          size: parentSize,
           variant: parentVariant,
+          size: parentSize,
           action: parentAction,
         },
-        size,
-        class: className,
+        class: className
       })}
       ref={ref}
     />
@@ -427,4 +402,5 @@ ButtonSpinner.displayName = 'ButtonSpinner';
 ButtonIcon.displayName = 'ButtonIcon';
 ButtonGroup.displayName = 'ButtonGroup';
 
-export { Button, ButtonText, ButtonSpinner, ButtonIcon, ButtonGroup };
+export { Button, ButtonGroup, ButtonIcon, ButtonSpinner, ButtonText };
+
