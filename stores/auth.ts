@@ -1,7 +1,7 @@
 import { IDENTITY_KEY, TOKEN } from '@/constant/auth';
 import { TIdentity } from '@/global';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { configure, makeAutoObservable, runInAction } from 'mobx';
+import { action, configure, makeAutoObservable, runInAction } from 'mobx';
 
 configure({
   enforceActions: 'always',
@@ -68,7 +68,7 @@ class AuthStore {
    * @param isLogin 是否处于登录状态
    * @param totken token令牌
    */
-  async setLoginState(isLogin: boolean, token?: string) {
+  setLoginState = action(async (isLogin: boolean, token?: string) => {
     try {
       if (!isLogin) await AsyncStorage.removeItem(TOKEN);
       else if (isLogin && token) {
@@ -79,7 +79,7 @@ class AuthStore {
     } catch (error) {
       console.error('Failed to setLoginState because of set token by AsyncStorage', error);
     }
-  }
+  })
 
   /**
    * 设置当前身份
