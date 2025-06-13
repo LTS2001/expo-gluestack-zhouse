@@ -1,7 +1,22 @@
 import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
 import { Toast } from '@/components/ui/toast';
+import {
+  COMPLAINT_LIST_HREF,
+  COMPLAINT_LIST_TEXT,
+  LANDLORD_REPORT_HREF,
+  LANDLORD_REPORT_TEXT,
+  LEASE_NOTICE_HREF,
+  LEASE_NOTICE_TEXT,
+  SELF_INFO_HREF,
+  SELF_INFO_TEXT,
+  TENANT_COLLECT_HREF,
+  TENANT_COLLECT_TEXT,
+  TENANT_HISTORY_HREF,
+  TENANT_HISTORY_TEXT,
+  TENANT_REPORT_HREF,
+  TENANT_REPORT_TEXT,
+} from '@/constants/domain';
 import '@/global.css';
-import { useColorScheme } from '@/hooks/useColorScheme';
 import {
   DarkTheme,
   DefaultTheme,
@@ -25,12 +40,44 @@ export default function RootLayout() {
   }
 
   return (
-    <GluestackUIProvider mode={colorScheme ?? "light"}>
+    <GluestackUIProvider mode={colorScheme ?? 'light'}>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack initialRouteName='identity'>
+        <Stack
+          initialRouteName='identity'
+          screenOptions={{ headerTitleAlign: 'center' }}
+        >
           <Stack.Screen name='identity' options={{ headerShown: false }} />
           <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
+          <Stack.Screen name='login' options={{ headerShown: false }} />
+          <Stack.Screen
+            name={SELF_INFO_HREF}
+            options={{ title: SELF_INFO_TEXT }}
+          />
+          <Stack.Screen
+            name={TENANT_REPORT_HREF}
+            options={{ title: TENANT_REPORT_TEXT }}
+          />
+          <Stack.Screen
+            name={TENANT_COLLECT_HREF}
+            options={{ title: TENANT_COLLECT_TEXT }}
+          />
+          <Stack.Screen
+            name={TENANT_HISTORY_HREF}
+            options={{ title: TENANT_HISTORY_TEXT }}
+          />
+          <Stack.Screen
+            name={COMPLAINT_LIST_HREF}
+            options={{ title: COMPLAINT_LIST_TEXT }}
+          />
+          <Stack.Screen
+            name={LANDLORD_REPORT_HREF}
+            options={{ title: LANDLORD_REPORT_TEXT }}
+          />
+          <Stack.Screen
+            name={LEASE_NOTICE_HREF}
+            options={{ title: LEASE_NOTICE_TEXT }}
+          />
+          <Stack.Screen name='+not-found' />
         </Stack>
         <StatusBar style='auto' />
         <Toast />

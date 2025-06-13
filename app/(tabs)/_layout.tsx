@@ -21,7 +21,7 @@ export default function Layout() {
         name='market'
         options={{
           title: '房屋市场',
-          tabBarIcon: ({ focused }) => <Icon as='MaterialIcons' name="home-repair-service" size={26} color={getIconColor(focused)} />
+          tabBarIcon: ({ focused }) => <Icon as='MaterialIcons' name="home-repair-service" size={28} color={getIconColor(focused)} />
         }}
       />
       <Tabs.Screen

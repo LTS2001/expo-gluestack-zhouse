@@ -2,7 +2,7 @@ import { IExistLease, IUser } from '@/global';
 import { configure, makeAutoObservable } from 'mobx';
 
 configure({
-  enforceActions: 'always'
+  enforceActions: 'always',
 });
 
 class UserStore {
@@ -13,7 +13,7 @@ class UserStore {
   /**
    * user information
    */
-  user: IUser | undefined;
+  user: IUser | undefined = undefined;
 
   /**
    * current landlord info

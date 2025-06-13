@@ -1,16 +1,16 @@
 /**
- * 登录态token
+ * login status token
  */
 export const TOKEN = 'jwt_token';
 /**
- * 房东身份
+ * landlord identity
  */
 export const LANDLORD = 'landlord';
 /**
- * 租客身份
+ * tenant identity
  */
 export const TENANT = 'tenant';
 /**
- * 身份key
+ * identity key
  */
 export const IDENTITY_KEY = 'identity_key';

@@ -1,30 +1,20 @@
-import { showToast } from '@tarojs/taro';
+import { userLogout } from '@/services/user';
+import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
-import { Button } from '@tarojs/components';
-import AlterComp from '@/components/Alter';
-import useTenant from '@/hooks/useTenant';
-import authStore from '@/stores/AuthStore';
-import AuthConstant from '@/constant/AuthConstant';
-import useLandlord from '@/hooks/useLandlord';
+import { AlertDialogGroup } from '../ui/alert-dialog';
+import { Button, ButtonText } from '../ui/button';
+import { showToast } from '../ui/toast';
 interface IProps {
   isLogin: boolean;
 }
 const Logout = (props: IProps) => {
   const { isLogin } = props;
   const [logoutPopupVisible, setLogoutPopupVisible] = useState(false);
-  const { tenantLogout } = useTenant();
-  const { landlordLogout } = useLandlord();
-  const { identity } = authStore;
-  const { TENANT, LANDLORD } = AuthConstant;
   /**
    * 确认退出登录
    */
   const confirmLogout = () => {
-    if (identity === LANDLORD) {
-      landlordLogout();
-    } else if (identity === TENANT) {
-      tenantLogout();
-    }
+    userLogout();
     setLogoutPopupVisible(false);
     showToast({
       title: '已退出登录！',
@@ -34,13 +24,14 @@ const Logout = (props: IProps) => {
     <>
       {isLogin && (
         <Button
-          className='logout-btn'
-          onClick={() => setLogoutPopupVisible(true)}
+          className='mx-6'
+          size='lg'
+          onTouchEnd={() => setLogoutPopupVisible(true)}
         >
-          退出登录
+          <ButtonText>退出登录</ButtonText>
         </Button>
       )}
-      <AlterComp
+      <AlertDialogGroup
         visible={logoutPopupVisible}
         onClose={() => setLogoutPopupVisible(false)}
         onConfirm={confirmLogout}
@@ -50,4 +41,4 @@ const Logout = (props: IProps) => {
   );
 };
 
-export default Logout;
+export default observer(Logout);

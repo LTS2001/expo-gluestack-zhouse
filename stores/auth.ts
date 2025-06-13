@@ -1,7 +1,7 @@
-import { IDENTITY_KEY, TOKEN } from '@/constant/auth';
+import { IDENTITY_KEY, TOKEN } from '@/constants/auth';
 import { TIdentity } from '@/global';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { action, configure, makeAutoObservable, runInAction } from 'mobx';
+import { configure, makeAutoObservable } from 'mobx';
 
 configure({
   enforceActions: 'always',
@@ -11,78 +11,79 @@ class AuthStore {
     try {
       const [storedToken, storedIdentity] = await Promise.all([
         AsyncStorage.getItem(TOKEN),
-        AsyncStorage.getItem(IDENTITY_KEY)
-      ])
-      runInAction(() => {
-        this.token = storedToken
-        this.identity = storedIdentity as TIdentity
-        this.isLogin = !!storedToken
-      })
+        AsyncStorage.getItem(IDENTITY_KEY),
+      ]);
+      this.token = storedToken;
+      this.identity = storedIdentity as TIdentity;
+      this.isLogin = !!storedToken;
     } catch (error) {
       console.error('Failed to initialize store:', error);
     } finally {
-      runInAction(() => {
-        this.isInitialized = true
-      })
+      this.isInitialized = true;
     }
   }
 
   constructor() {
     makeAutoObservable(this, {}, { autoBind: true });
-    this.initializeStore()
+    this.initializeStore();
   }
   /**
-   * 初始化状态标识
+   * initialization status identification
    */
-  isInitialized: boolean = false
+  isInitialized: boolean = false;
 
   /**
-   * 登录态token
+   * user login status token
    */
-  token: string | null = null;
+  token: string | undefined | null = undefined;
 
   /**
-   * 标志是否处于登录
+   * flag user is login status
    */
   isLogin: boolean = false;
 
   /**
-   * 当前身份
+   * currently identity
    */
-  identity: TIdentity | null = null;
+  identity: TIdentity | undefined = undefined;
 
   /**
-   * 上一个身份
+   * previous identity
    */
-  preIdentity: TIdentity | null = null;
+  preIdentity: TIdentity | undefined = undefined;
 
   /**
-   * 设置token值
+   * set token
    */
   async setToken(token: string) {
     this.token = token;
   }
 
   /**
-   * 设置登录态
-   * @param isLogin 是否处于登录状态
-   * @param totken token令牌
+   * set login status
+   * @param isLogin login status
+   * @param totken token
    */
-  setLoginState = action(async (isLogin: boolean, token?: string) => {
+  async setLoginState(isLogin: boolean, token?: string) {
     try {
+      // logout
       if (!isLogin) await AsyncStorage.removeItem(TOKEN);
+      // login
       else if (isLogin && token) {
         await AsyncStorage.setItem(TOKEN, token);
         this.token = token;
       }
       this.isLogin = isLogin;
     } catch (error) {
-      console.error('Failed to setLoginState because of set token by AsyncStorage', error);
+      console.error(
+        'Failed to setLoginState because of set token by AsyncStorage',
+        error
+      );
     }
-  })
+  }
 
   /**
-   * 设置当前身份
+   * set currently identity
    */
   async setIdentityState(identity: TIdentity) {
     try {
@@ -94,19 +95,19 @@ class AuthStore {
   }
 
   /**
-   * 清除当前身份
+   * clear currently identity
    */
   async clearIdentityState() {
     try {
       await AsyncStorage.removeItem(IDENTITY_KEY);
-      this.identity = null;
+      this.identity = undefined;
     } catch (error) {
       console.error('Failed to clearIdentityState', error);
     }
   }
 
   /**
-   * 设置上一个身份
+   * set previous identity
    */
   async setPreIdentityState(identity: TIdentity) {
     this.preIdentity = identity;

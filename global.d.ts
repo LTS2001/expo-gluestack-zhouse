@@ -711,4 +711,22 @@ declare module '@/global' {
     identityNumber: string;
     identityImg: string;
   }
+
+  /**
+   * server return base response format
+   */
+  interface BaseRes<T = any> {
+    code: number;
+    message: string;
+    data: T
+  }
+
+  /**
+   * login request params type
+   */
+  type ILogin = {
+    phone: string
+    password: string
+  }
+  type IRegister = ILogin
 }
