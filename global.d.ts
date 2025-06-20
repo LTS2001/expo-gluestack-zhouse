@@ -650,7 +650,7 @@ declare module '@/global' {
   /**
    * landlord and tenant interface
    */
-  interface IUser {
+  interface IUser extends IUserVerify {
     /**
      * user id
      */
@@ -682,11 +682,11 @@ declare module '@/global' {
     /**
      * register date
      */
-    createdAt?: Date;
+    createdAt?: string;
     /**
      * update date
      */
-    updatedAt?: Date;
+    updatedAt?: string;
   }
 
   /**
@@ -718,15 +718,23 @@ declare module '@/global' {
   interface BaseRes<T = any> {
     code: number;
     message: string;
-    data: T
+    data: T;
   }
 
   /**
    * login request params type
    */
   type ILogin = {
-    phone: string
-    password: string
+    phone: string;
+    password: string;
+  };
+  type IRegister = ILogin;
+
+  /**
+   * update base user info interface
+   */
+  interface IUpdateBaseUserInfo {
+    name?: string;
+    remark?: string;
   }
-  type IRegister = ILogin
 }

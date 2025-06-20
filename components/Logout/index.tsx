@@ -1,4 +1,4 @@
-import { userLogout } from '@/services/user';
+import useUser from '@/hooks/useUser';
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { AlertDialogGroup } from '../ui/alert-dialog';
@@ -10,6 +10,7 @@ interface IProps {
 const Logout = (props: IProps) => {
   const { isLogin } = props;
   const [logoutPopupVisible, setLogoutPopupVisible] = useState(false);
+  const { userLogout } = useUser();
   /**
    * 确认退出登录
    */
@@ -18,6 +19,7 @@ const Logout = (props: IProps) => {
     setLogoutPopupVisible(false);
     showToast({
       title: '已退出登录！',
+      icon: 'success',
     });
   };
   return (

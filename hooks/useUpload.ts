@@ -1,0 +1,44 @@
+import { showToast } from '@/components/ui/toast';
+import { uploadUserHeadImg } from '@/request/api/medium';
+import * as ImagePicker from 'expo-image-picker';
+import useUser from './useUser';
+export default function useUpload() {
+  const { getUserInfo } = useUser();
+  /**
+   * upload user header image
+   */
+  const uploadHeaderImage = async () => {
+    try {
+      // request permission
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        showToast({ title: '需要相册权限才能上传头像' });
+        return;
+      }
+      // open image picker
+      const result = await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
+      if (!result.canceled) {
+        const uri = result.assets[0].uri;
+        const formData = new FormData();
+        formData.append('avatar', {
+          uri,
+          type: 'image/jpeg',
+          name: 'avatar.jpg',
+        } as any);
+        const res = await uploadUserHeadImg(formData);
+        await getUserInfo()
+        return res
+      }
+    } catch (error) {
+      console.error('选择图片失败:', error);
+      showToast({ title: '选择图片失败，请重试', icon: 'error' });
+    }
+  };
+
+  return { uploadHeaderImage };
+}

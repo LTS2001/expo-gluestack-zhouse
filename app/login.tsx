@@ -10,18 +10,19 @@ import { Text } from '@/components/ui/text';
 import { showToast } from '@/components/ui/toast';
 import { View } from '@/components/ui/view';
 import { LANDLORD, TENANT } from '@/constants/auth';
+import useUser from '@/hooks/useUser';
 import { login, registry } from '@/request/api/user';
-import { getUserInfo } from '@/services/user';
 import authStore from '@/stores/auth';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { z } from 'zod';
 
 export default function Login() {
   const { identity } = authStore;
+  const { getUserInfo } = useUser();
   const insets = useSafeAreaInsets();
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [checkPasswordVisible, setCheckPasswordVisible] = useState(false);
@@ -90,7 +91,7 @@ export default function Login() {
     try {
       if (isRegister) {
         await registry({ phone, password });
-        showToast({ title: '注册成功！' });
+        showToast({ title: '注册成功！', icon: 'success' });
         setIsRegister(false);
       } else {
         await login({ phone, password });

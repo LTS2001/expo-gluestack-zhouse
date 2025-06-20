@@ -155,7 +155,7 @@ interface IShowToastProps {
   descStyles?: IToastDescriptionProps;
   action?: keyof typeof toastTitleStyle.variants.action;
   variant?: keyof typeof toastTitleStyle.variants.variant;
-  icon?: React.ReactNode;
+  icon?: React.ReactNode | 'success' | 'error';
 }
 
 const Toast = (props: ToastProps) => {
@@ -203,9 +203,35 @@ const Toast = (props: ToastProps) => {
             >
               <View className='flex-row justify-center'>
                 {icon ? (
-                  icon
+                  typeof icon === 'string' ? (
+                    icon === 'success' ? (
+                      <Icon
+                        as='AntDesign'
+                        name='smileo'
+                        size={16}
+                        lightColor='white'
+                        darkColor='black'
+                      />
+                    ) : icon === 'error' ? (
+                      <Icon
+                        as='AntDesign'
+                        name='frowno'
+                        size={16}
+                        lightColor='white'
+                        darkColor='black'
+                      />
+                    ) : null
+                  ) : (
+                    icon
+                  )
                 ) : (
-                  <Icon as='AntDesign' name='exclamationcircle' size={16} />
+                  <Icon
+                    as='AntDesign'
+                    name='exclamationcircle'
+                    size={16}
+                    lightColor='white'
+                    darkColor='black'
+                  />
                 )}
                 <Text
                   aria-live='assertive'
@@ -286,3 +312,4 @@ const showToast = (
 };
 
 export { showToast, Toast };
+

@@ -1,5 +1,5 @@
 import Domain from '@/components/domain';
-import Logout from '@/components/Logout';
+import Logout from '@/components/logout';
 import { Icon } from '@/components/ui/icon';
 import { Image } from '@/components/ui/image';
 import { Text } from '@/components/ui/text';
@@ -20,12 +20,12 @@ import {
   TENANT_REPORT_TEXT,
 } from '@/constants/domain';
 import useIdentity from '@/hooks/useIdentity';
-import { getUserInfo } from '@/services/user';
+import useUser from '@/hooks/useUser';
 import authStore from '@/stores/auth';
 import userStore from '@/stores/user';
 import { router } from 'expo-router';
 import { observer } from 'mobx-react-lite';
-import React, { useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 function SwitchIdentityIcon() {
@@ -99,8 +99,7 @@ const Landlord = observer(() => {
           onTouchEnd={() => router.push(isLogin ? '/self-info' : '/login')}
         >
           <Image
-            source={require('@/assets/images/tenant.png')}
-            alt=''
+            src={user?.headImg}
             className='bg-white rounded-full shadow-hard-1'
             size='xl'
             needShadow
@@ -187,8 +186,7 @@ const Tenant = observer(() => {
         >
           <View className='-mt-16'>
             <Image
-              source={require('@/assets/images/tenant.png')}
-              alt=''
+              src={user?.headImg}
               className='bg-white rounded-full'
               size='xl'
               needShadow
@@ -210,10 +208,14 @@ const Tenant = observer(() => {
 });
 
 function User() {
-  const { identity } = authStore;
+  const { identity, isLogin } = authStore;
+  const { getUserInfo, userLogout } = useUser();
   useEffect(() => {
     getUserInfo();
-  }, []);
+  }, [getUserInfo]);
+  useEffect(() => {
+    if (!isLogin) userLogout();
+  }, [isLogin, userLogout]);
   return (
     <View className='bg-secondary-0 flex-1'>
       {identity === 'landlord' ? (
