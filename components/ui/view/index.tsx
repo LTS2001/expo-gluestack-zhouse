@@ -1,6 +1,5 @@
 import { type VariantProps } from '@gluestack-ui/nativewind-utils';
 import { tva } from '@gluestack-ui/nativewind-utils/tva';
-import cls from 'classnames';
 import React from 'react';
 import { View as RNView, useColorScheme, ViewProps } from 'react-native';
 const viewStyle = tva({});
@@ -15,22 +14,25 @@ type IViewProps = ViewProps &
   };
 
 const View = React.forwardRef<React.ComponentRef<typeof RNView>, IViewProps>(
-  function View({ className, needShadow, ...props }, ref) {
+  function View({ className, needShadow, style: _style, ...props }, ref) {
     const colorSchema = useColorScheme();
-    const _className = cls([
-      className,
-      needShadow
-        ? {
-            'shadow-hard-1': colorSchema === 'light',
-            'shadow-hard-4': colorSchema === 'dark',
-          }
-        : null,
-    ]);
     return (
       <RNView
         ref={ref}
         {...props}
-        className={viewStyle({ class: _className })}
+        className={viewStyle({ class: className })}
+        style={Object.assign(
+          needShadow
+            ? {
+                shadowColor: colorSchema === 'light' ? '#000' : '#fff',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.25,
+                shadowRadius: 8,
+                elevation: 8,
+              }
+            : {},
+          _style
+        )}
       />
     );
   }

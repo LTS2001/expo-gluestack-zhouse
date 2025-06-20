@@ -2,7 +2,6 @@
 import { createImage } from '@gluestack-ui/image';
 import type { VariantProps } from '@gluestack-ui/nativewind-utils';
 import { tva } from '@gluestack-ui/nativewind-utils/tva';
-import cls from 'classnames';
 import React from 'react';
 import { Platform, Image as RNImage, useColorScheme } from 'react-native';
 
@@ -38,29 +37,33 @@ const Image = React.forwardRef<
      */
     needShadow?: boolean;
   }
->(function Image({ size = 'md', className, needShadow, ...props }, ref) {
+>(function Image(
+  { size = 'md', className, needShadow, style: _style, ...props },
+  ref
+) {
   const colorSchema = useColorScheme();
-  const _className = cls([
-    className,
-    needShadow
-      ? {
-          'shadow-hard-1': colorSchema === 'light',
-          'shadow-hard-4': colorSchema === 'dark',
-        }
-      : null,
-  ]);
   return (
     <UIImage
-      className={imageStyle({ size, class: _className })}
+      className={imageStyle({ size, class: className })}
       alt=''
       {...props}
       ref={ref}
-      // @ts-expect-error : web only
-      style={
-        Platform.OS === 'web'
-          ? { height: 'revert-layer', width: 'revert-layer' }
-          : undefined
-      }
+      style={Object.assign(
+        needShadow
+          ? {
+              shadowColor: colorSchema === 'light' ? '#000' : '#fff',
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.25,
+              shadowRadius: 8,
+              ...(Platform.OS === 'android'
+                ? {
+                    elevation: 8,
+                  }
+                : {}),
+            }
+          : {},
+        _style
+      )}
     />
   );
 });
