@@ -20,9 +20,11 @@ import userStore from '@/stores/user';
 import { formatUtcTime } from '@/utils/common';
 import { zodResolver } from '@hookform/resolvers/zod';
 import cls from 'classnames';
+import { router } from 'expo-router';
 import { observer } from 'mobx-react-lite';
 import { ReactNode, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { ScrollView } from 'react-native';
 import { z } from 'zod';
 interface IUserInfoConfig {
   type: 'text' | 'image' | 'node';
@@ -179,40 +181,43 @@ const SelfInfo = () => {
     showToast({ title: '保存成功', icon: 'success' });
   };
   return (
-    <>
-      <View className='bg-background-0 px-4 py-1'>
+    <ScrollView showsVerticalScrollIndicator={false}>
+      <View className='bg-background-0 px-4 rounded-xl'>
         {userInfoConfig.map((info, idx) => {
+          const { event, text, type, content } = info;
           return (
             <View
               className={cls([
-                'flex-row items-center py-5 border-secondary-400',
+                'flex-row items-center py-5 border-secondary-400 px-2',
                 {
                   'border-b': idx !== userInfoConfig.length - 1,
                 },
               ])}
               key={idx}
-              onTouchEnd={info.event}
+              onTouchEnd={event}
             >
-              <Text className='flex-1 text-lg'>{info.text}</Text>
-              {info.type === 'text' ? (
-                <Text className='text-lg text-primary-100'>{info.content}</Text>
+              <Text className='flex-1 text-lg'>{text}</Text>
+              {type === 'text' ? (
+                <Text className='text-lg text-primary-100'>{content}</Text>
               ) : (
-                info.content
+                content
               )}
-              <Icon as='AntDesign' name='right' size={18} className='ml-2' />
+              {event && (
+                <Icon as='AntDesign' name='right' size={18} className='ml-2 -mr-2' />
+              )}
             </View>
           );
         })}
       </View>
-      <View className='info-wrap'>
+      <View className='bg-background-0 px-4 mt-4 rounded-xl'>
         {/* 实名信息 */}
         {user?.status === NORMAL &&
           identityInfoConfig.map((info, idx) => (
             <View
               className={cls([
-                'flex-row items-center py-5 border-secondary-400',
+                'flex-row items-center py-4 border-secondary-400 px-2',
                 {
-                  'border-b': idx !== userInfoConfig.length - 1,
+                  'border-b': idx !== identityInfoConfig.length - 1,
                 },
               ])}
               key={idx}
@@ -231,10 +236,7 @@ const SelfInfo = () => {
       {user?.status === UN_IDENTITY && (
         <View
           className='mx-4 my-10'
-          onTouchEnd={
-            () => {}
-            // navigateTo({ url: '/pages/identityVerification/index' })
-          }
+          onTouchEnd={() => router.push('/identity-verify')}
         >
           <Button>
             <ButtonText>去实名</ButtonText>
@@ -283,7 +285,7 @@ const SelfInfo = () => {
           </FormControl>
         }
       />
-    </>
+    </ScrollView>
   );
 };
 

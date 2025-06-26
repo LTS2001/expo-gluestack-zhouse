@@ -2,21 +2,35 @@
  * 格式化世界标准时间
  * @param utcTime 世界标准时间
  */
-export function formatUtcTime(utcTime?: Date | string | null) {
+export function formatUtcTime(
+  utcTime?: Date | string | null,
+  precision?: 'year' | 'month' | 'day' | 'minute' | 'second'
+) {
   if (!utcTime) return '';
   const d = new Date(utcTime);
   const year = d.getFullYear();
   let month: number | string = d.getMonth() + 1;
-  month = month < 10 ? "0" + month : month;
+  month = month < 10 ? '0' + month : month;
   let day: number | string = d.getUTCDate();
-  day = day < 10 ? "0" + day : day;
+  day = day < 10 ? '0' + day : day;
   let hours: number | string = d.getHours();
-  hours = hours < 10 ? "0" + hours : hours;
+  hours = hours < 10 ? '0' + hours : hours;
   let minutes: number | string = d.getMinutes();
-  minutes = minutes < 10 ? "0" + minutes : minutes;
+  minutes = minutes < 10 ? '0' + minutes : minutes;
   let seconds: number | string = d.getSeconds();
-  seconds = seconds < 10 ? "0" + seconds : seconds;
-  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  seconds = seconds < 10 ? '0' + seconds : seconds;
+  switch (precision) {
+    case 'year':
+      return `${year}`;
+    case 'month':
+      return `${year}-${month}`;
+    case 'day':
+      return `${year}-${month}-${day}`;
+    case 'minute':
+      return `${year}-${month}-${day} ${hours}:${minutes}`;
+    default:
+      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  }
 }
 
 /**
@@ -63,9 +77,9 @@ export function formatChatDate(formatDate: Date, isSession?: boolean) {
   const month: number | string = date.getMonth() + 1;
   const day: number | string = date.getUTCDate();
   let hours: number | string = date.getHours();
-  hours = hours < 10 ? "0" + hours : hours;
+  hours = hours < 10 ? '0' + hours : hours;
   let minutes: number | string = date.getMinutes();
-  minutes = minutes < 10 ? "0" + minutes : minutes;
+  minutes = minutes < 10 ? '0' + minutes : minutes;
   if (
     year === today.getFullYear() &&
     date.getMonth() === today.getMonth() &&
@@ -79,7 +93,7 @@ export function formatChatDate(formatDate: Date, isSession?: boolean) {
     date.getDate() === yesterday.getDate()
   ) {
     // 昨天
-    return isSession ? "昨天" : `昨天 ${hours}:${minutes}`;
+    return isSession ? '昨天' : `昨天 ${hours}:${minutes}`;
   } else if (year === today.getFullYear()) {
     // 今年
     return isSession
@@ -166,9 +180,8 @@ export function addMonthsToDate(
 export function getPreviousMonth(yearMonth) {
   const [year, month] = yearMonth.split('-').map(Number);
   const date = new Date(year, month - 1, 1); // 当前月份的第一天
-  date.setMonth(date.getMonth() - 1);       // 设置为上一个月
+  date.setMonth(date.getMonth() - 1); // 设置为上一个月
   const previousYear = date.getFullYear();
   const previousMonth = String(date.getMonth() + 1).padStart(2, '0'); // 保证两位
   return `${previousYear}-${previousMonth}`;
 }
-

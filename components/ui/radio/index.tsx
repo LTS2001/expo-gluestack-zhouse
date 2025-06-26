@@ -1,15 +1,14 @@
 'use client';
-import React from 'react';
-import { createRadio } from '@gluestack-ui/radio';
-import { Pressable, View, Platform, Text } from 'react-native';
+import type { VariantProps } from '@gluestack-ui/nativewind-utils';
 import { tva } from '@gluestack-ui/nativewind-utils/tva';
 import {
-  withStyleContext,
   useStyleContext,
+  withStyleContext,
 } from '@gluestack-ui/nativewind-utils/withStyleContext';
-import { cssInterop } from 'nativewind';
-import type { VariantProps } from '@gluestack-ui/nativewind-utils';
-import { PrimitiveIcon, UIIcon } from '@gluestack-ui/icon';
+import { createRadio } from '@gluestack-ui/radio';
+import React from 'react';
+import { Platform, Pressable, Text, View } from 'react-native';
+import { Icon } from '../icon';
 
 const SCOPE = 'Radio';
 
@@ -20,22 +19,9 @@ const UIRadio = createRadio({
     typeof withStyleContext<typeof Pressable>
   >,
   Group: View,
-  Icon: UIIcon,
+  Icon: Icon,
   Indicator: View,
   Label: Text,
-});
-
-cssInterop(PrimitiveIcon, {
-  className: {
-    target: 'style',
-    nativeStyleToProp: {
-      height: true,
-      width: true,
-      fill: true,
-      color: 'classNameColor',
-      stroke: true,
-    },
-  },
 });
 
 const radioStyle = tva({
@@ -55,14 +41,6 @@ const radioGroupStyle = tva({
 
 const radioIconStyle = tva({
   base: 'rounded-full justify-center items-center text-primary-800 fill-primary-800',
-
-  parentVariants: {
-    size: {
-      sm: 'h-[9px] w-[9px]',
-      md: 'h-3 w-3',
-      lg: 'h-4 w-4',
-    },
-  },
 });
 
 const radioIndicatorStyle = tva({
@@ -81,11 +59,11 @@ const radioLabelStyle = tva({
   parentVariants: {
     size: {
       '2xs': 'text-2xs',
-      'xs': 'text-xs',
-      'sm': 'text-sm',
-      'md': 'text-base',
-      'lg': 'text-lg',
-      'xl': 'text-xl',
+      xs: 'text-xs',
+      sm: 'text-sm',
+      md: 'text-base',
+      lg: 'text-lg',
+      xl: 'text-xl',
       '2xl': 'text-2xl',
       '3xl': 'text-3xl',
       '4xl': 'text-4xl',
@@ -163,50 +141,20 @@ const RadioLabel = React.forwardRef<
   );
 });
 
-type IRadioIconProps = React.ComponentProps<typeof UIRadio.Icon> &
-  VariantProps<typeof radioIconStyle> & {
-    height?: number;
-    width?: number;
-  };
+type IRadioIconProps = VariantProps<typeof radioIconStyle> & {
+  height?: number;
+  width?: number;
+} & React.ComponentProps<typeof UIRadio.Icon>;
 const RadioIcon = React.forwardRef<
   React.ComponentRef<typeof UIRadio.Icon>,
   IRadioIconProps
 >(function RadioIcon({ className, size, ...props }, ref) {
-  const { size: parentSize } = useStyleContext(SCOPE);
-
-  if (typeof size === 'number') {
-    return (
-      <UIRadio.Icon
-        ref={ref}
-        {...props}
-        className={radioIconStyle({ class: className })}
-        size={size}
-      />
-    );
-  } else if (
-    (props.height !== undefined || props.width !== undefined) &&
-    size === undefined
-  ) {
-    return (
-      <UIRadio.Icon
-        ref={ref}
-        {...props}
-        className={radioIconStyle({ class: className })}
-      />
-    );
-  }
-
   return (
     <UIRadio.Icon
-      {...props}
-      className={radioIconStyle({
-        parentVariants: {
-          size: parentSize,
-        },
-        size,
-        class: className,
-      })}
       ref={ref}
+      {...props}
+      className={radioIconStyle({ class: className })}
+      size={size}
     />
   );
 });
@@ -217,4 +165,4 @@ RadioIndicator.displayName = 'RadioIndicator';
 RadioLabel.displayName = 'RadioLabel';
 RadioIcon.displayName = 'RadioIcon';
 
-export { Radio, RadioGroup, RadioIndicator, RadioLabel, RadioIcon };
+export { Radio, RadioGroup, RadioIcon, RadioIndicator, RadioLabel };

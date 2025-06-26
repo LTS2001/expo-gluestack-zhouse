@@ -1,5 +1,5 @@
 import { showToast } from '@/components/ui/toast';
-import { uploadUserHeadImg } from '@/request/api/medium';
+import { uploadImgVideo, uploadUserHeadImg } from '@/request/api/medium';
 import * as ImagePicker from 'expo-image-picker';
 import useUser from './useUser';
 export default function useUpload() {
@@ -31,8 +31,8 @@ export default function useUpload() {
           name: 'avatar.jpg',
         } as any);
         const res = await uploadUserHeadImg(formData);
-        await getUserInfo()
-        return res
+        await getUserInfo();
+        return res;
       }
     } catch (error) {
       console.error('选择图片失败:', error);
@@ -40,5 +40,37 @@ export default function useUpload() {
     }
   };
 
-  return { uploadHeaderImage };
+  const uploadIdentityCardImage = async () => {
+    try {
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        showToast({ title: '需要相册权限才能上传' });
+        return Promise.reject();
+      }
+      // open image picker
+      const result = await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: true,
+        aspect: [16, 10],
+        quality: 1,
+      });
+      if (!result.canceled) {
+        const uri = result.assets[0].uri;
+        const formData = new FormData();
+        formData.append('identity', {
+          uri,
+          type: 'image/jpeg',
+          name: 'identity.jpg',
+        } as any);
+        const res = await uploadImgVideo(formData);
+        return res;
+      }
+      return Promise.reject();
+    } catch (error) {
+      console.error('选择图片失败:', error);
+      showToast({ title: '上传身份证失败，请重试', icon: 'error' });
+    }
+  };
+
+  return { uploadHeaderImage, uploadIdentityCardImage };
 }

@@ -77,6 +77,10 @@ export default function RootLayout() {
             name={LEASE_NOTICE_HREF}
             options={{ title: LEASE_NOTICE_TEXT }}
           />
+          <Stack.Screen
+            name='identity-verify'
+            options={{ title: '实名认证' }}
+          />
           <Stack.Screen name='+not-found' />
         </Stack>
         <StatusBar style='auto' />

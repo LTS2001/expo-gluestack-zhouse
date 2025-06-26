@@ -4,7 +4,7 @@ import { BaseRes } from '@/global';
 import authStore from '@/stores/auth';
 import _, { AxiosResponse } from 'axios';
 const axios = _.create({
-  baseURL: 'http://192.168.1.102:7002',
+  baseURL: 'http://172.63.48.66:7002',
   timeout: 5000,
 });
 
@@ -13,7 +13,7 @@ axios.interceptors.request.use(
     // each request carries the authorization field
     config.headers.Authorization = authStore.token;
     // matching these strings means uploading an image or video
-    if (/(\/headImg|\/medium|\/medium\/chat)$/.test(config.url!)) {
+    if (/(\/headImg|medium)$/.test(config.url!)) {
       config.headers['Content-Type'] = 'multipart/form-data';
     }
     return config;
@@ -44,10 +44,10 @@ axios.interceptors.response.use(
           await authStore.setLoginState(false);
         }
         showToast({ title: '未登录' });
-        return new Promise(() => { });
+        return new Promise(() => {});
       } else {
         showToast({ title: res.data.message });
-        return new Promise(() => { });
+        return new Promise(() => {});
       }
     }
   },
@@ -56,9 +56,8 @@ axios.interceptors.response.use(
     console.log('axios error', error);
     showToast({ title: '请求出错了！', icon: 'error' });
     // interrupt promise chain
-    return new Promise(() => { });
+    return new Promise(() => {});
   }
 );
 
 export { axios };
-
