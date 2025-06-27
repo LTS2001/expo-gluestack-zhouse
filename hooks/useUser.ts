@@ -7,7 +7,7 @@ import leaseStore from '@/stores/lease';
 import reportStore from '@/stores/report';
 import userStore from '@/stores/user';
 export default function useUser() {
-  const { setLoginState, setToken } = authStore;
+  const { setLoginState, setToken, identity } = authStore;
   const { clearLeaseHouse } = leaseStore;
   const { clearUser, clearLeasedTenant, setUser } = userStore;
   // const {websocketInstance, clearWebsocketInstance} = socketStore;
@@ -18,6 +18,7 @@ export default function useUser() {
    * get user info
    */
   const getUserInfo = async () => {
+    if (!identity) return;
     const user = await getUser();
     user && setUser(user);
   };

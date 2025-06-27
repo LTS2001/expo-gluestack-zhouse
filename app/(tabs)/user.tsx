@@ -218,11 +218,7 @@ function User() {
   }, [isLogin, userLogout]);
   return (
     <View className='bg-secondary-0 flex-1'>
-      {identity === 'landlord' ? (
-        <Landlord />
-      ) : identity === 'tenant' ? (
-        <Tenant />
-      ) : null}
+      {identity === 'tenant' ? <Tenant /> : <Landlord />}
     </View>
   );
 }

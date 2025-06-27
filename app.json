@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "expo-gluestack-zhouse",
+    "name": "行间小筑",
     "slug": "expo-gluestack-zhouse",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -42,8 +42,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "6b488617-a125-461c-bf1e-a53e6afd2624"
+        "projectId": "445c4fbe-2176-477c-823a-f8e1cab17b85"
       }
-    }
+    },
+    "owner": "litaosheng"
   }
 }
