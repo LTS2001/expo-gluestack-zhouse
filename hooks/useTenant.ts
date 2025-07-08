@@ -1,41 +1,38 @@
 // import TenantBusiness from '@/business/TenantBussiness';
-// import leaseStore from '@/stores/LeaseStore';
+import leaseStore from '@/stores/lease';
 // import { removeStorageSync } from '@tarojs/taro';
 // import AuthConstant from '@/constant/AuthConstant';
-// import authStore from '@/stores/AuthStore';
-// import userStore from '@/stores/UserStore';
+import authStore from '@/stores/auth';
+import userStore from '@/stores/user';
 // import socketStore from '@/stores/SocketStore';
 // import { eventCenter } from '@tarojs/runtime';
-// import chatStore from '@/stores/ChatStore';
-// import reportStore from '@/stores/ReportStore';
+import chatStore from '@/stores/chat';
+import reportStore from '@/stores/report';
 
 export default function useTenant() {
-  // const {setLoginState, setToken} = authStore;
-  // const {clearLeaseHouse, setLeaseHouse} = leaseStore;
-  // const {clearUser, user} = userStore;
+  const { setLoginState, setToken } = authStore;
+  const { clearLeaseHouse, setLeaseHouse } = leaseStore;
+  const { clearUser } = userStore;
   // const {websocketInstance, clearWebsocketInstance} = socketStore;
-  // const {clearCurrentChatSession, clearChatSessionList} = chatStore;
-  // const {clearTenantReportList} = reportStore;
+  const { clearCurrentChatSession, clearChatSessionList } = chatStore;
+  const { clearTenantReportList } = reportStore;
 
   /**
    * 租客退出登录
    */
   const tenantLogout = () => {
-    // setLoginState(false);
-    // setToken('');
-    // removeStorageSync(AuthConstant.TOKEN);
-    // clearUser();
-    // clearLeaseHouse();
-    // // 断开 websocket
+    setLoginState(false);
+    setToken('');
+    clearUser();
+    clearLeaseHouse();
+    // disconnect websocket
     // websocketInstance?.close();
-    // // 清除 websocket 实例
+    // clear websocket instance
     // clearWebsocketInstance();
-    // // 取消所有事件的订阅
-    // eventCenter.off();
-    // clearCurrentChatSession();
-    // clearChatSessionList();
-    // // 清除房屋维修记录
-    // clearTenantReportList();
+    clearCurrentChatSession();
+    clearChatSessionList();
+    // clear tenant report list
+    clearTenantReportList();
   };
 
   /**

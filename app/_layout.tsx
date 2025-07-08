@@ -43,7 +43,7 @@ export default function RootLayout() {
     <GluestackUIProvider mode={colorScheme ?? 'light'}>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <Stack
-          initialRouteName='add-house'
+          initialRouteName='(tabs)'
           screenOptions={{ headerTitleAlign: 'center' }}
         >
           <Stack.Screen name='identity' options={{ headerShown: false }} />
@@ -81,7 +81,12 @@ export default function RootLayout() {
             name='identity-verify'
             options={{ title: '实名认证' }}
           />
-          <Stack.Screen name='add-house' options={{ title: '添加房屋' }} />
+          <Stack.Screen
+            name='choose-location'
+            options={{
+              title: '选择位置',
+            }}
+          />
           <Stack.Screen name='add-edit-house' options={{ title: '添加房屋' }} />
           <Stack.Screen name='+not-found' />
         </Stack>

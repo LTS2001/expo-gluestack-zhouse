@@ -5,8 +5,9 @@ interface IProps {
   srcs?: string | string[];
   visible?: boolean;
   onClose?: () => void;
+  index?: number;
 }
-const ImagePreview = ({ srcs: _srcs, visible, onClose }: IProps) => {
+const ImagePreview = ({ srcs: _srcs, visible, onClose, index }: IProps) => {
   const srcs = typeof _srcs === 'string' ? [_srcs] : _srcs;
   return (
     <AlertDialog isOpen={visible}>
@@ -14,6 +15,7 @@ const ImagePreview = ({ srcs: _srcs, visible, onClose }: IProps) => {
         <ImageViewer
           imageUrls={srcs?.map((s) => ({ url: SERVER_ROOT + s }))}
           onClick={onClose}
+          index={index}
         />
       </AlertDialogContent>
     </AlertDialog>

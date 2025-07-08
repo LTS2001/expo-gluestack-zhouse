@@ -72,5 +72,32 @@ export default function useUpload() {
     }
   };
 
-  return { uploadHeaderImage, uploadIdentityCardImage };
+  const uploadImage = async (image: ImagePicker.ImagePickerOptions) => {
+    try {
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        showToast({ title: '需要相册权限才能上传' });
+        return Promise.reject();
+      }
+      const result = await ImagePicker.launchImageLibraryAsync(image);
+      if (!result.canceled) {
+        const uri = result.assets[0].uri;
+        const formData = new FormData();
+        formData.append('image', {
+          uri,
+          type: 'image/jpeg',
+          name: Date.now().valueOf() + 'image.jpg',
+        } as any);
+        const res = await uploadImgVideo(formData);
+        return res;
+      }
+      return Promise.reject();
+    } catch (error) {
+      console.error('选择图片失败:', error);
+      showToast({ title: '上传图片失败，请重试', icon: 'error' });
+    }
+  };
+
+  return { uploadHeaderImage, uploadIdentityCardImage, uploadImage };
 }

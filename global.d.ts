@@ -737,4 +737,17 @@ declare module '@/global' {
     name?: string;
     remark?: string;
   }
+
+  /**
+   * tencent map location
+   */
+  interface ITencentMapLocation {
+    cityname: string;
+    latlng: {
+      lat: number;
+      lng: number;
+    };
+    poiaddress: string;
+    poiname: string;
+  }
 }

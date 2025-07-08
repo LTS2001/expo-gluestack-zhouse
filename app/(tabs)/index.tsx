@@ -12,7 +12,7 @@ export default function Index() {
         <ButtonText>我是按钮</ButtonText>
       </Button>
 
-      <Button onTouchEnd={() => router.push('/add-house')}>
+      <Button onTouchEnd={() => router.push('/add-edit-house')}>
         <ButtonText>Add House</ButtonText>
       </Button>
     </View>

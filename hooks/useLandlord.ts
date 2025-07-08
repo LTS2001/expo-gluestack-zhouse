@@ -1,49 +1,48 @@
 // import HouseLeaseBusiness from '@/business/HouseLeaseBusiness';
-// import leaseStore from '@/stores/LeaseStore';
+import leaseStore from '@/stores/lease';
 // import LandlordBusiness from '@/business/LandlordBusiness';
-// import userStore from '@/stores/UserStore';
+import userStore from '@/stores/user';
 // import { removeStorageSync } from '@tarojs/taro';
-// import AuthConstant from '@/constant/AuthConstant';
-// import authStore from '@/stores/AuthStore';
-// import houseStore from '@/stores/HouseStore';
-// import socketStore from '@/stores/SocketStore';
+// import AuthConstant from '@/constants/auth';
+import authStore from '@/stores/auth';
+import houseStore from '@/stores/house';
+// import socketStore from '@/stores/socket';
 // import { eventCenter } from '@tarojs/runtime';
-// import chatStore from '@/stores/ChatStore';
-// import reportStore from '@/stores/ReportStore';
+import chatStore from '@/stores/chat';
+import reportStore from '@/stores/report';
 
 export default function useLandlord() {
-  // const {setLoginState, setToken} = authStore;
-  // const {clearUser, setReleaseTenant, clearReleaseTenant} = userStore;
-  // const {clearLandlordHouseList} = houseStore;
-  // const {setPendingLeaseList} = leaseStore;
+  const { setLoginState, setToken } = authStore;
+  const { clearUser, leasedTenant, clearLeasedTenant } = userStore;
+  const { clearLandlordHouseList } = houseStore;
+  const { setPendingLeaseList } = leaseStore;
   // const {websocketInstance, clearWebsocketInstance} = socketStore;
-  // const {clearCurrentChatSession, clearChatSessionList} = chatStore;
-  // const {clearLandlordReportList} = reportStore;
+  const { clearCurrentChatSession, clearChatSessionList } = chatStore;
+  const { clearLandlordReportList } = reportStore;
 
   /**
-   * 房东退出登录
+   * landlord logout
    */
   const landlordLogout = () => {
-    // setLoginState(false);
-    // setToken('');
-    // removeStorageSync(AuthConstant.TOKEN);
-    // clearUser();
-    // clearLandlordHouseList();
-    // // 断开 websocket
+    setLoginState(false);
+    setToken('');
+    clearUser();
+    clearLandlordHouseList();
+    // disconnect websocket
     // websocketInstance?.close();
-    // // 清除 websocket 实例
+    // clear websocket instance
     // clearWebsocketInstance();
-    // // 取消所有事件的订阅
+    // cancel all event subscriptions
     // eventCenter.off();
-    // clearCurrentChatSession();
-    // clearChatSessionList();
-    // // 清除房屋维修
-    // clearLandlordReportList();
-    // clearReleaseTenant();
+    clearCurrentChatSession();
+    clearChatSessionList();
+    // clear landlord report list
+    clearLandlordReportList();
+    clearLeasedTenant();
   };
 
   /**
-   * 获取待处理的租赁申请
+   * get pending lease
    */
   const getPendingLease = async () => {
     // const pendingLeaseList: any = await HouseLeaseBusiness.getTenantLeasePendingTodoByLandlordId();
@@ -51,17 +50,16 @@ export default function useLandlord() {
   };
 
   /**
-   * 通过房东id获取自己租客信息
+   * get tenants by landlord id
    */
   const getTenantsByLandlordId = async () => {
     // const tenantList: any = await LandlordBusiness.getTenantsByLandlordId();
     // setReleaseTenant(tenantList);
   };
 
-
   return {
     landlordLogout,
     getPendingLease,
-    getTenantsByLandlordId
+    getTenantsByLandlordId,
   };
 }
