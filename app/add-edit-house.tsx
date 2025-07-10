@@ -19,13 +19,15 @@ import { Text } from '@/components/ui/text';
 import { Textarea, TextareaInput } from '@/components/ui/textarea';
 import { showToast } from '@/components/ui/toast';
 import { View } from '@/components/ui/view';
+import useHouse from '@/hooks/useHouse';
 import { useTool } from '@/hooks/useTool';
 import useUpload from '@/hooks/useUpload';
-import { addHouse } from '@/request/api/house';
+import { addHouse, updateHouse } from '@/request/api/house';
+import houseStore from '@/stores/house';
 import locationStore from '@/stores/location';
 import { zodResolver } from '@hookform/resolvers/zod';
 import cls from 'classnames';
-import { router } from 'expo-router';
+import { router, useNavigation } from 'expo-router';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -209,8 +211,9 @@ const GenerateForm = ({ config }: { config: IFormConfig[] }) => {
 };
 
 const AddEditHouse = () => {
-  const { title, address, setTitle, setAddress, latitude, longitude } =
-    locationStore;
+  const { title, address, latitude, longitude } = locationStore;
+  const { currentHouse } = houseStore;
+  const navigation = useNavigation();
   const form = useForm<TFormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -224,6 +227,7 @@ const AddEditHouse = () => {
       toilet: '2',
       kitchen: '2',
       balcony: '2',
+      note: '',
     },
   });
   const scrollViewRef = useRef<ScrollView>(null);
@@ -236,15 +240,45 @@ const AddEditHouse = () => {
   });
   const { keyboardHeight } = useTool();
   const { uploadImage } = useUpload();
+  const { getLandlordHouseList } = useHouse();
   useEffect(() => {
-    form.setValue('addressName', title);
-    form.setValue('addressDetail', address);
-  }, [title, address, form]);
+    navigation.setOptions({
+      title: currentHouse ? '编辑房屋' : '新增房屋',
+    });
+  }, [currentHouse, navigation]);
 
   useEffect(() => {
-    setTitle('');
-    setAddress('');
-  }, [setTitle, setAddress]);
+    if (currentHouse) {
+      form.setValue('name', currentHouse.name);
+      form.setValue('price', currentHouse.price.toString());
+      form.setValue('waterFee', currentHouse.waterFee.toString());
+      form.setValue('electricityFee', currentHouse.electricityFee.toString());
+      form.setValue('internetFee', currentHouse.internetFee.toString());
+      form.setValue('fuelFee', currentHouse.fuelFee.toString());
+      form.setValue('depositNumber', currentHouse.depositNumber.toString());
+      form.setValue('priceNumber', currentHouse.priceNumber.toString());
+      form.setValue('area', currentHouse.area.toString());
+      form.setValue('floor', currentHouse.floor.toString());
+      form.setValue('toward', currentHouse.toward.toString());
+      form.setValue('toilet', currentHouse.toilet.toString());
+      form.setValue('kitchen', currentHouse.kitchen.toString());
+      form.setValue('balcony', currentHouse.balcony.toString());
+      form.setValue('addressName', currentHouse.addressName);
+      form.setValue(
+        'addressDetail',
+        `${currentHouse.provinceName}${currentHouse.cityName}${currentHouse.areaName}${currentHouse.addressInfo}`
+      );
+      form.setValue('note', currentHouse.note || '');
+      form.setValue('houseImg', JSON.parse(currentHouse.houseImg));
+    }
+  }, [currentHouse, form]);
+
+  useEffect(() => {
+    if (title && address) {
+      form.setValue('addressName', title);
+      form.setValue('addressDetail', address);
+    }
+  }, [title, address, form]);
 
   const formConfig: IFormConfig[] = [
     // base info
@@ -458,8 +492,7 @@ const AddEditHouse = () => {
 
   const onFinish = async (value: TFormSchema) => {
     try {
-      await addHouse({
-        ...value,
+      const formData = {
         price: Number(value.price),
         waterFee: Number(value.waterFee),
         electricityFee: Number(value.electricityFee),
@@ -476,11 +509,25 @@ const AddEditHouse = () => {
         longitude: Number(longitude),
         latitude: Number(latitude),
         houseImg: JSON.stringify(value.houseImg),
-      });
+      };
+      if (currentHouse) {
+        await updateHouse({
+          ...value,
+          ...formData,
+          houseId: currentHouse.houseId,
+          addressId: currentHouse.addressId,
+        });
+      } else {
+        await addHouse({
+          ...value,
+          ...formData,
+        });
+      }
       showToast({
         title: '提交成功',
         icon: 'success',
       });
+      getLandlordHouseList();
       router.back();
     } catch (error) {
       console.error('提交失败:', error);

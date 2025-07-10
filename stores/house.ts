@@ -13,7 +13,7 @@ class HouseStore {
   /**
    * information about the current house
    */
-  currentHouse: IHouse | undefined;
+  currentHouse: IHouse | undefined = undefined;
 
   /**
    * total number of houses
@@ -23,17 +23,17 @@ class HouseStore {
   /**
    * all the houses of the current landlord
    */
-  landlordHouseList: IHouse[] | undefined;
+  landlordHouseList: IHouse[] | undefined = undefined;
 
   /**
    * collection list of houses
    */
-  houseCollectList: ICollectList[] | undefined;
+  houseCollectList: ICollectList[] | undefined = undefined;
 
   /**
    * list of houses in the housing market
    */
-  marketHouseList: IHouse[] | undefined;
+  marketHouseList: IHouse[] | undefined = undefined;
 
   /**
    * set list of houses in the housing market
@@ -54,14 +54,14 @@ class HouseStore {
    * set the currently edited house info
    * @param houses
    */
-  setEditorCurrentHouse = (house: IHouse) => {
+  setCurrentHouse = (house: IHouse) => {
     this.currentHouse = house;
   };
 
   /**
    * clear the currently edited house info
    */
-  clearEditorCurrentHouse = () => {
+  clearCurrentHouse = () => {
     this.currentHouse = undefined;
   };
 

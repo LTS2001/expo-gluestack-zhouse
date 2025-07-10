@@ -7,6 +7,7 @@ interface IProps {
   className?: string;
   bgColor?: string;
   textSize?: 'text-sm' | 'text-md' | 'text-lg';
+  expand?: boolean;
 }
 
 const Tag = (props: IProps) => {
@@ -15,17 +16,22 @@ const Tag = (props: IProps) => {
     className,
     bgColor = 'bg-theme-primary',
     textSize = 'text-sm',
+    expand = false,
   } = props;
   return (
     <View
       className={cls(
-        'rounded-md w-6 h-6 flex items-center justify-center',
+        'rounded-md flex items-center justify-center',
         className,
-        bgColor
+        bgColor,
+        {
+          'w-6 h-6': !expand,
+          'py-0.5 px-2': expand,
+        }
       )}
     >
       <Text className={cls('text-white leading-none', textSize)}>
-        {content[0]}
+        {expand ? content : content[0]}
       </Text>
     </View>
   );

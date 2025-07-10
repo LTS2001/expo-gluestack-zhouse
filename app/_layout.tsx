@@ -87,7 +87,7 @@ export default function RootLayout() {
               title: '选择位置',
             }}
           />
-          <Stack.Screen name='add-edit-house' options={{ title: '添加房屋' }} />
+          <Stack.Screen name='add-edit-house' />
           <Stack.Screen name='+not-found' />
         </Stack>
         <StatusBar style='auto' />

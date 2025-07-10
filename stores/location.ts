@@ -1,12 +1,12 @@
 import { configure, makeAutoObservable } from 'mobx';
 
 configure({
-  enforceActions: 'always'
+  enforceActions: 'always',
 });
 
 class LocationStore {
   constructor() {
-    makeAutoObservable(this, {}, {autoBind: true});
+    makeAutoObservable(this, {}, { autoBind: true });
   }
 
   /**
@@ -55,19 +55,19 @@ class LocationStore {
 
   setMinLat(minLat: number) {
     this.minLat = minLat;
-  };
+  }
 
   setMaxLat(maxLat: number) {
     this.maxLat = maxLat;
-  };
+  }
 
   setMinLng(minLng: number) {
     this.minLng = minLng;
-  };
+  }
 
   setMaxLng(maxLng: number) {
     this.maxLng = maxLng;
-  };
+  }
 
   /**
    * set title of location
@@ -95,7 +95,7 @@ class LocationStore {
 
   /**
    * set latitude
-   * @param latitude
+   * @param latitude latitude
    */
   setLatitude(latitude: number) {
     this.latitude = latitude;
@@ -103,10 +103,24 @@ class LocationStore {
 
   /**
    * set longitude
-   * @param longitude 经度
+   * @param longitude longitude
    */
   setLongitude(longitude: number) {
     this.longitude = longitude;
+  }
+
+  /**
+   * clear title of location
+   */
+  clearTitle() {
+    this.title = '';
+  }
+
+  /**
+   * clear address of location
+   */
+  clearAddress() {
+    this.address = '';
   }
 }
 

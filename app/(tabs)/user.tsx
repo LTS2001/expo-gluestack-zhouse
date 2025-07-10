@@ -22,6 +22,7 @@ import {
 import useIdentity from '@/hooks/useIdentity';
 import useUser from '@/hooks/useUser';
 import authStore from '@/stores/auth';
+import houseStore from '@/stores/house';
 import userStore from '@/stores/user';
 import { router } from 'expo-router';
 import { observer } from 'mobx-react-lite';
@@ -43,14 +44,16 @@ function SwitchIdentityIcon() {
     </View>
   );
 }
+
 const Landlord = observer(() => {
   const { user } = userStore;
   const { isLogin } = authStore;
+  const { houseNumberTotal } = houseStore;
   // const { leasePendingNoticeNum } = useLease();
   // const { landlordReportPendingNoticeNum } = useReport();
   // const { getTenantsByLandlordId } = useLandlord();
   // const { getWebSocketMessage } = useSocket();
-  // 功能区列表
+  // domain list
   const domainList = useMemo(
     () => [
       {
@@ -114,7 +117,9 @@ const Landlord = observer(() => {
           className='w-2/5 h-28 border border-secondary-400 shadow-hard-3 bg-secondary-0 rounded-lg items-center pt-3'
           needShadow
         >
-          <Text className='font-bold text-theme-primary text-6xl'>{0}</Text>
+          <Text className='font-bold text-theme-primary text-6xl'>
+            {houseNumberTotal}
+          </Text>
           <Text>已有房屋</Text>
         </View>
         <View
@@ -132,9 +137,13 @@ const Landlord = observer(() => {
         </View>
       </View>
       <Domain domainList={domainList} isLogin={isLogin} />
+      <View className='mt-10'>
+        <Logout isLogin={isLogin} />
+      </View>
     </>
   );
 });
+
 const Tenant = observer(() => {
   const { user } = userStore;
   const { isLogin } = authStore;

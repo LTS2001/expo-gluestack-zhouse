@@ -40,7 +40,7 @@ const Image = React.forwardRef<
     needShadow?: boolean;
   }
 >(function Image(
-  { size = 'md', className, needShadow, style: _style, src, ...props },
+  { size = 'md', className, needShadow, style: _style, src = '/common/male.png', ...props },
   ref
 ) {
   const colorSchema = useColorScheme();
