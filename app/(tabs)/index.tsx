@@ -95,9 +95,8 @@ const LandlordHome = observer(() => {
    * @param houses house info
    */
   const toHouseInfo = (houses: IHouse) => {
-    // router.push('/house-info');
-    // set house info to store
     setCurrentHouse(houses);
+    router.push('/landlord-look-house');
   };
 
   return (
@@ -157,18 +156,10 @@ const LandlordHome = observer(() => {
                     <Button onTouchEnd={() => toHouseInfo(item)} size='sm'>
                       <ButtonText>查看</ButtonText>
                     </Button>
-                    <Button
-                      onTouchEnd={() => toEditor(item)}
-                      className='bg-theme-primary'
-                      size='sm'
-                    >
+                    <Button onTouchEnd={() => toEditor(item)} size='sm'>
                       <ButtonText>编辑</ButtonText>
                     </Button>
-                    <Button
-                      onTouchEnd={() => openDelAlter(item)}
-                      className='bg-error-700'
-                      size='sm'
-                    >
+                    <Button onTouchEnd={() => openDelAlter(item)} size='sm'>
                       <ButtonText>删除</ButtonText>
                     </Button>
                   </View>

@@ -88,6 +88,7 @@ export default function RootLayout() {
             }}
           />
           <Stack.Screen name='add-edit-house' />
+          <Stack.Screen name='landlord-look-house' />
           <Stack.Screen name='+not-found' />
         </Stack>
         <StatusBar style='auto' />
