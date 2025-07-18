@@ -324,7 +324,17 @@ declare module '@/global' {
   /**
    * request params interface when update house info
    */
-  interface IUpdateHouseReq extends IAddHouseReq {
+  interface IUpdateHouseReq
+    extends Omit<
+      IAddHouseReq,
+      | 'provinceName'
+      | 'cityName'
+      | 'areaName'
+      | 'addressInfo'
+      | 'createdAt'
+      | 'updatedAt'
+      | 'landlordId'
+    > {
     /**
      * house id
      */

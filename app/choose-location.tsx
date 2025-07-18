@@ -2,20 +2,20 @@ import { Button, ButtonText } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { View } from '@/components/ui/view';
+import emitter from '@/emitter';
+import * as EventName from '@/emitter/event-name';
 import { ITencentMapLocation } from '@/global';
-import locationStore from '@/stores/location';
 import { useNavigation } from '@react-navigation/native';
 import { Asset } from 'expo-asset';
 import { readAsStringAsync } from 'expo-file-system';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
-
 export default function AddHouse() {
-  const { setTitle, setAddress, setLatitude, setLongitude } = locationStore;
   const [html, setHtml] = useState('');
   const [location, setLocation] = useState<ITencentMapLocation | null>(null);
   const navigation = useNavigation();
+  const { eventName } = useLocalSearchParams();
   useEffect(() => {
     loadHtmlFile();
   }, []);
@@ -25,12 +25,12 @@ export default function AddHouse() {
       headerRight: () => (
         <Button
           size='xs'
-          action='positive'
+          action={location ? 'positive' : 'secondary'}
+          disabled={!location}
           onPress={() => {
-            setTitle(location?.poiname ?? '');
-            setAddress(location?.poiaddress ?? '');
-            setLatitude(location?.latlng.lat ?? 0);
-            setLongitude(location?.latlng.lng ?? 0);
+            if (typeof eventName === 'string') {
+              emitter.emit(eventName as keyof typeof EventName, location!);
+            }
             router.back();
           }}
         >
@@ -47,7 +47,7 @@ export default function AddHouse() {
         </View>
       ),
     });
-  }, [location, navigation, setTitle, setAddress, setLatitude, setLongitude]);
+  }, [location, navigation, eventName]);
 
   const loadHtmlFile = async () => {
     const asset = await Asset.loadAsync(

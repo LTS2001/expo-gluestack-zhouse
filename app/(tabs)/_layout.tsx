@@ -1,6 +1,5 @@
 import { Icon } from '@/components/ui/icon';
 import { Tabs } from 'expo-router';
-import React from 'react';
 export default function Layout() {
   const getIconColor = (focused: boolean) => (focused ? '#f2a536' : '#999');
 
@@ -11,6 +10,7 @@ export default function Layout() {
         headerTitleAlign: 'center',
         headerShown: true,
       }}
+      initialRouteName='index'
     >
       <Tabs.Screen
         name='index'
@@ -25,6 +25,7 @@ export default function Layout() {
         name='market'
         options={{
           title: '房屋市场',
+          headerTitle: '',
           tabBarIcon: ({ focused }) => (
             <Icon
               as='MaterialIcons'

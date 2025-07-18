@@ -28,8 +28,15 @@ export const getUser = (): Promise<IUser> => axios.get(`${authStore.identity}`);
 
 /**
  * update user info (base info or identity real name verify)
- * @param data 
+ * @param data
  */
 export const updateUser = (
   data: IUpdateBaseUserInfo | IUserVerify
 ): Promise<IUser> => axios.put(`${authStore.identity}`, data);
+
+/**
+ * get landlord by ids
+ * @param ids landlord id list
+ */
+export const getLandlordByIds = (ids: string): Promise<IUser[]> =>
+  axios.get(`landlord/list?ids=${ids}`);

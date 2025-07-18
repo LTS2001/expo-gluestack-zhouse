@@ -79,7 +79,7 @@ function LandlordLookHouse() {
   };
 
   return (
-    <ScrollView className='flex-1'>
+    <ScrollView className='flex-1' showsVerticalScrollIndicator={false}>
       <HouseImageList imgList={JSON.parse(currentHouse?.houseImg || '[]')} />
       <View
         className='gap-6 bg-secondary-50 p-4 rounded-lg mx-4 mt-4'

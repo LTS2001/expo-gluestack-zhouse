@@ -1,31 +1,50 @@
 import Empty from '@/components/empty';
+import HeaderSearch from '@/components/header-search';
 import HouseCard from '@/components/house-card';
 import Tag from '@/components/tag';
 import { AlertDialogGroup } from '@/components/ui/alert-dialog';
 import { Button, ButtonText } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
+import { showToast } from '@/components/ui/toast';
 import { View } from '@/components/ui/view';
 import { HouseToStatusMap } from '@/constants/house';
 import { IHouse } from '@/global';
 
 import useHouse from '@/hooks/useHouse';
+import { updateHouse } from '@/request/api/house';
 import authStore from '@/stores/auth';
 import houseStore from '@/stores/house';
-import locationStore from '@/stores/location';
-import { router } from 'expo-router';
+import { router, useNavigation } from 'expo-router';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
 
 const LandlordHome = observer(() => {
+  const navigation = useNavigation();
   const { landlordHouseList, setCurrentHouse, clearCurrentHouse } = houseStore;
   const { isLogin } = authStore;
-  const { clearTitle, clearAddress } = locationStore;
   const { getLandlordHouseList } = useHouse();
   // 删除房屋提示框
   const [delHouseAlterVisible, setDelHouseAlterVisible] = useState(false);
+  const [publishHouseAlterVisible, setPublishHouseAlterVisible] =
+    useState(false);
   const [chooseHouse, setChooseHouse] = useState<IHouse>();
+  const [search, setSearch] = useState('');
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+
+  useEffect(() => {
+    console.log('isSearchFocused', isSearchFocused);
+    navigation.setOptions({
+      headerTitle: isSearchFocused ? '' : '我的房源',
+      headerRight: () => (
+        <HeaderSearch
+          onChangeText={setSearch}
+          onChangeFocus={setIsSearchFocused}
+        />
+      ),
+    });
+  }, [navigation, isSearchFocused]);
 
   useEffect(() => {
     getLandlordHouseList();
@@ -36,8 +55,6 @@ const LandlordHome = observer(() => {
    */
   const addHouse = () => {
     clearCurrentHouse();
-    clearTitle();
-    clearAddress();
     router.push('/add-edit-house');
   };
 
@@ -48,25 +65,16 @@ const LandlordHome = observer(() => {
   const toEditor = (house: IHouse) => {
     // set house info to store
     setCurrentHouse(house);
-    clearTitle();
-    clearAddress();
     router.push('/add-edit-house');
   };
 
   /**
-   * close delete house alert
+   * to house info
+   * @param houses house info
    */
-  const closeDelAlter = () => {
-    setDelHouseAlterVisible(false);
-  };
-
-  /**
-   * open delete house alert
-   * @param house house info
-   */
-  const openDelAlter = (house: IHouse) => {
-    setChooseHouse(house);
-    setDelHouseAlterVisible(true);
+  const toHouseInfo = (houses: IHouse) => {
+    setCurrentHouse(houses);
+    router.push('/landlord-look-house');
   };
 
   /**
@@ -90,13 +98,29 @@ const LandlordHome = observer(() => {
     // });
   };
 
-  /**
-   * to house info
-   * @param houses house info
-   */
-  const toHouseInfo = (houses: IHouse) => {
-    setCurrentHouse(houses);
-    router.push('/landlord-look-house');
+  const confirmPublishHouse = async () => {
+    if (!chooseHouse) return;
+    const {
+      provinceName,
+      cityName,
+      areaName,
+      addressInfo,
+      createdAt,
+      updatedAt,
+      landlordId,
+      ...house
+    } = chooseHouse;
+    await updateHouse({
+      ...house,
+      status: HouseToStatusMap.notLeaseReleased,
+      addressDetail: `${provinceName}${cityName}${areaName}${addressInfo}`,
+    });
+    await getLandlordHouseList();
+    showToast({
+      title: '发布成功',
+      icon: 'success',
+    });
+    setPublishHouseAlterVisible(false);
   };
 
   return (
@@ -106,14 +130,16 @@ const LandlordHome = observer(() => {
           {landlordHouseList.map((item: IHouse, idx: number) => {
             const { notLeaseNotReleased, notLeaseReleased, release } =
               HouseToStatusMap;
+            const status = Number(item.status);
             // published (not lease released)
-            const publish = Number(item.status) === notLeaseReleased;
+            const isPublish = status === notLeaseReleased;
+
             // waiting for rent (not lease not released or published)
-            const forRent = [notLeaseNotReleased, publish].includes(
-              Number(item.status)
+            const forRent = [notLeaseNotReleased, notLeaseReleased].includes(
+              status
             );
             // rented
-            const rented = Number(item.status) === release;
+            const rented = status === release;
             return (
               <HouseCard
                 key={idx}
@@ -124,21 +150,24 @@ const LandlordHome = observer(() => {
                 isStatusSlot={true}
                 StatusSlotComponent={
                   <View className='flex-row gap-2'>
+                    {isPublish && (
+                      <Tag
+                        content={forRent ? '待租' : rented ? '已租' : '删除'}
+                        bgColor={
+                          forRent
+                            ? 'bg-theme-tertiary'
+                            : rented
+                            ? 'bg-theme-primary'
+                            : 'bg-theme-secondary'
+                        }
+                        expand
+                      />
+                    )}
+
                     <Tag
-                      content={forRent ? '待租' : rented ? '已租' : '删除'}
+                      content={rented || isPublish ? '已发布' : '未发布'}
                       bgColor={
-                        forRent
-                          ? 'bg-theme-tertiary'
-                          : rented
-                          ? 'bg-theme-primary'
-                          : 'bg-theme-secondary'
-                      }
-                      expand
-                    />
-                    <Tag
-                      content={rented || publish ? '已发布' : '未发布'}
-                      bgColor={
-                        rented || publish
+                        rented || isPublish
                           ? 'bg-theme-primary'
                           : 'bg-theme-secondary'
                       }
@@ -159,9 +188,26 @@ const LandlordHome = observer(() => {
                     <Button onTouchEnd={() => toEditor(item)} size='sm'>
                       <ButtonText>编辑</ButtonText>
                     </Button>
-                    <Button onTouchEnd={() => openDelAlter(item)} size='sm'>
+                    <Button
+                      onTouchEnd={() => {
+                        setChooseHouse(item);
+                        setDelHouseAlterVisible(true);
+                      }}
+                      size='sm'
+                    >
                       <ButtonText>删除</ButtonText>
                     </Button>
+                    {!isPublish ? (
+                      <Button
+                        onTouchEnd={() => {
+                          setChooseHouse(item);
+                          setPublishHouseAlterVisible(true);
+                        }}
+                        size='sm'
+                      >
+                        <ButtonText>发布</ButtonText>
+                      </Button>
+                    ) : null}
                   </View>
                 }
               />
@@ -190,18 +236,49 @@ const LandlordHome = observer(() => {
       )}
       <AlertDialogGroup
         visible={delHouseAlterVisible}
-        onClose={closeDelAlter}
+        onClose={() => setDelHouseAlterVisible(false)}
         onConfirm={confirmDelHouse}
         content='你确定要删除该房屋吗？'
+      />
+      <AlertDialogGroup
+        visible={publishHouseAlterVisible}
+        onClose={() => setPublishHouseAlterVisible(false)}
+        onConfirm={confirmPublishHouse}
+        content='你确定要发布该房屋吗？'
       />
     </View>
   );
 });
 
 const TenantHome = observer(() => {
+  const navigation = useNavigation();
+  const [ws, setWs] = useState<WebSocket>();
+  useEffect(() => {
+    navigation.setOptions({
+      headerTitle: '我的租房',
+      headerRight: null,
+    });
+  }, [navigation]);
+
+  useEffect(() => {
+    const ws = new WebSocket('ws://172.63.48.66:7003?TENANT=1');
+    setWs(ws);
+    return () => {
+      ws.close();
+    };
+  }, []);
+
   return (
     <View>
       <Text>我是租客首页</Text>
+      <Button onTouchEnd={() => {
+        ws?.send(JSON.stringify({
+          type: 'message',
+          content: '你好',
+        }));
+      }}>
+        <ButtonText>发送消息</ButtonText>
+      </Button>
     </View>
   );
 });

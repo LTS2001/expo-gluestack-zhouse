@@ -19,12 +19,14 @@ import { Text } from '@/components/ui/text';
 import { Textarea, TextareaInput } from '@/components/ui/textarea';
 import { showToast } from '@/components/ui/toast';
 import { View } from '@/components/ui/view';
+import emitter from '@/emitter';
+import { GET_LOCATION } from '@/emitter/event-name';
+import { ITencentMapLocation } from '@/global';
 import useHouse from '@/hooks/useHouse';
 import { useTool } from '@/hooks/useTool';
 import useUpload from '@/hooks/useUpload';
 import { addHouse, updateHouse } from '@/request/api/house';
 import houseStore from '@/stores/house';
-import locationStore from '@/stores/location';
 import { zodResolver } from '@hookform/resolvers/zod';
 import cls from 'classnames';
 import { router, useNavigation } from 'expo-router';
@@ -211,7 +213,6 @@ const GenerateForm = ({ config }: { config: IFormConfig[] }) => {
 };
 
 const AddEditHouse = () => {
-  const { title, address, latitude, longitude } = locationStore;
   const { currentHouse } = houseStore;
   const navigation = useNavigation();
   const form = useForm<TFormSchema>({
@@ -241,6 +242,18 @@ const AddEditHouse = () => {
   const { keyboardHeight } = useTool();
   const { uploadImage } = useUpload();
   const { getLandlordHouseList } = useHouse();
+  const [chooseLocation, setChooseLocation] = useState<ITencentMapLocation>();
+  useEffect(() => {
+    emitter.on(GET_LOCATION, (data) => {
+      form.setValue('addressName', data.poiname);
+      form.setValue('addressDetail', data.poiaddress);
+      setChooseLocation(data);
+    });
+    return () => {
+      emitter.off(GET_LOCATION);
+    };
+  }, [form]);
+
   useEffect(() => {
     navigation.setOptions({
       title: currentHouse ? '编辑房屋' : '新增房屋',
@@ -272,13 +285,6 @@ const AddEditHouse = () => {
       form.setValue('houseImg', JSON.parse(currentHouse.houseImg));
     }
   }, [currentHouse, form]);
-
-  useEffect(() => {
-    if (title && address) {
-      form.setValue('addressName', title);
-      form.setValue('addressDetail', address);
-    }
-  }, [title, address, form]);
 
   const formConfig: IFormConfig[] = [
     // base info
@@ -402,7 +408,14 @@ const AddEditHouse = () => {
       rightSlot: (
         <View
           className='px-3 py-1'
-          onTouchEnd={() => router.push('/choose-location')}
+          onTouchEnd={() =>
+            router.push({
+              pathname: '/choose-location',
+              params: {
+                eventName: GET_LOCATION,
+              },
+            })
+          }
         >
           <Icon as='Octicons' name='location' size={22} />
         </View>
@@ -506,8 +519,8 @@ const AddEditHouse = () => {
         toilet: Number(value.toilet),
         kitchen: Number(value.kitchen),
         balcony: Number(value.balcony),
-        longitude: Number(longitude),
-        latitude: Number(latitude),
+        longitude: Number(chooseLocation?.latlng?.lng),
+        latitude: Number(chooseLocation?.latlng?.lat),
         houseImg: JSON.stringify(value.houseImg),
       };
       if (currentHouse) {
@@ -539,7 +552,11 @@ const AddEditHouse = () => {
   };
 
   return (
-    <ScrollView ref={scrollViewRef} className='p-4 bg-background-0 flex-1'>
+    <ScrollView
+      ref={scrollViewRef}
+      className='p-4 bg-background-0 flex-1'
+      showsVerticalScrollIndicator={false}
+    >
       <FormProvider {...form}>
         <GenerateForm config={formConfig} />
       </FormProvider>
