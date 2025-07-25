@@ -1,8 +1,8 @@
-import { IExistLease, IHouseLease, IPendingLease } from "@/global";
-import { configure, makeAutoObservable } from "mobx";
+import { IExistLease, IHouseLease, IPendingLease } from '@/global';
+import { configure, makeAutoObservable } from 'mobx';
 
 configure({
-  enforceActions: "always",
+  enforceActions: 'always',
 });
 
 class LeaseStore {
@@ -13,32 +13,32 @@ class LeaseStore {
   /**
    * list of houses rented by tenants
    */
-  leaseHouseList: IHouseLease[] | undefined;
+  leaseHouseList: IHouseLease[] | undefined = undefined;
 
   /**
    * current rentail house
    */
-  currentLeaseHouse: IHouseLease | undefined;
+  currentLeaseHouse: IHouseLease | undefined = undefined;
 
   /**
-   * pending lease application
+   * landlord pending lease application
    */
-  pendingLeaseList: IPendingLease[] | undefined;
+  landlordPendingLeaseList: IPendingLease[] | undefined = undefined;
 
   /**
    * tenants who are currently being rented
    */
   currentRentBillTenant: IExistLease | undefined = {
-    houseAddress: "广东省深圳市南山区桃园路",
+    houseAddress: '广东省深圳市南山区桃园路',
     houseId: 5,
-    houseName: "豪门单身公寓",
+    houseName: '豪门单身公寓',
     landlordId: 12,
-    leaseDate: "2024-12-21T15:05:33.000Z",
+    leaseDate: '2024-12-21T15:05:33.000Z',
     leaseMonths: 13,
-    tenantHeadImg: "/upload_1734682148167.0.1396289794714498.0.jpg",
+    tenantHeadImg: '/upload_1734682148167.0.1396289794714498.0.jpg',
     tenantId: 4,
-    tenantName: "帅气租客yo",
-    tenantPhone: "18453793540",
+    tenantName: '帅气租客yo',
+    tenantPhone: '18453793540',
   };
 
   /**
@@ -67,15 +67,15 @@ class LeaseStore {
   /**
    * set up pending lease application
    */
-  setPendingLeaseList(pendingLeaseList: IPendingLease[]) {
-    this.pendingLeaseList = pendingLeaseList;
+  setLandlordPendingLeaseList(landlordPendingLeaseList: IPendingLease[]) {
+    this.landlordPendingLeaseList = landlordPendingLeaseList;
   }
 
   /**
    * clear pending lease application
    */
-  clearPendingLeaseList() {
-    this.pendingLeaseList = undefined;
+  clearLandlordPendingLeaseList() {
+    this.landlordPendingLeaseList = undefined;
   }
 
   /**

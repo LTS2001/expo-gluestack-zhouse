@@ -7,7 +7,7 @@ import userStore from '@/stores/user';
 // import socketStore from '@/stores/SocketStore';
 // import { eventCenter } from '@tarojs/runtime';
 import chatStore from '@/stores/chat';
-import reportStore from '@/stores/report';
+import reportStore from '@/stores/repair';
 
 export default function useTenant() {
   const { setLoginState, setToken } = authStore;

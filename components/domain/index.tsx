@@ -38,17 +38,21 @@ const Domain = (props: IProps) => {
             key={idx}
             onTouchEnd={() => toDetail(domain.to as Href)}
             className={cls([
-              'flex-row justify-between mx-6 py-4 border-b-[1px] border-secondary-500',
+              'flex-row justify-between mx-6 py-4 border-b-[1px] border-secondary-500 items-center',
               {
                 'border-t-[1px]': idx === 0,
               },
             ])}
           >
-            <View className='flex-row items-center' pointerEvents='none'>
+            <View className='flex-row items-center flex-1' pointerEvents='none'>
               {domain.icon}
               <Text className='text-lg ml-2'>{domain.text}</Text>
-              {domain.notice ? <Text>{domain.notice}</Text> : null}
             </View>
+            {domain.notice ? (
+              <Text className='bg-theme-primary text-white rounded-full px-2 text-sm py-0.5 mr-3'>
+                {domain.notice > 99 ? '99+' : domain.notice}
+              </Text>
+            ) : null}
             <Icon as='AntDesign' name='right' />
           </View>
         );

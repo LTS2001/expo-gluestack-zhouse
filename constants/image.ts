@@ -1,7 +1,7 @@
 /**
  * image and video server root
  */
-export const SERVER_ROOT = `http://172.63.48.66:50056`;
+export const SERVER_ROOT = `http://172.63.48.66:3000`;
 
 /**
  * default image

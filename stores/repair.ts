@@ -1,11 +1,11 @@
-import { IReport } from '@/global';
+import { IRepair } from '@/global';
 import { configure, makeAutoObservable } from 'mobx';
 
 configure({
   enforceActions: 'always',
 });
 
-class ReportStore {
+class RepairStore {
   constructor() {
     makeAutoObservable(this, {}, { autoBind: true });
   }
@@ -13,43 +13,43 @@ class ReportStore {
   /**
    * list of all repair applications of tenants
    */
-  tenantReportList: IReport[] | undefined;
+  tenantReportForRepairList: IRepair[] | undefined = undefined;
 
   /**
    * landlord's house repair (tenant's application for repair)
    */
-  landlordReportList: IReport[] | undefined;
+  landlordRepairList: IRepair[] | undefined = undefined;
 
   /**
    * set list of all repair applications of tenants
    * @param tenantReportList
    */
-  setTenantReportList(tenantReportList: IReport[]) {
-    this.tenantReportList = tenantReportList;
+  setTenantReportForRepairList(tenantReportForRepairList: IRepair[]) {
+    this.tenantReportForRepairList = tenantReportForRepairList;
   }
 
   /**
    * clear list of all repair applications of tenants
    */
-  clearTenantReportList() {
-    this.tenantReportList = undefined;
+  clearTenantReportForRepairList() {
+    this.tenantReportForRepairList = undefined;
   }
 
   /**
    * set landlord's house repair (tenant's application for repair)
    */
-  setLandlordReportList(landlordReportList: IReport[]) {
-    this.landlordReportList = landlordReportList;
+  setLandlordRepairList(landlordRepairList: IRepair[]) {
+    this.landlordRepairList = landlordRepairList;
   }
 
   /**
    * clear landlord's house repair (tenant's application for repair)
    */
-  clearLandlordReportList() {
-    this.landlordReportList = undefined;
+  clearLandlordRepairList() {
+    this.landlordRepairList = undefined;
   }
 }
 
-const reportStore = new ReportStore();
+const repairStore = new RepairStore();
 
-export default reportStore;
+export default repairStore;

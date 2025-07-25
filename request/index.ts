@@ -1,10 +1,11 @@
 import { showToast } from '@/components/ui/toast';
+import { PROTOCOL, SERVER_IP, SERVER_PORT } from '@/constants';
 import { NOT_LOGIN_ERROR, SUCCESS } from '@/constants/code';
 import { BaseRes } from '@/global';
 import authStore from '@/stores/auth';
 import _, { AxiosResponse } from 'axios';
 const axios = _.create({
-  baseURL: 'http://172.63.48.66:7002',
+  baseURL: `${PROTOCOL}://${SERVER_IP}:${SERVER_PORT}`,
   timeout: 5000,
 });
 

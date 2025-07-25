@@ -47,6 +47,14 @@ export default function Layout() {
               color={getIconColor(focused)}
             />
           ),
+          tabBarBadge: '92',
+          tabBarBadgeStyle: {
+            backgroundColor: '#f2a536',
+            color: '#fff',
+            overflow: 'hidden',
+            marginRight: -8,
+            fontSize: 10,
+          },
         }}
       />
       <Tabs.Screen
@@ -57,6 +65,14 @@ export default function Layout() {
           tabBarIcon: ({ focused }) => (
             <Icon as='FontAwesome' name='user' color={getIconColor(focused)} />
           ),
+          tabBarBadge: '92',
+          tabBarBadgeStyle: {
+            backgroundColor: '#f2a536',
+            color: '#fff',
+            overflow: 'hidden',
+            marginRight: -8,
+            fontSize: 10,
+          },
         }}
       />
     </Tabs>

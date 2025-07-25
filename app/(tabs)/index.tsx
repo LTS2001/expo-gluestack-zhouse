@@ -8,13 +8,16 @@ import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { showToast } from '@/components/ui/toast';
 import { View } from '@/components/ui/view';
+import { LANDLORD } from '@/constants/auth';
 import { HouseToStatusMap } from '@/constants/house';
+import { SOCKET_GET_PENDING_LEASE } from '@/constants/socket';
 import { IHouse } from '@/global';
 
 import useHouse from '@/hooks/useHouse';
 import { updateHouse } from '@/request/api/house';
 import authStore from '@/stores/auth';
 import houseStore from '@/stores/house';
+import socketStore from '@/stores/socket';
 import { router, useNavigation } from 'expo-router';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
@@ -48,6 +51,7 @@ const LandlordHome = observer(() => {
 
   useEffect(() => {
     getLandlordHouseList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLogin]);
 
   /**
@@ -252,7 +256,7 @@ const LandlordHome = observer(() => {
 
 const TenantHome = observer(() => {
   const navigation = useNavigation();
-  const [ws, setWs] = useState<WebSocket>();
+  const { socketInstance } = socketStore;
   useEffect(() => {
     navigation.setOptions({
       headerTitle: '我的租房',
@@ -260,23 +264,20 @@ const TenantHome = observer(() => {
     });
   }, [navigation]);
 
-  useEffect(() => {
-    const ws = new WebSocket('ws://172.63.48.66:7003?TENANT=1');
-    setWs(ws);
-    return () => {
-      ws.close();
-    };
-  }, []);
-
   return (
     <View>
       <Text>我是租客首页</Text>
-      <Button onTouchEnd={() => {
-        ws?.send(JSON.stringify({
-          type: 'message',
-          content: '你好',
-        }));
-      }}>
+      <Button
+        onTouchEnd={() => {
+          socketInstance?.send(
+            JSON.stringify({
+              toIdentity: LANDLORD,
+              toId: 1,
+              active: SOCKET_GET_PENDING_LEASE,
+            })
+          );
+        }}
+      >
         <ButtonText>发送消息</ButtonText>
       </Button>
     </View>

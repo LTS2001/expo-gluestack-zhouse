@@ -601,9 +601,9 @@ declare module '@/global' {
   }
 
   /**
-   * report house base interface
+   * repair house base interface
    */
-  interface IBaseReport {
+  interface IBaseRepair {
     /**
      * house id
      */
@@ -617,29 +617,29 @@ declare module '@/global' {
      */
     tenantId: number;
     /**
-     * house report reason
+     * house repair reason
      */
     reason: string;
     /**
-     * house report image url
+     * house repair image url
      */
     image: string;
     /**
-     * house report video url
+     * house repair video url
      */
     video: string;
   }
 
   /**
-   * a house report interface
+   * a house repair interface
    */
-  interface IReport extends IBaseReport {
+  interface IRepair extends IBaseRepair {
     /**
      * id
      */
     id: number;
     /**
-     * report status 0(pendding) 1(processed)
+     * repair status 0(pendding) 1(processed)
      */
     status: number;
     /**
@@ -653,9 +653,9 @@ declare module '@/global' {
   }
 
   /**
-   * request param interface when add report
+   * request param interface when add repair
    */
-  type IAddReportReq = IBaseReport;
+  type IAddRepairReq = IBaseRepair;
 
   /**
    * landlord and tenant interface

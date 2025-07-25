@@ -4,7 +4,7 @@ import authStore from '@/stores/auth';
 import chatStore from '@/stores/chat';
 import houseStore from '@/stores/house';
 import leaseStore from '@/stores/lease';
-import reportStore from '@/stores/report';
+import repairStore from '@/stores/repair';
 import userStore from '@/stores/user';
 export default function useUser() {
   const { setLoginState, setToken, identity } = authStore;
@@ -12,7 +12,8 @@ export default function useUser() {
   const { clearUser, clearLeasedTenant, setUser } = userStore;
   // const {websocketInstance, clearWebsocketInstance} = socketStore;
   const { clearCurrentChatSession, clearChatSessionList } = chatStore;
-  const { clearTenantReportList, clearLandlordReportList } = reportStore;
+  const { clearTenantReportForRepairList, clearLandlordRepairList } =
+    repairStore;
   const { clearLandlordHouseList } = houseStore;
   /**
    * get user info
@@ -41,11 +42,11 @@ export default function useUser() {
     clearCurrentChatSession();
     clearChatSessionList();
     // 清除房屋维修记录
-    clearTenantReportList();
+    clearTenantReportForRepairList();
     // clear all the house info of the landlord
     clearLandlordHouseList();
     // clear landlord's house repair (tenant's application for repair)
-    clearLandlordReportList();
+    clearLandlordRepairList();
     // clear the tenant information that has rented the landlord's house
     clearLeasedTenant();
   };

@@ -8,13 +8,15 @@ import ShowHouseMessages from '@/components/show-house-messages';
 import { Button, ButtonText } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { showToast } from '@/components/ui/toast';
-import { TENANT } from '@/constants/auth';
+import { LANDLORD, TENANT } from '@/constants/auth';
 import { HouseToLeaseMap } from '@/constants/house';
+import { SOCKET_GET_PENDING_LEASE } from '@/constants/socket';
 import { IHouse, IUser } from '@/global';
 import useCollect from '@/hooks/useCollect';
 import { addLease, getLeaseStatus } from '@/request/api/house-lease';
 import authStore from '@/stores/auth';
 import houseStore from '@/stores/house';
+import socketStore from '@/stores/socket';
 import userStore from '@/stores/user';
 import { useNavigation } from '@react-navigation/native';
 import { observer } from 'mobx-react-lite';
@@ -23,7 +25,7 @@ import { ScrollView } from 'react-native';
 
 const MarketLookHouse = () => {
   const { updateHouseCollectList, currentHouse } = houseStore;
-  // const { websocketInstance } = socketStore;
+  const { socketInstance } = socketStore;
   const { user, currentLandlord } = userStore;
   const { identity } = authStore;
   // const { setChatReceiver } = chatStore;
@@ -146,6 +148,13 @@ const MarketLookHouse = () => {
       // });
       return;
     }
+    socketInstance?.send(
+      JSON.stringify({
+        toIdentity: LANDLORD,
+        toId: landlord?.id!,
+        active: SOCKET_GET_PENDING_LEASE,
+      })
+    );
     setLeaseMsgVisible(true);
   };
 

@@ -8,17 +8,18 @@ import authStore from '@/stores/auth';
 import houseStore from '@/stores/house';
 // import socketStore from '@/stores/socket';
 // import { eventCenter } from '@tarojs/runtime';
+import { getLeasePendingByLandlordId } from '@/request/api/house-lease';
 import chatStore from '@/stores/chat';
-import reportStore from '@/stores/report';
+import repairStore from '@/stores/repair';
 
 export default function useLandlord() {
   const { setLoginState, setToken } = authStore;
-  const { clearUser, leasedTenant, clearLeasedTenant } = userStore;
+  const { clearUser, clearLeasedTenant } = userStore;
   const { clearLandlordHouseList } = houseStore;
-  const { setPendingLeaseList } = leaseStore;
+  const { setLandlordPendingLeaseList } = leaseStore;
   // const {websocketInstance, clearWebsocketInstance} = socketStore;
   const { clearCurrentChatSession, clearChatSessionList } = chatStore;
-  const { clearLandlordReportList } = reportStore;
+  const { clearLandlordRepairList } = repairStore;
 
   /**
    * landlord logout
@@ -37,20 +38,20 @@ export default function useLandlord() {
     clearCurrentChatSession();
     clearChatSessionList();
     // clear landlord report list
-    clearLandlordReportList();
+    clearLandlordRepairList();
     clearLeasedTenant();
   };
 
   /**
-   * get pending lease
+   * get the lease request that needs to be processed by the landlord
    */
-  const getPendingLease = async () => {
-    // const pendingLeaseList: any = await HouseLeaseBusiness.getTenantLeasePendingTodoByLandlordId();
-    // setPendingLeaseList(pendingLeaseList);
+  const getLeaseRequestNeedProcessedByLandlord = async () => {
+    const leasePendingByLandlordId = await getLeasePendingByLandlordId();
+    setLandlordPendingLeaseList(leasePendingByLandlordId);
   };
 
   /**
-   * get tenants by landlord id
+   * get the landlord's tenants by landlord id
    */
   const getTenantsByLandlordId = async () => {
     // const tenantList: any = await LandlordBusiness.getTenantsByLandlordId();
@@ -59,7 +60,7 @@ export default function useLandlord() {
 
   return {
     landlordLogout,
-    getPendingLease,
+    getLeaseRequestNeedProcessedByLandlord,
     getTenantsByLandlordId,
   };
 }

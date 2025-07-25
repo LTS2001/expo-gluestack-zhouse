@@ -17,6 +17,7 @@ import {
   TENANT_REPORT_TEXT,
 } from '@/constants/domain';
 import '@/global.css';
+import useInitialization from '@/hooks/useInitialization';
 import {
   DarkTheme,
   DefaultTheme,
@@ -29,6 +30,7 @@ import { useColorScheme } from 'react-native';
 import 'react-native-reanimated';
 
 export default function RootLayout() {
+  useInitialization();
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),

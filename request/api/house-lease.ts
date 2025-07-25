@@ -1,4 +1,4 @@
-import { IUser } from '@/global';
+import { IPendingLease, IUser } from '@/global';
 import { axios } from '..';
 
 /**
@@ -27,3 +27,9 @@ export const addLease = (data: {
   landlordId: number;
   leaseMonths: number;
 }) => axios.post(`/lease`, data);
+
+/**
+ * get the lease request that needs to be processed by the landlord
+ */
+export const getLeasePendingByLandlordId = (): Promise<IPendingLease[]> =>
+  axios.get(`/lease/pending`);

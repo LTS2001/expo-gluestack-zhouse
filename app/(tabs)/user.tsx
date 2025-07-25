@@ -20,13 +20,13 @@ import {
   TENANT_REPORT_TEXT,
 } from '@/constants/domain';
 import useIdentity from '@/hooks/useIdentity';
-import useUser from '@/hooks/useUser';
 import authStore from '@/stores/auth';
 import houseStore from '@/stores/house';
+import leaseStore from '@/stores/lease';
 import userStore from '@/stores/user';
 import { router } from 'expo-router';
 import { observer } from 'mobx-react-lite';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 function SwitchIdentityIcon() {
@@ -49,6 +49,7 @@ const Landlord = observer(() => {
   const { user } = userStore;
   const { isLogin } = authStore;
   const { houseNumberTotal } = houseStore;
+  const { landlordPendingLeaseList } = leaseStore;
   // const { leasePendingNoticeNum } = useLease();
   // const { landlordReportPendingNoticeNum } = useReport();
   // const { getTenantsByLandlordId } = useLandlord();
@@ -74,7 +75,7 @@ const Landlord = observer(() => {
         ),
         text: LEASE_NOTICE_TEXT,
         to: LEASE_NOTICE_HREF,
-        notice: 0,
+        notice: landlordPendingLeaseList?.length ?? 0,
       },
       {
         icon: <Icon as='AntDesign' name='edit' />,
@@ -83,8 +84,7 @@ const Landlord = observer(() => {
         notice: 0,
       },
     ],
-    // [leasePendingNoticeNum, landlordReportPendingNoticeNum]
-    []
+    [landlordPendingLeaseList]
   );
 
   // useEffect(() => {
@@ -217,14 +217,7 @@ const Tenant = observer(() => {
 });
 
 function User() {
-  const { identity, isLogin } = authStore;
-  const { getUserInfo, userLogout } = useUser();
-  useEffect(() => {
-    getUserInfo();
-  }, [getUserInfo]);
-  useEffect(() => {
-    if (!isLogin) userLogout();
-  }, [isLogin, userLogout]);
+  const { identity } = authStore;
   return (
     <View className='bg-secondary-0 flex-1'>
       {identity === 'tenant' ? <Tenant /> : <Landlord />}
