@@ -15,7 +15,7 @@ export default function useTenant() {
   const { clearUser } = userStore;
   // const {websocketInstance, clearWebsocketInstance} = socketStore;
   const { clearCurrentChatSession, clearChatSessionList } = chatStore;
-  const { clearTenantReportList } = reportStore;
+  const { clearTenantReportForRepairList } = reportStore;
 
   /**
    * 租客退出登录
@@ -32,7 +32,7 @@ export default function useTenant() {
     clearCurrentChatSession();
     clearChatSessionList();
     // clear tenant report list
-    clearTenantReportList();
+    clearTenantReportForRepairList();
   };
 
   /**

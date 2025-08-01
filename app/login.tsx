@@ -27,6 +27,7 @@ export default function Login() {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [checkPasswordVisible, setCheckPasswordVisible] = useState(false);
   const [isRegister, setIsRegister] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const formSchema = z
     .object({
       phone: z
@@ -94,6 +95,7 @@ export default function Login() {
         showToast({ title: '注册成功！', icon: 'success' });
         setIsRegister(false);
       } else {
+        setIsLoading(true);
         await login({ phone, password });
         // get user information
         await getUserInfo();
@@ -101,6 +103,8 @@ export default function Login() {
       }
     } catch (err) {
       console.log('err', err);
+    } finally {
+      setIsLoading(false);
     }
   };
   useEffect(() => {
@@ -239,6 +243,14 @@ export default function Login() {
         )}
         <Button className='mt-4' onTouchEnd={handleSubmit(handleUserSubmit)}>
           <ButtonText>{isRegister ? '注册' : '登录'}</ButtonText>
+          {isLoading && (
+            <Icon
+              as='Feather'
+              name='loader'
+              className='animate-spin'
+              size={18}
+            />
+          )}
         </Button>
         {!isRegister && (
           <View className='flex-row justify-center mt-6'>

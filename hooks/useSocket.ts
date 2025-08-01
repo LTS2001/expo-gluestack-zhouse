@@ -1,4 +1,4 @@
-import { SERVER_IP, SOCKET_PROTOCOL, WEBSOCKET_PORT } from '@/constants';
+import { SERVER_SOCKET_ROOT } from '@/constants';
 import { LANDLORD, TENANT } from '@/constants/auth';
 import {
   RECONNECT_INTERVAL,
@@ -36,18 +36,14 @@ export default function useSocket() {
   const { getLandlordRepairList } = useRepair();
   // const { getChatSessionList } = useChat();
 
-  // connect
-  const connect = ({
-    identity,
-    userId,
-  }: {
-    identity: string;
-    userId: number;
-  }) => {
-    console.log('connect', identity, userId);
-    const ws = new WebSocket(
-      `${SOCKET_PROTOCOL}://${SERVER_IP}:${WEBSOCKET_PORT}?${identity}=${userId}`
-    );
+  /**
+   * connect to websocket
+   * @param identity - user identity
+   * @param userId - user id
+   */
+  const connect = (identity?: string, userId?: number) => {
+    if (!identity || !userId) return;
+    const ws = new WebSocket(`${SERVER_SOCKET_ROOT}?${identity}=${userId}`);
     setWebsocketInstance(ws);
 
     ws.onopen = () => {
@@ -136,8 +132,7 @@ export default function useSocket() {
     const disposer = autorun(() => {
       const id = userStore.user?.id;
       const identity = authStore.identity;
-      if (!id || !identity) return;
-      connect({ identity, userId: id });
+      connect(identity, id);
       subscribeWebSocketEvent();
     });
     return () => disposer();

@@ -53,6 +53,30 @@ class AuthStore {
   preIdentity: TIdentity | undefined = undefined;
 
   /**
+   * flag user is already tip not login
+   */
+  isAlreadyTipNotLogin: boolean = false;
+
+  /**
+   * flag user is already tip request error
+   */
+  isAlreadyTipRequestError: boolean = false;
+
+  /**
+   * set flag user is already tip not login
+   */
+  setIsAlreadyTipNotLogin(flag: boolean) {
+    this.isAlreadyTipNotLogin = flag;
+  }
+
+  /**
+   * set flag user is already tip request error
+   */
+  setIsAlreadyTipRequestError(flag: boolean) {
+    this.isAlreadyTipRequestError = flag;
+  }
+
+  /**
    * set token
    */
   async setToken(token: string) {

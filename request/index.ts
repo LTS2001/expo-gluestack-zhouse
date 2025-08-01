@@ -1,11 +1,11 @@
 import { showToast } from '@/components/ui/toast';
-import { PROTOCOL, SERVER_IP, SERVER_PORT } from '@/constants';
+import { SERVER_API_ROOT } from '@/constants';
 import { NOT_LOGIN_ERROR, SUCCESS } from '@/constants/code';
 import { BaseRes } from '@/global';
 import authStore from '@/stores/auth';
 import _, { AxiosResponse } from 'axios';
 const axios = _.create({
-  baseURL: `${PROTOCOL}://${SERVER_IP}:${SERVER_PORT}`,
+  baseURL: SERVER_API_ROOT,
   timeout: 5000,
 });
 
@@ -45,7 +45,10 @@ axios.interceptors.response.use(
         if (authStore.isLogin) {
           await authStore.setLoginState(false);
         }
-        showToast({ title: '未登录' });
+        if (!authStore.isAlreadyTipNotLogin) {
+          authStore.setIsAlreadyTipNotLogin(true);
+          showToast({ title: '未登录' });
+        }
         return new Promise(() => {});
       } else {
         showToast({ title: res.data.message });
@@ -55,7 +58,7 @@ axios.interceptors.response.use(
   },
   // is mean fail to connect server
   (error) => {
-    console.log('axios error', error);
+    console.log('axios error', JSON.stringify(error));
     showToast({ title: '请求出错了！', icon: 'error' });
     // interrupt promise chain
     return new Promise(() => {});

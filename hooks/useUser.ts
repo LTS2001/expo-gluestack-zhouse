@@ -6,6 +6,7 @@ import houseStore from '@/stores/house';
 import leaseStore from '@/stores/lease';
 import repairStore from '@/stores/repair';
 import userStore from '@/stores/user';
+import { useCallback } from 'react';
 export default function useUser() {
   const { setLoginState, setToken, identity } = authStore;
   const { clearLeaseHouse } = leaseStore;
@@ -18,11 +19,12 @@ export default function useUser() {
   /**
    * get user info
    */
-  const getUserInfo = async () => {
+  const getUserInfo = useCallback(async () => {
     if (!identity) return;
     const user = await getUser();
     user && setUser(user);
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [identity]);
 
   /**
    * user(tenant/landlord) logout

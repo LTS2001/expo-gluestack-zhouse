@@ -16,5 +16,6 @@ export default function useInitialization() {
   }, [getUserInfo]);
   useEffect(() => {
     if (!isLogin) userLogout();
-  }, [isLogin, userLogout]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLogin]);
 }

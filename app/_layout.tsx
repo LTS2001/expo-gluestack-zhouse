@@ -45,7 +45,7 @@ export default function RootLayout() {
     <GluestackUIProvider mode={colorScheme ?? 'light'}>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <Stack
-          initialRouteName='(tabs)'
+          initialRouteName='identity'
           screenOptions={{ headerTitleAlign: 'center' }}
         >
           <Stack.Screen name='identity' options={{ headerShown: false }} />

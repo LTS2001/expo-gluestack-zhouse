@@ -1,9 +1,4 @@
 /**
- * image and video server root
- */
-export const SERVER_ROOT = `http://172.63.48.66:3000`;
-
-/**
  * default image
  */
 export const DEFAULT_IMG = '/common/male.png';

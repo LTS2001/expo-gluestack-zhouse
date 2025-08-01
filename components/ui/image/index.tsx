@@ -1,5 +1,5 @@
 'use client';
-import { SERVER_ROOT } from '@/constants/image';
+import { SERVER_IMAGE_ROOT } from '@/constants';
 import { createImage } from '@gluestack-ui/image';
 import type { VariantProps } from '@gluestack-ui/nativewind-utils';
 import { tva } from '@gluestack-ui/nativewind-utils/tva';
@@ -40,7 +40,14 @@ const Image = React.forwardRef<
     needShadow?: boolean;
   }
 >(function Image(
-  { size = 'md', className, needShadow, style: _style, src = '/common/male.png', ...props },
+  {
+    size = 'md',
+    className,
+    needShadow,
+    style: _style,
+    src = '/common/male.png',
+    ...props
+  },
   ref
 ) {
   const colorSchema = useColorScheme();
@@ -48,7 +55,7 @@ const Image = React.forwardRef<
     <UIImage
       className={imageStyle({ size, class: className })}
       alt=''
-      source={src ? { uri: SERVER_ROOT + src } : { uri: ' ' }}
+      source={src ? { uri: SERVER_IMAGE_ROOT + src } : { uri: ' ' }}
       {...props}
       ref={ref}
       style={Object.assign(
@@ -73,4 +80,3 @@ const Image = React.forwardRef<
 
 Image.displayName = 'Image';
 export { Image };
-

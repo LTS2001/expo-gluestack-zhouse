@@ -5,12 +5,12 @@ import { View } from '@/components/ui/view';
 import HouseImageList from '@/components/house-image-list';
 import ShowCollectFees from '@/components/show-collect-fees';
 import ShowHouseMessages from '@/components/show-house-messages';
+import { AlertDialogGroup } from '@/components/ui/alert-dialog';
 import { Button, ButtonText } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { showToast } from '@/components/ui/toast';
-import { LANDLORD, TENANT } from '@/constants/auth';
+import { TENANT } from '@/constants/auth';
 import { HouseToLeaseMap } from '@/constants/house';
-import { SOCKET_GET_PENDING_LEASE } from '@/constants/socket';
 import { IHouse, IUser } from '@/global';
 import useCollect from '@/hooks/useCollect';
 import { addLease, getLeaseStatus } from '@/request/api/house-lease';
@@ -148,13 +148,6 @@ const MarketLookHouse = () => {
       // });
       return;
     }
-    socketInstance?.send(
-      JSON.stringify({
-        toIdentity: LANDLORD,
-        toId: landlord?.id!,
-        active: SOCKET_GET_PENDING_LEASE,
-      })
-    );
     setLeaseMsgVisible(true);
   };
 
@@ -232,12 +225,12 @@ const MarketLookHouse = () => {
         </View>
         <ShowCollectFees houses={houses} />
         <ShowHouseMessages houses={houses} />
-        {/* <Alter
+        <AlertDialogGroup
           visible={leasePopupVisible}
           onClose={() => setLeasePopupVisible(false)}
           onConfirm={toLease}
           content='您的信息将会提供给房东，是否继续？'
-        /> */}
+        />
       </View>
       {/* <Popup
         title='请填写租赁信息'

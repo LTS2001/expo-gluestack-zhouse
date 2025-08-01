@@ -18,7 +18,7 @@ import { updateHouse } from '@/request/api/house';
 import authStore from '@/stores/auth';
 import houseStore from '@/stores/house';
 import socketStore from '@/stores/socket';
-import { router, useNavigation } from 'expo-router';
+import { Redirect, router, useNavigation } from 'expo-router';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
@@ -286,6 +286,12 @@ const TenantHome = observer(() => {
 
 function Home() {
   const { identity } = authStore;
-  return identity === 'tenant' ? <TenantHome /> : <LandlordHome />;
+  return identity === 'tenant' ? (
+    <TenantHome />
+  ) : identity === 'landlord' ? (
+    <LandlordHome />
+  ) : (
+    <Redirect href='/identity' />
+  );
 }
 export default observer(Home);

@@ -1,22 +1,14 @@
 /**
- * protocol
+ * api server root
  */
-export const PROTOCOL = 'http';
-/**
- * server ip
- */
-export const SERVER_IP = '172.63.48.66';
-/**
- * websocket protocol
- */
-export const SOCKET_PROTOCOL = 'ws';
+export const SERVER_API_ROOT = `https://3a0c8fea3cef.ngrok-free.app`;
 
 /**
- * server port
+ * websocket server root
  */
-export const SERVER_PORT = '7002';
+export const SERVER_SOCKET_ROOT = `ws://172.63.53.13:7003`;
 
 /**
- * websocket port
+ * image and video server root
  */
-export const WEBSOCKET_PORT = '7003';
+export const SERVER_IMAGE_ROOT = `https://e4750899d583.ngrok-free.app`;

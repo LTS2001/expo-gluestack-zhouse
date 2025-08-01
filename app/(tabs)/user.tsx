@@ -24,7 +24,7 @@ import authStore from '@/stores/auth';
 import houseStore from '@/stores/house';
 import leaseStore from '@/stores/lease';
 import userStore from '@/stores/user';
-import { router } from 'expo-router';
+import { Redirect, router } from 'expo-router';
 import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -33,12 +33,15 @@ function SwitchIdentityIcon() {
   const insets = useSafeAreaInsets();
   const { switchIdentity } = useIdentity();
   return (
-    <View style={{ paddingTop: insets.top + 16 }} className='ml-6'>
+    <View
+      style={{ marginTop: insets.top + 4 }}
+      className='ml-3 relative self-start p-3'
+      onTouchEnd={switchIdentity}
+    >
       <Icon
         as='FontAwesome6'
         name='user-pen'
         color='#eee'
-        onTouchEnd={switchIdentity}
         className='self-start'
       />
     </View>
@@ -97,19 +100,21 @@ const Landlord = observer(() => {
     <>
       <View className='h-80 bg-theme-primary'>
         <SwitchIdentityIcon />
-        <View
-          className='items-center -mt-2'
-          onTouchEnd={() => router.push(isLogin ? '/self-info' : '/login')}
-        >
-          <Image
-            src={user?.headImg}
-            className='bg-white rounded-full shadow-hard-1'
-            size='xl'
-            needShadow
-          />
-          <Text className='font-bold text-white text-2xl mt-2'>
-            {isLogin ? user?.name : '请登录'}
-          </Text>
+        <View className='justify-center items-center'>
+          <View
+            className='items-center -mt-5'
+            onTouchEnd={() => router.push(isLogin ? '/self-info' : '/login')}
+          >
+            <Image
+              src={user?.headImg}
+              className='bg-white rounded-full shadow-hard-1'
+              size='xl'
+              needShadow
+            />
+            <Text className='font-bold text-white text-2xl mt-2'>
+              {isLogin ? user?.name : '请登录'}
+            </Text>
+          </View>
         </View>
       </View>
       <View className='flex-row justify-center gap-6 -mt-12'>
@@ -220,7 +225,13 @@ function User() {
   const { identity } = authStore;
   return (
     <View className='bg-secondary-0 flex-1'>
-      {identity === 'tenant' ? <Tenant /> : <Landlord />}
+      {identity === 'tenant' ? (
+        <Tenant />
+      ) : identity === 'landlord' ? (
+        <Landlord />
+      ) : (
+        <Redirect href='/identity' />
+      )}
     </View>
   );
 }
