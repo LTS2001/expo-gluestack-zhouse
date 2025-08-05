@@ -1,3 +1,5 @@
+import { ConnectionState } from '@/constants/socket';
+import { ISocketMessage } from '@/global';
 import { configure, makeAutoObservable } from 'mobx';
 
 configure({
@@ -15,6 +17,26 @@ class SocketStore {
   socketInstance: WebSocket | undefined = undefined;
 
   /**
+   * connection state
+   */
+  connectionState: ConnectionState = ConnectionState.DISCONNECTED;
+
+  /**
+   * reconnect attempts
+   */
+  reconnectAttempts: number = 0;
+
+  /**
+   * last connected at
+   */
+  lastConnectedAt: Date | null = null;
+
+  /**
+   * message queue
+   */
+  messageQueue: ISocketMessage[] = [];
+
+  /**
    * set websocket instance
    * @param instance
    */
@@ -27,6 +49,41 @@ class SocketStore {
    */
   clearWebsocketInstance() {
     this.socketInstance = undefined;
+  }
+
+  /**
+   * set connection state
+   */
+  setConnectionState(state: ConnectionState) {
+    this.connectionState = state;
+  }
+
+  /**
+   * set reconnect attempts
+   */
+  setReconnectAttempts(attempts: number) {
+    this.reconnectAttempts = attempts;
+  }
+
+  /**
+   * set last connected at
+   */
+  setLastConnectedAt(date: Date) {
+    this.lastConnectedAt = date;
+  }
+
+  /**
+   * add message to queue
+   */
+  addToMessageQueue(message: ISocketMessage) {
+    this.messageQueue.push(message);
+  }
+
+  /**
+   * clear message queue
+   */
+  clearMessageQueue() {
+    this.messageQueue = [];
   }
 }
 

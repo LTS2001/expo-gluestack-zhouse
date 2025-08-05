@@ -1,3 +1,4 @@
+import { SOCKET_MESSAGES } from '@/constants/socket';
 declare module '@/global' {
   type TIdentity = 'landlord' | 'tenant';
 
@@ -759,5 +760,20 @@ declare module '@/global' {
     };
     poiaddress: string;
     poiname: string;
+  }
+
+  /**
+   * websocket message types
+   */
+  type SocketMessageActionType =
+    (typeof SOCKET_MESSAGES)[keyof typeof SOCKET_MESSAGES];
+
+  /**
+   * websocket message interface
+   */
+  interface ISocketMessage {
+    toIdentity: TIdentity;
+    toId: number;
+    active: SocketMessageActionType;
   }
 }

@@ -1,29 +1,49 @@
 /**
- * reconnect interval
+ * websocket message types
  */
-export const RECONNECT_INTERVAL = 3000;
+export const SOCKET_MESSAGES = {
+  HEARTBEAT: 'Heartbeat',
+  GET_PENDING_LEASE: 'GetPendingLease',
+  GET_LANDLORD_REPORT: 'GetLandlordReport',
+  GET_TENANT_LEASE_HOUSE: 'GetTenantLeaseHouse',
+  GET_TENANT_REPORT: 'GetTenantReport',
+  GET_CHAT_MESSAGE: 'GetChatMessage',
+};
+
+// for backward compatibility, keep the original exports
+export const SOCKET_GET_PENDING_LEASE = SOCKET_MESSAGES.GET_PENDING_LEASE;
+export const SOCKET_GET_LANDLORD_REPORT = SOCKET_MESSAGES.GET_LANDLORD_REPORT;
+export const SOCKET_GET_TENANT_LEASE_HOUSE =
+  SOCKET_MESSAGES.GET_TENANT_LEASE_HOUSE;
+export const SOCKET_GET_TENANT_REPORT = SOCKET_MESSAGES.GET_TENANT_REPORT;
+export const SOCKET_GET_CHAT_MESSAGE = SOCKET_MESSAGES.GET_CHAT_MESSAGE;
+export const SOCKET_HEARTBEAT = SOCKET_MESSAGES.HEARTBEAT;
 
 /**
- * websocket: get pending lease
+ * heartbeat configuration
  */
-export const SOCKET_GET_PENDING_LEASE = 'GetPendingLease';
+export const SOCKET_HEARTBEAT_INTERVAL = 30000; // 30 seconds send heartbeat
+export const SOCKET_HEARTBEAT_TIMEOUT = 10000; // 10 seconds no heartbeat response, consider disconnected
 
 /**
- * websocket: get landlord report
+ * reconnection configuration
  */
-export const SOCKET_GET_LANDLORD_REPORT = 'GetLandlordReport';
+export const SOCKET_MAX_RECONNECT_ATTEMPTS = 10; // maximum reconnection attempts
+export const SOCKET_BASE_RECONNECT_DELAY = 1000; // base reconnection delay (milliseconds)
+export const SOCKET_MAX_RECONNECT_DELAY = 30000; // maximum reconnection delay (milliseconds)
 
 /**
- * websocket: get tenant lease house
+ * message queue configuration
  */
-export const SOCKET_GET_TENANT_LEASE_HOUSE = 'GetTenantLeaseHouse';
+export const SOCKET_MAX_QUEUE_SIZE = 100; // maximum queue size
+export const SOCKET_QUEUE_TIMEOUT = 60000; // message queue timeout (milliseconds)
 
 /**
- * websocket: get tenant report
+ * websocket connection state enum
  */
-export const SOCKET_GET_TENANT_REPORT = 'GetTenantReport';
-
-/**
- * websocket: get chat message
- */
-export const SOCKET_GET_CHAT_MESSAGE = 'GetChatMessage';
+export enum ConnectionState {
+  DISCONNECTED = 'disconnected',
+  CONNECTING = 'connecting',
+  CONNECTED = 'connected',
+  RECONNECTING = 'reconnecting',
+}
