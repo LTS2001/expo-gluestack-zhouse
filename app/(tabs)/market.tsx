@@ -129,7 +129,7 @@ const Market = () => {
    */
   const getHouseCollectNum = async () => {
     if (marketHouseList instanceof Array && marketHouseList[0]?.houseId) {
-      const collectList: any = await getCollectHouseNum(
+      const collectList = await getCollectHouseNum(
         marketHouseList.map((house) => house?.houseId).join(',')!
       );
       setHouseCollectList([

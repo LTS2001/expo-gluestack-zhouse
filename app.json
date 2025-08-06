@@ -17,7 +17,12 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.litaosheng.expogluestackzhouse"
+      "package": "com.litaosheng.expogluestackzhouse",
+      "permissions": [
+        "CALL_PHONE",
+        "READ_PHONE_STATE",
+        "READ_PHONE_NUMBERS"
+      ]
     },
     "web": {
       "bundler": "metro",

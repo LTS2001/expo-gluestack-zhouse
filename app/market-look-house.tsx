@@ -1,35 +1,49 @@
 import { Image } from '@/components/ui/image';
 import { Text } from '@/components/ui/text';
 import { View } from '@/components/ui/view';
+import { makePhoneCall } from '@/utils/phone';
 
 import HouseImageList from '@/components/house-image-list';
 import ShowCollectFees from '@/components/show-collect-fees';
 import ShowHouseMessages from '@/components/show-house-messages';
 import { AlertDialogGroup } from '@/components/ui/alert-dialog';
 import { Button, ButtonText } from '@/components/ui/button';
+import { DrawerGroup } from '@/components/ui/drawer';
+import {
+  FormControl,
+  FormControlErrorText,
+} from '@/components/ui/form-control';
 import { Icon } from '@/components/ui/icon';
+import { Input, InputField } from '@/components/ui/input';
 import { showToast } from '@/components/ui/toast';
-import { TENANT } from '@/constants/auth';
+import { LANDLORD, TENANT } from '@/constants/auth';
 import { HouseToLeaseMap } from '@/constants/house';
+import { SOCKET_GET_PENDING_LEASE } from '@/constants/socket';
 import { IHouse, IUser } from '@/global';
 import useCollect from '@/hooks/useCollect';
 import { addLease, getLeaseStatus } from '@/request/api/house-lease';
 import authStore from '@/stores/auth';
+import chatStore from '@/stores/chat';
 import houseStore from '@/stores/house';
 import socketStore from '@/stores/socket';
 import userStore from '@/stores/user';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigation } from '@react-navigation/native';
+import { router } from 'expo-router';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { ScrollView } from 'react-native';
+import { z } from 'zod';
 
 const MarketLookHouse = () => {
   const { updateHouseCollectList, currentHouse } = houseStore;
   const { socketInstance } = socketStore;
   const { user, currentLandlord } = userStore;
   const { identity } = authStore;
+  const { setChatReceiver } = chatStore;
   // const { setChatReceiver } = chatStore;
-  const { changeCollectStatus, getHouseCollectStatus } = useCollect();
+  const { changeHouseCollectStatus, getHouseCollectStatus } = useCollect();
   // const { useLeaveChatSession } = useChat();
 
   const [houses, setHouses] = useState<IHouse>();
@@ -42,11 +56,28 @@ const MarketLookHouse = () => {
   const [leaseState, setLeaseState] = useState(0);
   // lease message popup visible
   const [leaseMsgVisible, setLeaseMsgVisible] = useState(false);
-  const [leaseMonths, setLeaseMonths] = useState('');
+  const [leaseMonths, setLeaseMonths] = useState(0);
 
   // useLeaveChatSession();
 
   const navigation = useNavigation();
+
+  const formSchema = z.object({
+    leaseMonths: z.coerce
+      .number({
+        required_error: '请填写租赁月数',
+        invalid_type_error: '只能输入数字',
+      })
+      .min(3, { message: '租赁月数至少为3个月' })
+      .max(60, { message: '租赁月数最多为60个月' }),
+  });
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+  });
 
   useEffect(() => {
     navigation.setOptions({
@@ -57,111 +88,124 @@ const MarketLookHouse = () => {
     return () => {
       houseStore.clearCurrentHouse();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /**
-   * 打电话
+   * make phone call to landlord
    */
-  const phoneLandlord = () => {
-    // landlord?.phone &&
-    //   makePhoneCall({
-    //     phoneNumber: landlord.phone,
-    //   });
+  const phoneLandlord = async () => {
+    if (landlord?.phone) {
+      await makePhoneCall(landlord.phone);
+    } else {
+      showToast({
+        title: '房东电话信息不可用',
+        action: 'error',
+      });
+    }
   };
 
   /**
-   * 去改变房屋的收藏状态
+   * change house collect status
    */
   const toChangeHouseCollectStatus = async () => {
-    // const res: any = await changeCollectStatus(
-    //   houses?.houseId!,
-    //   landlord?.id!,
-    //   Number(!collected)
-    // );
-    // setCollected(!collected);
-    // updateHouseCollectList(res.houseId, res.status);
+    const res = await changeHouseCollectStatus(
+      houses?.houseId!,
+      landlord?.id!,
+      Number(!collected)
+    );
+    setCollected(!collected);
+    updateHouseCollectList(res.houseId, res.status);
   };
 
   /**
-   * 获取当前房屋的收藏状态
+   * get current house collect status
    */
   const getCurrentHouseCollectStatus = async () => {
     if (houses?.houseId) {
-      const status: number | null = await getHouseCollectStatus(houses.houseId);
+      const status = await getHouseCollectStatus(houses.houseId);
       status && setCollected(Boolean(status));
     }
   };
 
   /**
-   * 获取当前房屋的租赁状态
+   * get current house lease status
    */
   const getCurrentHouseLeaseStatue = async () => {
-    // 未登录
+    // not login
     if (!authStore.isLogin) return;
     if (houses?.houseId && user?.id) {
-      const res: any = await getLeaseStatus(houses?.houseId, user?.id);
+      const res = await getLeaseStatus(houses?.houseId, user?.id);
       res?.status && setLeaseState(res.status);
     }
   };
 
-  // 租客未登录进来，点击收藏或者租赁
+  // tenant not login, click collect or lease
   useEffect(() => {
     getCurrentHouseCollectStatus();
     getCurrentHouseLeaseStatue();
-  }, [houses?.houseId, user?.id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [houses, user]);
 
   /**
-   * 去租赁
+   * send lease request to landlord
    */
-  const toLease = async () => {
+  const sendLeaseRequest = async () => {
     if (houses?.houseId && user?.id) {
-      const res: any = await addLease({
+      const res = await addLease({
         houseId: houses?.houseId,
         landlordId: landlord?.id!,
         tenantId: user?.id,
-        leaseMonths: Number(leaseMonths),
+        leaseMonths,
       });
       if (!res.status) return;
       setLeaseState(res.status);
       showToast({
-        title: '申请发送成功，等待处理！',
+        title: '申请发送成功，请耐心等待房东处理',
       });
       setLeasePopupVisible(false);
-      // websocketInstance &&
-      //   websocketInstance.send({
-      //     data: JSON.stringify({
-      //       toIdentity: AuthConstant.LANDLORD,
-      //       toId: landlord?.id!,
-      //       active: BusinessConstant.SOCKET_GET_PENDING_LEASE,
-      //     }),
-      //   });
+      setLeaseMsgVisible(false);
+      socketInstance?.send(
+        JSON.stringify({
+          toIdentity: LANDLORD,
+          toId: landlord?.id!,
+          active: SOCKET_GET_PENDING_LEASE,
+        })
+      );
     }
   };
 
   /**
-   * 处理点击租赁按钮事件
+   * handle click lease btn
    */
   const handleClickLeaseBtn = () => {
     if (!authStore.isLogin) {
-      // navigateTo({
-      //   url: `/pages/login/index?execute=${BusinessConstant.EXECUTE_BACK}`,
-      // });
+      router.push('/login');
       return;
     }
     setLeaseMsgVisible(true);
   };
 
-  const lookHouseComment = () => {
-    // navigateTo({
-    //   url: `/pages/houseAllComment/index?houseName=${houses?.name}&houseId=${houses?.houseId}`,
-    // });
+  /**
+   * look house all comment
+   */
+  const lookHouseAllComment = () => {
+    router.push({
+      pathname: '/house-all-comment',
+      params: {
+        houseName: houses?.name,
+        houseId: houses?.houseId,
+      },
+    });
   };
 
+  /**
+   * to chat
+   */
   const toChat = () => {
-    // setChatReceiver(currentLandlord);
-    // navigateTo({
-    //   url: `/pages/chatMessage/index`,
-    // });
+    if (!currentLandlord) return;
+    setChatReceiver(currentLandlord);
+    router.push('/chat-message');
   };
 
   return (
@@ -180,7 +224,7 @@ const MarketLookHouse = () => {
             </View>
             <View
               className='flex-row items-center gap-1 self-end'
-              onTouchEnd={lookHouseComment}
+              onTouchEnd={lookHouseAllComment}
             >
               <Text>查看房屋评论</Text>
               <Icon as='AntDesign' name='right' size={16} />
@@ -189,7 +233,7 @@ const MarketLookHouse = () => {
           {identity === TENANT && (
             <View className='flex-row items-center gap-8'>
               <View onTouchEnd={toChangeHouseCollectStatus}>
-                {!collected ? (
+                {collected ? (
                   <Icon
                     as='AntDesign'
                     name='star'
@@ -215,10 +259,10 @@ const MarketLookHouse = () => {
                 <ButtonText>租赁</ButtonText>
               </Button>
             ) : (
-              <View className='already-leased'>
-                <View className='line'></View>
+              <View className='flex-row items-center gap-2 justify-center'>
+                <View className='h-[1px] bg-primary-0 flex-1'></View>
                 <Text className='text'>已向房东发送租赁请求</Text>
-                <View className='line'></View>
+                <View className='h-[1px] bg-primary-0 flex-1'></View>
               </View>
             )
           ) : null}
@@ -228,36 +272,43 @@ const MarketLookHouse = () => {
         <AlertDialogGroup
           visible={leasePopupVisible}
           onClose={() => setLeasePopupVisible(false)}
-          onConfirm={toLease}
+          onConfirm={sendLeaseRequest}
           content='您的信息将会提供给房东，是否继续？'
         />
+        <DrawerGroup
+          visible={leaseMsgVisible}
+          onClose={() => setLeaseMsgVisible(false)}
+          onConfirm={handleSubmit((val) => {
+            setLeaseMonths(val.leaseMonths);
+            setLeasePopupVisible(true);
+          })}
+          title={<Text className='font-bold text-2xl'>请填写租赁信息</Text>}
+          content={
+            <FormControl className='flex-1 '>
+              <View className='flex-row gap-2 items-center'>
+                <Text className='text-lg'>租赁月数：</Text>
+                <View className='flex-1'>
+                  <Controller
+                    name='leaseMonths'
+                    control={control}
+                    render={({ field: { onChange } }) => (
+                      <Input variant='underlined'>
+                        <InputField
+                          placeholder='您打算租多少个月'
+                          onChangeText={onChange}
+                        />
+                      </Input>
+                    )}
+                  />
+                </View>
+              </View>
+              <FormControlErrorText className='mt-1'>
+                {errors.leaseMonths?.message}
+              </FormControlErrorText>
+            </FormControl>
+          }
+        />
       </View>
-      {/* <Popup
-        title='请填写租赁信息'
-        visible={leaseMsgVisible}
-        onClose={() => setLeaseMsgVisible(false)}
-        onConfirm={async () => {
-          if (!leaseMonths) {
-            showToast({ title: '请填写租赁月数', icon: 'none' });
-            return;
-          }
-          if (isNaN(Number(leaseMonths))) {
-            showToast({ title: '租赁月数只能填数字', icon: 'none' });
-            return;
-          }
-          setLeaseMsgVisible(false);
-          setLeasePopupVisible(true);
-        }}
-      >
-        <View className='flex items-center'>
-          <Text>租赁月数：</Text>
-          <Input
-            placeholder='您打算租多少个月'
-            onChange={(value) => setLeaseMonths(value)}
-            type='number'
-          ></Input>
-        </View>
-      </Popup> */}
     </ScrollView>
   );
 };

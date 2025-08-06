@@ -119,6 +119,19 @@ declare module '@/global' {
   }
 
   /**
+   * collect
+   */
+  interface ICollect {
+    createdAt: string;
+    houseId: number;
+    id: number;
+    landlordId: number;
+    status: number;
+    tenantId: number;
+    updatedAt: string;
+  }
+
+  /**
    * when tenant add comment interface
    */
   interface IAddComment {
@@ -510,6 +523,20 @@ declare module '@/global' {
    * leases that currently exist
    */
   type IExistLease = IPendingLease;
+
+  /**
+   * lease
+   */
+  interface ILease {
+    createdAt: string;
+    houseId: number;
+    id: number;
+    landlordId: number;
+    leaseMonths: number;
+    status: number;
+    tenantId: number;
+    updatedAt: string;
+  }
 
   /**
    * landlord add rent bill interface
