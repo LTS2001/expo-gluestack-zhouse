@@ -1,4 +1,4 @@
-import { SOCKET_MESSAGES } from '@/constants/socket';
+import { SOCKET_MESSAGES } from '@/constants';
 declare module '@/global' {
   type TIdentity = 'landlord' | 'tenant';
 

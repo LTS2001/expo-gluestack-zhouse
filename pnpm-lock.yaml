@@ -20,9 +20,6 @@ importers:
       '@gluestack-ui/divider':
         specifier: ^0.1.10
         version: 0.1.10(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-      '@gluestack-ui/fab':
-        specifier: ^0.1.28
-        version: 0.1.28(react-dom@19.0.0(react@19.0.0))(react-native@0.79.2(@babel/core@7.27.7)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0)
       '@gluestack-ui/form-control':
         specifier: ^0.1.19
         version: 0.1.19(react-dom@19.0.0(react@19.0.0))(react-native@0.79.2(@babel/core@7.27.7)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0)
@@ -892,12 +889,6 @@ packages:
 
   '@gluestack-ui/divider@0.1.10':
     resolution: {integrity: sha512-/hZx1Rmy4Pgln9AwAprAEQcxYPEHjHSNF4xCUWlK/q0peyiMT5Nagt54VnxykVn5A0b2zg5QKP0pOqOF9xeE6w==}
-    peerDependencies:
-      react: '>=16'
-      react-dom: '>=16'
-
-  '@gluestack-ui/fab@0.1.28':
-    resolution: {integrity: sha512-NTzTN08KyX3iqcC5LiRqymrO+TlCzfcjDS5GeO0Y+1AiH7loKwWwDm0PFn3TbflfycRTG0jw8RkUqs2Ckov/mg==}
     peerDependencies:
       react: '>=16'
       react-dom: '>=16'
@@ -5916,16 +5907,6 @@ snapshots:
     dependencies:
       react: 19.0.0
       react-dom: 19.0.0(react@19.0.0)
-
-  '@gluestack-ui/fab@0.1.28(react-dom@19.0.0(react@19.0.0))(react-native@0.79.2(@babel/core@7.27.7)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0)':
-    dependencies:
-      '@gluestack-ui/utils': 0.1.15(react-dom@19.0.0(react@19.0.0))(react-native@0.79.2(@babel/core@7.27.7)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0)
-      '@react-native-aria/focus': 0.2.9(react-dom@19.0.0(react@19.0.0))(react-native@0.79.2(@babel/core@7.27.7)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0)
-      '@react-native-aria/interactions': 0.2.16(react-dom@19.0.0(react@19.0.0))(react-native@0.79.2(@babel/core@7.27.7)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0)
-      react: 19.0.0
-      react-dom: 19.0.0(react@19.0.0)
-    transitivePeerDependencies:
-      - react-native
 
   '@gluestack-ui/form-control@0.1.19(react-dom@19.0.0(react@19.0.0))(react-native@0.79.2(@babel/core@7.27.7)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0)':
     dependencies:

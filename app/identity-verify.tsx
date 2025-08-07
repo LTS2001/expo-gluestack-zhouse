@@ -1,25 +1,24 @@
-import { Button, ButtonText } from '@/components/ui/button';
+import { getUserInfo, uploadIdentityCardImage } from '@/business';
 import {
+  Button,
+  ButtonText,
   FormControl,
   FormControlErrorText,
-} from '@/components/ui/form-control';
-import { Icon } from '@/components/ui/icon';
-import { Image } from '@/components/ui/image';
-import { Input, InputField } from '@/components/ui/input';
-import {
+  Icon,
+  Image,
+  Input,
+  InputField,
   Radio,
   RadioGroup,
   RadioIcon,
   RadioIndicator,
   RadioLabel,
-} from '@/components/ui/radio';
-import { Text } from '@/components/ui/text';
-import { showToast } from '@/components/ui/toast';
-import { View } from '@/components/ui/view';
-import useUpload from '@/hooks/useUpload';
-import useUser from '@/hooks/useUser';
-import { updateUser } from '@/request/api/user';
-import { formatUtcTime } from '@/utils/common';
+  showToast,
+  Text,
+  View,
+} from '@/components/ui';
+import { putUserApi } from '@/request';
+import { formatUtcTime } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { router } from 'expo-router';
@@ -81,8 +80,6 @@ const IdentityVerify = () => {
   } = useForm<TFormSchema>({
     resolver: zodResolver(formSchema),
   });
-  const { uploadIdentityCardImage } = useUpload();
-  const { getUserInfo } = useUser();
   const [bornVisible, setBornVisible] = useState(false);
 
   const uploadIdCard = async (onChange: (...event: any[]) => void) => {
@@ -232,7 +229,7 @@ const IdentityVerify = () => {
 
   const onFinish = async (value: TFormSchema) => {
     const { identityImgFront, identityImgBack, identitySex, ..._vals } = value;
-    await updateUser({
+    await putUserApi({
       ..._vals,
       identitySex: Number(identitySex),
       identityImg: JSON.stringify([identityImgFront, identityImgBack]),

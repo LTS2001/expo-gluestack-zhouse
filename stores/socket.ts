@@ -1,4 +1,4 @@
-import { ConnectionState } from '@/constants/socket';
+import { ConnectionState } from '@/constants';
 import { ISocketMessage } from '@/global';
 import { configure, makeAutoObservable } from 'mobx';
 

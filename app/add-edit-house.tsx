@@ -1,32 +1,31 @@
-import ImagePreview from '@/components/image-preview';
-import Tag from '@/components/tag';
-import { Button, ButtonText } from '@/components/ui/button';
+import { getLandlordHouseList, uploadImage } from '@/business';
+import { ImagePreview, Tag } from '@/components';
 import {
+  Button,
+  ButtonText,
   FormControl,
   FormControlErrorText,
-} from '@/components/ui/form-control';
-import { Icon } from '@/components/ui/icon';
-import { Image } from '@/components/ui/image';
-import { Input, InputField } from '@/components/ui/input';
-import {
+  Icon,
+  Image,
+  Input,
+  InputField,
   Radio,
   RadioGroup,
   RadioIcon,
   RadioIndicator,
   RadioLabel,
-} from '@/components/ui/radio';
-import { Text } from '@/components/ui/text';
-import { Textarea, TextareaInput } from '@/components/ui/textarea';
-import { showToast } from '@/components/ui/toast';
-import { View } from '@/components/ui/view';
+  showToast,
+  Text,
+  Textarea,
+  TextareaInput,
+  View,
+} from '@/components/ui';
 import emitter from '@/emitter';
 import { GET_LOCATION } from '@/emitter/event-name';
 import { ITencentMapLocation } from '@/global';
-import useHouse from '@/hooks/useHouse';
-import { useTool } from '@/hooks/useTool';
-import useUpload from '@/hooks/useUpload';
-import { addHouse, updateHouse } from '@/request/api/house';
-import houseStore from '@/stores/house';
+import { useKeyboardHeight } from '@/hooks';
+import { postHouseApi, putHouseApi } from '@/request';
+import { houseStore } from '@/stores';
 import { zodResolver } from '@hookform/resolvers/zod';
 import cls from 'classnames';
 import { router, useNavigation } from 'expo-router';
@@ -239,9 +238,7 @@ const AddEditHouse = () => {
     visible: false,
     index: 0,
   });
-  const { keyboardHeight } = useTool();
-  const { uploadImage } = useUpload();
-  const { getLandlordHouseList } = useHouse();
+  const { keyboardHeight } = useKeyboardHeight();
   const [chooseLocation, setChooseLocation] = useState<ITencentMapLocation>();
   useEffect(() => {
     emitter.on(GET_LOCATION, (data) => {
@@ -524,14 +521,14 @@ const AddEditHouse = () => {
         houseImg: JSON.stringify(value.houseImg),
       };
       if (currentHouse) {
-        await updateHouse({
+        await putHouseApi({
           ...value,
           ...formData,
           houseId: currentHouse.houseId,
           addressId: currentHouse.addressId,
         });
       } else {
-        await addHouse({
+        await postHouseApi({
           ...value,
           ...formData,
         });
@@ -540,7 +537,7 @@ const AddEditHouse = () => {
         title: '提交成功',
         icon: 'success',
       });
-      getLandlordHouseList();
+      await getLandlordHouseList();
       router.back();
     } catch (error) {
       console.error('提交失败:', error);

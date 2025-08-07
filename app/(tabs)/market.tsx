@@ -1,18 +1,12 @@
-import Empty from '@/components/empty';
-import HeaderSearch from '@/components/header-search';
-import { Icon } from '@/components/ui/icon';
-import { Image } from '@/components/ui/image';
-import { Text } from '@/components/ui/text';
-import { View } from '@/components/ui/view';
-import { ASPECT_RATIO } from '@/constants/image';
+import { getMarketHouseList } from '@/business';
+import { Empty, HeaderSearch } from '@/components';
+import { Icon, Image, Text, View } from '@/components/ui';
+import { ASPECT_RATIO } from '@/constants';
 import emitter from '@/emitter';
 import { GET_LOCATION } from '@/emitter/event-name';
 import { IHouse, ITencentMapLocation, IUser } from '@/global';
-import useHouse from '@/hooks/useHouse';
-import { getCollectHouseNum } from '@/request/api/house-collect';
-import { getLandlordByIds } from '@/request/api/user';
-import houseStore from '@/stores/house';
-import userStore from '@/stores/user';
+import { getCollectHouseNumApi, getLandlordListApi } from '@/request';
+import { houseStore, userStore } from '@/stores';
 import { useNavigation } from '@react-navigation/native';
 import { router } from 'expo-router';
 import { observer } from 'mobx-react-lite';
@@ -39,7 +33,6 @@ const Market = () => {
   const { setCurrentLandlord } = userStore;
   // landlord list
   const [landlordList, setLandlordList] = useState<IUser[]>([]);
-  const { getMarketHouseList } = useHouse();
   const navigation = useNavigation();
   const [search, setSearch] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -117,7 +110,7 @@ const Market = () => {
         (item) => item.landlordId
       );
       // 获取房东信息
-      const landlordList = await getLandlordByIds(
+      const landlordList = await getLandlordListApi(
         [...new Set(landlordIds)].join(',')
       );
       setLandlordList((l) => [...l, ...landlordList]);
@@ -129,7 +122,7 @@ const Market = () => {
    */
   const getHouseCollectNum = async () => {
     if (marketHouseList instanceof Array && marketHouseList[0]?.houseId) {
-      const collectList = await getCollectHouseNum(
+      const collectList = await getCollectHouseNumApi(
         marketHouseList.map((house) => house?.houseId).join(',')!
       );
       setHouseCollectList([

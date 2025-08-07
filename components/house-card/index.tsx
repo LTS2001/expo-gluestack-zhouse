@@ -1,8 +1,6 @@
-import Tag from '@/components/tag';
-import { Image } from '@/components/ui/image';
-import { Text } from '@/components/ui/text';
-import { View } from '@/components/ui/view';
-import { formatUtcTime } from '@/utils/common';
+import { Tag } from '@/components';
+import { Image, Text, View } from '@/components/ui';
+import { formatUtcTime } from '@/utils';
 import { observer } from 'mobx-react-lite';
 
 interface IProps {

@@ -1,18 +1,20 @@
-import { Button, ButtonText } from '@/components/ui/button';
+import { getUserInfo } from '@/business';
 import {
+  Button,
+  ButtonText,
   FormControl,
   FormControlErrorText,
-} from '@/components/ui/form-control';
-import { Icon } from '@/components/ui/icon';
-import { Image } from '@/components/ui/image';
-import { Input, InputField } from '@/components/ui/input';
-import { Text } from '@/components/ui/text';
-import { showToast } from '@/components/ui/toast';
-import { View } from '@/components/ui/view';
-import { LANDLORD, TENANT } from '@/constants/auth';
-import useUser from '@/hooks/useUser';
-import { login, registry } from '@/request/api/user';
-import authStore from '@/stores/auth';
+  Icon,
+  Image,
+  Input,
+  InputField,
+  showToast,
+  Text,
+  View,
+} from '@/components/ui';
+import { LANDLORD, TENANT } from '@/constants';
+import { postLoginApi, postRegistryApi } from '@/request';
+import { authStore } from '@/stores';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -22,7 +24,6 @@ import { z } from 'zod';
 
 export default function Login() {
   const { identity } = authStore;
-  const { getUserInfo } = useUser();
   const insets = useSafeAreaInsets();
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [checkPasswordVisible, setCheckPasswordVisible] = useState(false);
@@ -91,12 +92,12 @@ export default function Login() {
     const { phone, password } = data;
     try {
       if (isRegister) {
-        await registry({ phone, password });
+        await postRegistryApi({ phone, password });
         showToast({ title: '注册成功！', icon: 'success' });
         setIsRegister(false);
       } else {
         setIsLoading(true);
-        await login({ phone, password });
+        await postLoginApi({ phone, password });
         // get user information
         await getUserInfo();
         router.back();

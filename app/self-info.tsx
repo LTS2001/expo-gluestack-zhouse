@@ -1,23 +1,24 @@
-import ImagePreview from '@/components/image-preview';
-import { Button, ButtonText } from '@/components/ui/button';
-import { DrawerGroup } from '@/components/ui/drawer';
+import { updateUserInfo, uploadHeaderImage } from '@/business';
+import { ImagePreview } from '@/components';
 import {
+  Button,
+  ButtonText,
+  DrawerGroup,
   FormControl,
   FormControlErrorText,
   FormControlHelper,
   FormControlHelperText,
-} from '@/components/ui/form-control';
-import { Icon } from '@/components/ui/icon';
-import { Image } from '@/components/ui/image';
-import { Input, InputField } from '@/components/ui/input';
-import { Text } from '@/components/ui/text';
-import { showToast } from '@/components/ui/toast';
-import { View } from '@/components/ui/view';
-import { DELETE, NORMAL, STOP_USING, UN_IDENTITY } from '@/constants/auth';
-import useUpload from '@/hooks/useUpload';
-import useUser from '@/hooks/useUser';
-import userStore from '@/stores/user';
-import { formatUtcTime } from '@/utils/common';
+  Icon,
+  Image,
+  Input,
+  InputField,
+  Text,
+  View,
+  showToast,
+} from '@/components/ui';
+import { DELETE, NORMAL, STOP_USING, UN_IDENTITY } from '@/constants';
+import { userStore } from '@/stores';
+import { formatUtcTime } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import cls from 'classnames';
 import { router } from 'expo-router';
@@ -37,8 +38,6 @@ type IUserIdentityConfig = IUserInfoConfig;
 
 const SelfInfo = () => {
   const { user } = userStore;
-  const { updateUserInfo } = useUser();
-  const { uploadHeaderImage } = useUpload();
   const [headerImageVisible, setHeaderImageVisible] = useState(false);
   const [changeNameVisible, setChangeNameVisible] = useState(false);
   const formSchema = z.object({
@@ -203,7 +202,12 @@ const SelfInfo = () => {
                 content
               )}
               {event && (
-                <Icon as='AntDesign' name='right' size={18} className='ml-2 -mr-2' />
+                <Icon
+                  as='AntDesign'
+                  name='right'
+                  size={18}
+                  className='ml-2 -mr-2'
+                />
               )}
             </View>
           );

@@ -1,23 +1,23 @@
-import Empty from '@/components/empty';
-import HeaderSearch from '@/components/header-search';
-import HouseCard from '@/components/house-card';
-import Tag from '@/components/tag';
-import { AlertDialogGroup } from '@/components/ui/alert-dialog';
-import { Button, ButtonText } from '@/components/ui/button';
-import { Icon } from '@/components/ui/icon';
-import { Text } from '@/components/ui/text';
-import { showToast } from '@/components/ui/toast';
-import { View } from '@/components/ui/view';
-import { LANDLORD } from '@/constants/auth';
-import { HouseToStatusMap } from '@/constants/house';
-import { SOCKET_GET_PENDING_LEASE } from '@/constants/socket';
+import { getLandlordHouseList } from '@/business';
+import { Empty, HeaderSearch, HouseCard, Tag } from '@/components';
+import {
+  AlertDialogGroup,
+  Button,
+  ButtonText,
+  Icon,
+  Text,
+  View,
+  showToast,
+} from '@/components/ui';
+import {
+  HouseToStatusMap,
+  LANDLORD,
+  SOCKET_GET_PENDING_LEASE,
+} from '@/constants';
 import { IHouse } from '@/global';
 
-import useHouse from '@/hooks/useHouse';
-import { updateHouse } from '@/request/api/house';
-import authStore from '@/stores/auth';
-import houseStore from '@/stores/house';
-import socketStore from '@/stores/socket';
+import { putHouseApi } from '@/request';
+import { authStore, houseStore, socketStore } from '@/stores';
 import { Redirect, router, useNavigation } from 'expo-router';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
@@ -27,7 +27,6 @@ const LandlordHome = observer(() => {
   const navigation = useNavigation();
   const { landlordHouseList, setCurrentHouse, clearCurrentHouse } = houseStore;
   const { isLogin } = authStore;
-  const { getLandlordHouseList } = useHouse();
   // 删除房屋提示框
   const [delHouseAlterVisible, setDelHouseAlterVisible] = useState(false);
   const [publishHouseAlterVisible, setPublishHouseAlterVisible] =
@@ -51,7 +50,6 @@ const LandlordHome = observer(() => {
 
   useEffect(() => {
     getLandlordHouseList();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLogin]);
 
   /**
@@ -114,7 +112,7 @@ const LandlordHome = observer(() => {
       landlordId,
       ...house
     } = chooseHouse;
-    await updateHouse({
+    await putHouseApi({
       ...house,
       status: HouseToStatusMap.notLeaseReleased,
       addressDetail: `${provinceName}${cityName}${areaName}${addressInfo}`,

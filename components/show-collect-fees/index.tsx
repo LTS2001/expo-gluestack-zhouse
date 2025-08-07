@@ -1,6 +1,5 @@
-import { Text } from '@/components/ui/text';
-import { View } from '@/components/ui/view';
-import { FieldToNameMap, FieldToUnit } from '@/constants/house';
+import { Text, View } from '@/components/ui';
+import { FieldToNameMap, FieldToUnit } from '@/constants';
 import { IHouse, IHouseLease } from '@/global';
 
 interface IProps {

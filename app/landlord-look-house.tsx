@@ -1,15 +1,14 @@
-import HouseImageList from '@/components/house-image-list';
-import ShowCollectFees from '@/components/show-collect-fees';
-import ShowHouseMessages from '@/components/show-house-messages';
-import Tag from '@/components/tag';
-import { Icon } from '@/components/ui/icon';
-import { Image } from '@/components/ui/image';
-import { Text } from '@/components/ui/text';
-import { View } from '@/components/ui/view';
-import { HouseToStatusMap } from '@/constants/house';
+import {
+  HouseImageList,
+  ShowCollectFees,
+  ShowHouseMessages,
+  Tag,
+} from '@/components';
+import { Icon, Image, Text, View } from '@/components/ui';
+import { HouseToStatusMap } from '@/constants';
 import { IUser } from '@/global';
-import { getLeaseByHouseId } from '@/request/api/house-lease';
-import houseStore from '@/stores/house';
+import { getTenantLeaseHouseApi } from '@/request';
+import { houseStore } from '@/stores';
 import { useNavigation } from '@react-navigation/native';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useMemo, useState } from 'react';
@@ -20,9 +19,9 @@ function LandlordLookHouse() {
   const { currentHouse } = houseStore;
   // const { setChatReceiver } = chatStore;
   // const { useLeaveChatSession } = useChat();
-  const [currentTenant, setCurrentTenant] = useState<IUser>();
+  const [currentTenant, setCurrentTenant] = useState<IUser | null>();
   const getCurrentTenant = async (houseId: number) => {
-    const res = await getLeaseByHouseId(houseId);
+    const res = await getTenantLeaseHouseApi(houseId);
     setCurrentTenant(res);
   };
 
@@ -47,35 +46,19 @@ function LandlordLookHouse() {
     return () => {
       houseStore.clearCurrentHouse();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     navigation.setOptions({
       title: currentHouse?.name,
     });
-  }, [currentHouse]);
+  }, [currentHouse, navigation]);
 
   const lookHouseComment = () => {
     // navigateTo({
     //   url: `/pages/houseAllComment/index?houseName=${currentHouse?.name}&houseId=${currentHouse?.houseId}`,
     // });
-  };
-
-  const toChat = () => {
-    // setChatReceiver(currentTenant);
-    // navigateTo({
-    //   url: `/pages/chatMessage/index`,
-    // });
-  };
-
-  /**
-   * 打电话
-   */
-  const phoneTenant = () => {
-    // currentTenant?.phone &&
-    //   makePhoneCall({
-    //     phoneNumber: currentTenant.phone,
-    //   });
   };
 
   return (

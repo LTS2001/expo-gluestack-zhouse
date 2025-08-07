@@ -1,38 +1,42 @@
-import { IHouseLease, ILease, IPendingLease, IUser } from '@/global';
-import { axios } from '..';
+import { ILease, IPendingLease, IUser } from '@/global';
+import { axios } from '../axios';
 
 /**
- * get lease by house id
+ * get the tenant of the leased house
  * @param houseId house id
- * @returns lease info
+ * @returns tenant info or null
  */
-export const getLeaseByHouseId = (houseId: number): Promise<IUser> =>
-  axios.get(`/lease/houseId?houseId=${houseId}`);
+export const getTenantLeaseHouseApi = (
+  houseId: number
+): Promise<IUser | null> => axios.get(`/lease/tenant?houseId=${houseId}`);
 
 /**
- * get lease status
+ * get the lease information of the tenant in this house
  * @param houseId house id
  * @param tenantId tenant id
+ * @returns lease info or null
  */
-export const getLeaseStatus = (
+export const getLeaseHouseTenantApi = (
   houseId: number,
   tenantId: number
-): Promise<ILease> =>
+): Promise<ILease | null> =>
   axios.get(`/lease?houseId=${houseId}&tenantId=${tenantId}`);
 
 /**
  * add lease
  * @param data lease data
+ * @returns lease info
  */
-export const addLease = (data: {
+export const postLeaseApi = (data: {
   houseId: number;
   tenantId: number;
   landlordId: number;
   leaseMonths: number;
-}): Promise<IHouseLease> => axios.post(`/lease`, data);
+}): Promise<ILease> => axios.post(`/lease`, data);
 
 /**
- * get the lease request that needs to be processed by the landlord
+ * get the lease application that needs to be processed by the landlord
+ * @returns lease application list
  */
-export const getLeasePendingByLandlordId = (): Promise<IPendingLease[]> =>
+export const getLeasePendingListApi = (): Promise<IPendingLease[]> =>
   axios.get(`/lease/pending`);

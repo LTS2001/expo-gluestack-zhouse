@@ -1,33 +1,37 @@
 import { IAddHouseReq, IHouse, IUpdateHouseReq } from '@/global';
-import { axios } from '..';
+import { axios } from '../axios';
 
 /**
  * add house
  * @param data house info
+ * @returns house info
  */
-export const addHouse = (data: IAddHouseReq) => axios.post('/house', data);
+export const postHouseApi = (data: IAddHouseReq): Promise<IHouse> =>
+  axios.post('/house', data);
 
 /**
- * get houses
+ * get house list (landlord's house list)
+ * @returns house list
  */
-export const getHouses = (): Promise<IHouse[]> => axios.get('/house');
+export const getHouseListLandlordApi = (): Promise<IHouse[]> =>
+  axios.get('/house');
 
 /**
- * update house
+ * update house info
  * @param data house info
+ * @returns house info
  */
-export const updateHouse = (data: IUpdateHouseReq) => axios.put('/house', data);
+export const putHouseApi = (data: IUpdateHouseReq): Promise<IHouse> =>
+  axios.put('/house', data);
 
 /**
- * get houses by page
- * @param minLat
- * @param maxLat
- * @param minLng
- * @param maxLng
+ * get house list by page
+ * @param params latitude and longitude range
+ * @returns house list
  */
-export const getHousesByPage = (params: {
+export const getHouseListPageApi = (params: {
   minLat: number;
   maxLat: number;
   minLng: number;
   maxLng: number;
-}) => axios.get(`/house/page`, { params });
+}): Promise<IHouse[]> => axios.get(`/house/page`, { params });

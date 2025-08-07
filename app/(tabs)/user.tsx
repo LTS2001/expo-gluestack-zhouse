@@ -1,9 +1,6 @@
-import Domain from '@/components/domain';
-import Logout from '@/components/logout';
-import { Icon } from '@/components/ui/icon';
-import { Image } from '@/components/ui/image';
-import { Text } from '@/components/ui/text';
-import { View } from '@/components/ui/view';
+import { switchIdentity } from '@/business';
+import { Domain, Logout } from '@/components';
+import { Icon, Image, Text, View } from '@/components/ui';
 import {
   COMPLAINT_LIST_HREF,
   COMPLAINT_LIST_TEXT,
@@ -18,12 +15,8 @@ import {
   TENANT_HISTORY_TEXT,
   TENANT_REPORT_HREF,
   TENANT_REPORT_TEXT,
-} from '@/constants/domain';
-import useIdentity from '@/hooks/useIdentity';
-import authStore from '@/stores/auth';
-import houseStore from '@/stores/house';
-import leaseStore from '@/stores/lease';
-import userStore from '@/stores/user';
+} from '@/constants';
+import { authStore, houseStore, leaseStore, userStore } from '@/stores';
 import { Redirect, router } from 'expo-router';
 import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
@@ -31,7 +24,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 function SwitchIdentityIcon() {
   const insets = useSafeAreaInsets();
-  const { switchIdentity } = useIdentity();
   return (
     <View
       style={{ marginTop: insets.top + 4 }}

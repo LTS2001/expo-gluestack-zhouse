@@ -1,4 +1,4 @@
-import { AlertDialog, AlertDialogContent } from '@/components/ui/alert-dialog';
+import { AlertDialog, AlertDialogContent } from '@/components/ui';
 import { SERVER_IMAGE_ROOT } from '@/constants';
 import ImageViewer from 'react-native-image-zoom-viewer';
 interface IProps {

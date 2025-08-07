@@ -5,7 +5,7 @@ import {
   KitchenToNameMap,
   ToiletToNameMap,
   TowardToNameMap,
-} from '@/constants/house';
+} from '@/constants';
 import { IHouse, IHouseLease } from '@/global';
 import { Text } from '../ui/text';
 import { View } from '../ui/view';
@@ -14,7 +14,7 @@ interface IProps {
   houses?: IHouse | IHouseLease;
 }
 
-const ShowHouseMessage = (props: IProps) => {
+const ShowHouseMessages = (props: IProps) => {
   const { houses } = props;
   // 房屋信息展示字段
   const houseMessage = [
@@ -82,4 +82,4 @@ const ShowHouseMessage = (props: IProps) => {
   );
 };
 
-export default ShowHouseMessage;
+export default ShowHouseMessages;

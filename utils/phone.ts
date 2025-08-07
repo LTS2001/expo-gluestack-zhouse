@@ -1,4 +1,4 @@
-import { showToast } from '@/components/ui/toast';
+import { showToast } from '@/components/ui';
 import * as Linking from 'expo-linking';
 
 /**

@@ -5,38 +5,44 @@ import {
   IUser,
   IUserVerify,
 } from '@/global';
-import authStore from '@/stores/auth';
-import { axios } from '..';
+import { authStore } from '@/stores';
+import { axios } from '../axios';
 /**
  * user login
  * @param data phone and password
+ * @returns user info (landlord info or tenant info)
  */
-export const login = (data: ILogin): Promise<IUser> =>
+export const postLoginApi = (data: ILogin): Promise<IUser> =>
   axios.post(`${authStore.identity}/login`, data);
 
 /**
  * user registry
  * @param data phone and password
+ * @returns user info (landlord info or tenant info)
  */
-export const registry = (data: IRegister): Promise<IUser> =>
+export const postRegistryApi = (data: IRegister): Promise<IUser> =>
   axios.post(`${authStore.identity}/registry`, data);
 
 /**
- * get user information (tenant info or landlord info)
+ * get user information
+ * @returns user info (landlord info or tenant info)
  */
-export const getUser = (): Promise<IUser> => axios.get(`${authStore.identity}`);
+export const getUserApi = (): Promise<IUser> =>
+  axios.get(`${authStore.identity}`);
 
 /**
  * update user info (base info or identity real name verify)
- * @param data
+ * @param data user info
+ * @returns user info (landlord info or tenant info)
  */
-export const updateUser = (
+export const putUserApi = (
   data: IUpdateBaseUserInfo | IUserVerify
 ): Promise<IUser> => axios.put(`${authStore.identity}`, data);
 
 /**
- * get landlord by ids
+ * get landlord list by ids
  * @param ids landlord id list
+ * @returns landlord list
  */
-export const getLandlordByIds = (ids: string): Promise<IUser[]> =>
+export const getLandlordListApi = (ids: string): Promise<IUser[]> =>
   axios.get(`landlord/list?ids=${ids}`);

@@ -1,4 +1,4 @@
-import { Icon } from '@/components/ui/icon';
+import { Icon } from '@/components/ui';
 import { Tabs } from 'expo-router';
 export default function Layout() {
   const getIconColor = (focused: boolean) => (focused ? '#f2a536' : '#999');

@@ -1,6 +1,4 @@
-import { Icon } from '@/components/ui/icon';
-import { Input, InputField } from '@/components/ui/input';
-import { View } from '@/components/ui/view';
+import { Icon, Input, InputField, View } from '@/components/ui';
 import { useState } from 'react';
 
 interface IHeaderSearchProps {

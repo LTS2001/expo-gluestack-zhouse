@@ -1,7 +1,4 @@
-import { Button, ButtonText } from '@/components/ui/button';
-import { Icon } from '@/components/ui/icon';
-import { Text } from '@/components/ui/text';
-import { View } from '@/components/ui/view';
+import { Button, ButtonText, Icon, Text, View } from '@/components/ui';
 import emitter from '@/emitter';
 import * as EventName from '@/emitter/event-name';
 import { ITencentMapLocation } from '@/global';

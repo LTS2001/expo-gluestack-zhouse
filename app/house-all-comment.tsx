@@ -1,5 +1,4 @@
-import { Text } from '@/components/ui/text';
-import { View } from '@/components/ui/view';
+import { Text, View } from '@/components/ui';
 import { ScrollView } from 'react-native';
 
 export default function HouseAllComment() {

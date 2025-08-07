@@ -1,3 +1,10 @@
+export * from './auth';
+export * from './code';
+export * from './domain';
+export * from './house';
+export * from './image';
+export * from './map';
+export * from './socket';
 /**
  * api server root
  */

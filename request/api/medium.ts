@@ -1,17 +1,20 @@
-import authStore from '@/stores/auth';
-import { axios } from '..';
+import { authStore } from '@/stores';
+import { axios } from '../axios';
 
 /**
  * upload user head image
  */
-export const uploadUserHeadImg = (data: FormData) =>
+export const postUploadUserHeadImgApi = (data: FormData) =>
   axios.post(`${authStore.identity}/headImg`, data);
+
 /**
  * upload image or video
  */
-export const uploadImgVideo = (data: FormData) => axios.post('medium', data);
+export const postUploadImgVideoApi = (data: FormData) =>
+  axios.post('medium', data);
+
 /**
- * chat upload image or video
+ * upload image or video for chat
  */
-export const chatUploadImgVideo = (data: FormData) =>
+export const postChatUploadImgVideoApi = (data: FormData) =>
   axios.post('medium/chat', data);

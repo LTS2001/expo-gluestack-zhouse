@@ -1,4 +1,4 @@
-import { IDENTITY_KEY, TOKEN } from '@/constants/auth';
+import { IDENTITY_KEY, TOKEN } from '@/constants';
 import { TIdentity } from '@/global';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { configure, makeAutoObservable } from 'mobx';

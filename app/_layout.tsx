@@ -1,5 +1,4 @@
-import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
-import { Toast } from '@/components/ui/toast';
+import { GluestackUIProvider, Toast } from '@/components/ui';
 import {
   COMPLAINT_LIST_HREF,
   COMPLAINT_LIST_TEXT,
@@ -15,9 +14,9 @@ import {
   TENANT_HISTORY_TEXT,
   TENANT_REPORT_HREF,
   TENANT_REPORT_TEXT,
-} from '@/constants/domain';
+} from '@/constants';
 import '@/global.css';
-import useInitialization from '@/hooks/useInitialization';
+import { useInitialization } from '@/hooks';
 import {
   DarkTheme,
   DefaultTheme,

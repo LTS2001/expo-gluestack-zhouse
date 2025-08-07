@@ -1,32 +1,40 @@
-import { Image } from '@/components/ui/image';
-import { Text } from '@/components/ui/text';
-import { View } from '@/components/ui/view';
-import { makePhoneCall } from '@/utils/phone';
-
-import HouseImageList from '@/components/house-image-list';
-import ShowCollectFees from '@/components/show-collect-fees';
-import ShowHouseMessages from '@/components/show-house-messages';
-import { AlertDialogGroup } from '@/components/ui/alert-dialog';
-import { Button, ButtonText } from '@/components/ui/button';
-import { DrawerGroup } from '@/components/ui/drawer';
+import { getCollectHouseStatus, updateCollectHouseStatus } from '@/business';
 import {
+  HouseImageList,
+  ShowCollectFees,
+  ShowHouseMessages,
+} from '@/components';
+import {
+  AlertDialogGroup,
+  Button,
+  ButtonText,
+  DrawerGroup,
   FormControl,
   FormControlErrorText,
-} from '@/components/ui/form-control';
-import { Icon } from '@/components/ui/icon';
-import { Input, InputField } from '@/components/ui/input';
-import { showToast } from '@/components/ui/toast';
-import { LANDLORD, TENANT } from '@/constants/auth';
-import { HouseToLeaseMap } from '@/constants/house';
-import { SOCKET_GET_PENDING_LEASE } from '@/constants/socket';
+  Icon,
+  Image,
+  Input,
+  InputField,
+  Text,
+  View,
+  showToast,
+} from '@/components/ui';
+import {
+  HouseToLeaseMap,
+  LANDLORD,
+  SOCKET_GET_PENDING_LEASE,
+  TENANT,
+} from '@/constants';
 import { IHouse, IUser } from '@/global';
-import useCollect from '@/hooks/useCollect';
-import { addLease, getLeaseStatus } from '@/request/api/house-lease';
-import authStore from '@/stores/auth';
-import chatStore from '@/stores/chat';
-import houseStore from '@/stores/house';
-import socketStore from '@/stores/socket';
-import userStore from '@/stores/user';
+import { getLeaseHouseTenantApi, postLeaseApi } from '@/request';
+import {
+  authStore,
+  chatStore,
+  houseStore,
+  socketStore,
+  userStore,
+} from '@/stores';
+import { makePhoneCall } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigation } from '@react-navigation/native';
 import { router } from 'expo-router';
@@ -43,7 +51,6 @@ const MarketLookHouse = () => {
   const { identity } = authStore;
   const { setChatReceiver } = chatStore;
   // const { setChatReceiver } = chatStore;
-  const { changeHouseCollectStatus, getHouseCollectStatus } = useCollect();
   // const { useLeaveChatSession } = useChat();
 
   const [houses, setHouses] = useState<IHouse>();
@@ -109,7 +116,7 @@ const MarketLookHouse = () => {
    * change house collect status
    */
   const toChangeHouseCollectStatus = async () => {
-    const res = await changeHouseCollectStatus(
+    const res = await updateCollectHouseStatus(
       houses?.houseId!,
       landlord?.id!,
       Number(!collected)
@@ -123,7 +130,7 @@ const MarketLookHouse = () => {
    */
   const getCurrentHouseCollectStatus = async () => {
     if (houses?.houseId) {
-      const status = await getHouseCollectStatus(houses.houseId);
+      const status = await getCollectHouseStatus(houses.houseId);
       status && setCollected(Boolean(status));
     }
   };
@@ -135,7 +142,7 @@ const MarketLookHouse = () => {
     // not login
     if (!authStore.isLogin) return;
     if (houses?.houseId && user?.id) {
-      const res = await getLeaseStatus(houses?.houseId, user?.id);
+      const res = await getLeaseHouseTenantApi(houses?.houseId, user?.id);
       res?.status && setLeaseState(res.status);
     }
   };
@@ -152,7 +159,7 @@ const MarketLookHouse = () => {
    */
   const sendLeaseRequest = async () => {
     if (houses?.houseId && user?.id) {
-      const res = await addLease({
+      const res = await postLeaseApi({
         houseId: houses?.houseId,
         landlordId: landlord?.id!,
         tenantId: user?.id,

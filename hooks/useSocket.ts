@@ -1,7 +1,8 @@
-import { SERVER_SOCKET_ROOT } from '@/constants';
-import { LANDLORD, TENANT } from '@/constants/auth';
+import { getLeasePendingListByLandlord } from '@/business';
 import {
   ConnectionState,
+  LANDLORD,
+  SERVER_SOCKET_ROOT,
   SOCKET_BASE_RECONNECT_DELAY,
   SOCKET_GET_CHAT_MESSAGE,
   SOCKET_GET_LANDLORD_REPORT,
@@ -13,7 +14,8 @@ import {
   SOCKET_HEARTBEAT_TIMEOUT,
   SOCKET_MAX_RECONNECT_ATTEMPTS,
   SOCKET_MAX_RECONNECT_DELAY,
-} from '@/constants/socket';
+  TENANT,
+} from '@/constants';
 import emitter from '@/emitter';
 import {
   GET_CURRENT_LAST_ONE_MESSAGE,
@@ -24,16 +26,12 @@ import {
   GET_TENANT_REPORT,
 } from '@/emitter/event-name';
 import { ISocketMessage, TIdentity } from '@/global';
-import authStore from '@/stores/auth';
-import socketStore from '@/stores/socket';
-import userStore from '@/stores/user';
+import { authStore, socketStore, userStore } from '@/stores';
 import { autorun } from 'mobx';
 import { useCallback, useEffect, useRef } from 'react';
 import { AppState } from 'react-native';
-import useLandlord from './useLandlord';
-import useRepair from './useRepair';
 
-export default function useInitializationSocket() {
+export default function useSocket() {
   const reconnectTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const heartbeatTimer = useRef<ReturnType<typeof setInterval>>(undefined);
   const heartbeatTimeoutTimer =
@@ -53,8 +51,6 @@ export default function useInitializationSocket() {
     addToMessageQueue,
     clearMessageQueue,
   } = socketStore;
-  const { getLeaseRequestNeedProcessedByLandlord } = useLandlord();
-  const { getLandlordRepairList } = useRepair();
 
   /**
    * calculate exponential backoff reconnect delay
@@ -367,11 +363,11 @@ export default function useInitializationSocket() {
       else if (currentIdentity === LANDLORD) {
         // get the lease request that needs to be processed by the landlord
         emitter.on(GET_PENDING_LEASE, () => {
-          getLeaseRequestNeedProcessedByLandlord();
+          getLeasePendingListByLandlord();
         });
         // get the repair request that needs to be processed by the landlord
         emitter.on(GET_LANDLORD_REPORT, () => {
-          getLandlordRepairList(currentUserId);
+          // getLandlordRepairList(currentUserId);
         });
       }
       // someone send message, need to get session list, latest message, other info
@@ -380,7 +376,6 @@ export default function useInitializationSocket() {
         // getChatSessionList();
       });
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 
