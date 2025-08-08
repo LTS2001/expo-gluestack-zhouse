@@ -1,0 +1,41 @@
+import { LANDLORD, TENANT } from '@/constants';
+import { authStore, leaseStore } from '@/stores';
+import { autorun } from 'mobx';
+import { useEffect, useRef, useState } from 'react';
+
+export default function useTabBarBadgeNum() {
+  const [mineNum, setMineNum] = useState<number | undefined>();
+  const [chatNum] = useState<number | undefined>();
+  const autorunDebounceTimer = useRef<
+    ReturnType<typeof setTimeout> | undefined
+  >(undefined);
+  useEffect(() => {
+    if (autorunDebounceTimer.current) {
+      clearTimeout(autorunDebounceTimer.current);
+    }
+    const disposer = autorun(() => {
+      const { identity, isLogin } = authStore;
+      const { landlordPendingLeaseList } = leaseStore;
+
+      autorunDebounceTimer.current = setTimeout(() => {
+        if (!isLogin) return;
+        if (identity === LANDLORD) {
+          const _mineNum = landlordPendingLeaseList?.length;
+          setMineNum(_mineNum ? _mineNum : undefined);
+        } else if (identity === TENANT) {
+        }
+      }, 100);
+    });
+    return () => {
+      if (autorunDebounceTimer.current) {
+        clearTimeout(autorunDebounceTimer.current);
+      }
+      disposer();
+    };
+  }, []);
+
+  return {
+    mineNum,
+    chatNum,
+  };
+}

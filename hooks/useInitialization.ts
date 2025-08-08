@@ -1,22 +1,67 @@
-import { getUserInfo, userLogout } from '@/business';
+import { getLeasePendingListByLandlord, getUserInfo } from '@/business';
+import { LANDLORD } from '@/constants';
 import { authStore } from '@/stores';
 import { autorun } from 'mobx';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
+import useCurrentPage from './useCurrentPage';
 import useSocket from './useSocket';
 
 export default function useInitialization() {
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
+  const autorunDebounceTimer = useRef<
+    ReturnType<typeof setTimeout> | undefined
+  >(undefined);
   // initialize websocket
-  useSocket();
+  const { disconnect } = useSocket();
+  const { isIdentityPage } = useCurrentPage();
 
-  // initialize user info
-  const { isLogin } = authStore;
+  useEffect(() => {
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
+    }
+    debounceTimer.current = setTimeout(() => {
+      // get user info when you first enter the app
+      getUserInfo();
+    }, 100);
+    return () => {
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current);
+      }
+    };
+  }, []);
+
   useEffect(() => {
     const disposer = autorun(() => {
-      getUserInfo();
+      const { identity, isLogin } = authStore;
+
+      if (autorunDebounceTimer.current) {
+        clearTimeout(autorunDebounceTimer.current);
+      }
+      autorunDebounceTimer.current = setTimeout(() => {
+        /**
+         * the following situations will trigger the `get lease pending list` api
+         * 1. get lease pending list when you first enter the app (if you are landlord and login)
+         * 2. get lease pending list when you login (if you are landlord)
+         * 3. get lease pending list when you change the landlord identity
+         */
+        if (identity === LANDLORD && isLogin) getLeasePendingListByLandlord();
+        /**
+         * the following situations will trigger the `disconnect` api
+         * 1. when you logout
+         * 2. when you change the identity to other identity === logout
+         */
+
+        if (!isLogin || isIdentityPage) disconnect();
+      }, 100);
     });
-    return () => disposer();
-  }, []);
-  useEffect(() => {
-    if (!isLogin) userLogout();
-  }, [isLogin]);
+
+    return () => {
+      if (autorunDebounceTimer.current) {
+        clearTimeout(autorunDebounceTimer.current);
+      }
+      disposer();
+    };
+  }, [disconnect, isIdentityPage]);
 }

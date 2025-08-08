@@ -36,7 +36,6 @@ const LandlordHome = observer(() => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   useEffect(() => {
-    console.log('isSearchFocused', isSearchFocused);
     navigation.setOptions({
       headerTitle: isSearchFocused ? '' : '我的房源',
       headerRight: () => (

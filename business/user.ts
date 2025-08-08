@@ -1,5 +1,5 @@
 import { IUpdateBaseUserInfo, IUserVerify } from '@/global';
-import { getLeasePendingListApi, getUserApi, putUserApi } from '@/request';
+import { getUserApi, putUserApi } from '@/request';
 import {
   authStore,
   chatStore,
@@ -15,7 +15,7 @@ import { router } from 'expo-router';
  */
 export const userLogout = async () => {
   const { setLoginState, setToken } = authStore;
-  const { clearLeaseHouse } = leaseStore;
+  const { clearLeaseHouse, clearLandlordPendingLeaseList } = leaseStore;
   const { clearUser, clearLeasedTenant } = userStore;
   // const {websocketInstance, clearWebsocketInstance} = socketStore;
   const { clearCurrentChatSession, clearChatSessionList } = chatStore;
@@ -43,6 +43,8 @@ export const userLogout = async () => {
   clearLandlordRepairList();
   // clear the tenant information that has rented the landlord's house
   clearLeasedTenant();
+  // clear landlord pending lease list
+  clearLandlordPendingLeaseList();
 };
 
 /**
@@ -63,14 +65,6 @@ export const getUserInfo = async () => {
   if (!authStore.identity) return;
   const user = await getUserApi();
   user && userStore.setUser(user);
-};
-
-/**
- * get the lease request that needs to be processed by the landlord
- */
-export const getLeasePendingListByLandlord = async () => {
-  const res = await getLeasePendingListApi();
-  leaseStore.setLandlordPendingLeaseList(res);
 };
 
 /**

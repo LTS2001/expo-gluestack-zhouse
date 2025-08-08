@@ -1,4 +1,8 @@
-import { getCollectHouseStatus, updateCollectHouseStatus } from '@/business';
+import {
+  getCollectHouseStatus,
+  sendMessage,
+  updateCollectHouseStatus,
+} from '@/business';
 import {
   HouseImageList,
   ShowCollectFees,
@@ -27,13 +31,7 @@ import {
 } from '@/constants';
 import { IHouse, IUser } from '@/global';
 import { getLeaseHouseTenantApi, postLeaseApi } from '@/request';
-import {
-  authStore,
-  chatStore,
-  houseStore,
-  socketStore,
-  userStore,
-} from '@/stores';
+import { authStore, chatStore, houseStore, userStore } from '@/stores';
 import { makePhoneCall } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigation } from '@react-navigation/native';
@@ -46,7 +44,6 @@ import { z } from 'zod';
 
 const MarketLookHouse = () => {
   const { updateHouseCollectList, currentHouse } = houseStore;
-  const { socketInstance } = socketStore;
   const { user, currentLandlord } = userStore;
   const { identity } = authStore;
   const { setChatReceiver } = chatStore;
@@ -172,13 +169,11 @@ const MarketLookHouse = () => {
       });
       setLeasePopupVisible(false);
       setLeaseMsgVisible(false);
-      socketInstance?.send(
-        JSON.stringify({
-          toIdentity: LANDLORD,
-          toId: landlord?.id!,
-          active: SOCKET_GET_PENDING_LEASE,
-        })
-      );
+      sendMessage({
+        toIdentity: LANDLORD,
+        toId: landlord?.id!,
+        active: SOCKET_GET_PENDING_LEASE,
+      });
     }
   };
 

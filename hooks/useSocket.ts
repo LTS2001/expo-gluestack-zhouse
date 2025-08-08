@@ -1,4 +1,4 @@
-import { getLeasePendingListByLandlord } from '@/business';
+import { getLeasePendingListByLandlord, sendMessage } from '@/business';
 import {
   ConnectionState,
   LANDLORD,
@@ -27,9 +27,9 @@ import {
   GET_TENANT_LEASE_HOUSE,
   GET_TENANT_REPORT,
 } from '@/emitter/event-name';
-import { ISocketMessage, TIdentity } from '@/global';
+import { TIdentity } from '@/global';
 import { authStore, socketStore, userStore } from '@/stores';
-import { reaction } from 'mobx';
+import { autorun } from 'mobx';
 import { useCallback, useEffect, useRef } from 'react';
 import { AppState } from 'react-native';
 
@@ -54,7 +54,6 @@ export default function useSocket() {
     setConnectionState,
     setReconnectAttempts,
     setLastConnectedAt,
-    addToMessageQueue,
     clearMessageQueue,
   } = socketStore;
 
@@ -71,59 +70,34 @@ export default function useSocket() {
   }, []);
 
   /**
-   * send message (with queue mechanism)
-   */
-  const sendMessage = useCallback(
-    (message: ISocketMessage) => {
-      const ws = socketStore.socketInstance;
-      console.log('websocket: send message', message);
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify(message));
-        return true;
-      } else {
-        // if connection not established, add message to queue
-        addToMessageQueue(message);
-        console.log('websocket: message queued, waiting for connection');
-        return false;
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [socketStore]
-  );
-
-  /**
    * start heartbeat detection
    */
-  const startHeartbeat = useCallback(
-    (ws: WebSocket) => {
-      // clear previous heartbeat timer
-      if (heartbeatTimer.current) {
-        clearInterval(heartbeatTimer.current);
-      }
-      heartbeatTimer.current = setInterval(() => {
-        // send heartbeat
-        if (ws.readyState === WebSocket.OPEN) {
-          const currentIdentity = authStore.identity;
-          const currentUserId = userStore.user?.id;
-          if (currentIdentity && currentUserId) {
-            sendMessage({
-              toIdentity: currentIdentity,
-              toId: currentUserId,
-              active: SOCKET_HEARTBEAT,
-            });
+  const startHeartbeat = useCallback((ws: WebSocket) => {
+    // clear previous heartbeat timer
+    if (heartbeatTimer.current) {
+      clearInterval(heartbeatTimer.current);
+    }
+    heartbeatTimer.current = setInterval(() => {
+      // send heartbeat
+      if (ws.readyState === WebSocket.OPEN) {
+        const currentIdentity = authStore.identity;
+        const currentUserId = userStore.user?.id;
+        if (currentIdentity && currentUserId) {
+          sendMessage({
+            toIdentity: currentIdentity,
+            toId: currentUserId,
+            active: SOCKET_HEARTBEAT,
+          });
 
-            // set heartbeat timeout detection
-            heartbeatTimeoutTimer.current = setTimeout(() => {
-              console.log('websocket: heartbeat timeout, reconnecting...');
-              ws.close();
-            }, SOCKET_HEARTBEAT_TIMEOUT);
-          }
+          // set heartbeat timeout detection
+          heartbeatTimeoutTimer.current = setTimeout(() => {
+            console.log('websocket: heartbeat timeout, reconnecting...');
+            ws.close();
+          }, SOCKET_HEARTBEAT_TIMEOUT);
         }
-      }, SOCKET_HEARTBEAT_INTERVAL);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
+      }
+    }, SOCKET_HEARTBEAT_INTERVAL);
+  }, []);
 
   /**
    * stop heartbeat detection
@@ -254,7 +228,14 @@ export default function useSocket() {
       if (!currentIdentity || !currentUserId) return;
 
       // if already connecting, don't reconnect
-      if (connectionState.current === ConnectionState.CONNECTING) return;
+      if (
+        [
+          ConnectionState.CONNECTING,
+          ConnectionState.CONNECTED,
+          ConnectionState.RECONNECTING,
+        ].includes(connectionState.current)
+      )
+        return;
 
       connectionState.current = ConnectionState.CONNECTING;
 
@@ -316,7 +297,7 @@ export default function useSocket() {
       };
 
       ws.onclose = (event) => {
-        console.log('websocket: closed ', event.code, event.reason);
+        console.log(`websocket: closed ${event.code} ${event.reason}`);
         connectionState.current = ConnectionState.DISCONNECTED;
         setConnectionState(ConnectionState.DISCONNECTED);
         clearWebsocketInstance();
@@ -397,22 +378,22 @@ export default function useSocket() {
       'change',
       handleAppStateChange
     );
-    const disposer = reaction(
-      () => ({ identity: authStore.identity, userId: userStore.user?.id }),
-      ({ identity, userId }) => {
-        if (identity && userId) {
-          // debounce: delay connection, aggregate multiple changes in a short time
-          if (autorunDebounceTimer.current) {
-            clearTimeout(autorunDebounceTimer.current);
-          }
-          autorunDebounceTimer.current = setTimeout(() => {
-            subscribeWebSocketEvent(identity, userId);
-            connect();
-          }, 100);
+    const disposer = autorun(() => {
+      const { identity } = authStore;
+      const userId = userStore.user?.id;
+      const { socketInstance } = socketStore;
+
+      if (identity && userId && !socketInstance) {
+        // debounce: delay connection, aggregate multiple changes in a short time
+        if (autorunDebounceTimer.current) {
+          clearTimeout(autorunDebounceTimer.current);
         }
-      },
-      { fireImmediately: true, delay: 0 }
-    );
+        autorunDebounceTimer.current = setTimeout(() => {
+          subscribeWebSocketEvent(identity, userId);
+          connect();
+        }, 100);
+      }
+    });
     return () => {
       subscription?.remove();
       disconnect();
@@ -425,9 +406,6 @@ export default function useSocket() {
   }, [connect, subscribeWebSocketEvent, disconnect, handleAppStateChange]);
 
   return {
-    sendMessage,
     disconnect,
-    getConnectionState: () => connectionState.current,
-    getReconnectAttempts: () => reconnectAttempts.current,
   };
 }

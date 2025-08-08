@@ -40,3 +40,15 @@ export const postLeaseApi = (data: {
  */
 export const getLeasePendingListApi = (): Promise<IPendingLease[]> =>
   axios.get(`/lease/pending`);
+
+/**
+ * update the status of the lease
+ * @param data lease data
+ * @returns lease info
+ */
+export const putLeaseStatusApi = (data: {
+  status: number;
+  landlordId: number;
+  tenantId: number;
+  houseId: number;
+}): Promise<void> => axios.put(`/lease`, data);

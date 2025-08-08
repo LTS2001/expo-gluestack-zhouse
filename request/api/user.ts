@@ -13,7 +13,7 @@ import { axios } from '../axios';
  * @returns user info (landlord info or tenant info)
  */
 export const postLoginApi = (data: ILogin): Promise<IUser> =>
-  axios.post(`${authStore.identity}/login`, data);
+  axios.post(`/${authStore.identity}/login`, data);
 
 /**
  * user registry
@@ -21,14 +21,14 @@ export const postLoginApi = (data: ILogin): Promise<IUser> =>
  * @returns user info (landlord info or tenant info)
  */
 export const postRegistryApi = (data: IRegister): Promise<IUser> =>
-  axios.post(`${authStore.identity}/registry`, data);
+  axios.post(`/${authStore.identity}/registry`, data);
 
 /**
  * get user information
  * @returns user info (landlord info or tenant info)
  */
 export const getUserApi = (): Promise<IUser> =>
-  axios.get(`${authStore.identity}`);
+  axios.get(`/${authStore.identity}`);
 
 /**
  * update user info (base info or identity real name verify)
@@ -37,7 +37,7 @@ export const getUserApi = (): Promise<IUser> =>
  */
 export const putUserApi = (
   data: IUpdateBaseUserInfo | IUserVerify
-): Promise<IUser> => axios.put(`${authStore.identity}`, data);
+): Promise<IUser> => axios.put(`/${authStore.identity}`, data);
 
 /**
  * get landlord list by ids
@@ -45,4 +45,4 @@ export const putUserApi = (
  * @returns landlord list
  */
 export const getLandlordListApi = (ids: string): Promise<IUser[]> =>
-  axios.get(`landlord/list?ids=${ids}`);
+  axios.get(`/landlord/list?ids=${ids}`);

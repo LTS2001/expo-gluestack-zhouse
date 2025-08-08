@@ -8,4 +8,5 @@ export { default as Logout } from './logout';
 export { default as ShowCollectFees } from './show-collect-fees';
 export { default as ShowHouseMessages } from './show-house-messages';
 export { default as Tag } from './tag';
+export { default as TenantCard } from './tenant-card';
 

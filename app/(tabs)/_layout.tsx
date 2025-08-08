@@ -1,8 +1,9 @@
 import { Icon } from '@/components/ui';
+import { useTabBarBadgeNum } from '@/hooks';
 import { Tabs } from 'expo-router';
 export default function Layout() {
   const getIconColor = (focused: boolean) => (focused ? '#f2a536' : '#999');
-
+  const { mineNum, chatNum } = useTabBarBadgeNum();
   return (
     <Tabs
       screenOptions={{
@@ -47,7 +48,7 @@ export default function Layout() {
               color={getIconColor(focused)}
             />
           ),
-          tabBarBadge: '92',
+          tabBarBadge: chatNum,
           tabBarBadgeStyle: {
             backgroundColor: '#f2a536',
             color: '#fff',
@@ -65,7 +66,7 @@ export default function Layout() {
           tabBarIcon: ({ focused }) => (
             <Icon as='FontAwesome' name='user' color={getIconColor(focused)} />
           ),
-          tabBarBadge: '92',
+          tabBarBadge: mineNum,
           tabBarBadgeStyle: {
             backgroundColor: '#f2a536',
             color: '#fff',
