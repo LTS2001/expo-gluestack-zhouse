@@ -2,7 +2,7 @@ import { IRepair } from '@/global';
 import { configure, makeAutoObservable } from 'mobx';
 
 configure({
-  enforceActions: 'always',
+  enforceActions: 'never',
 });
 
 class RepairStore {

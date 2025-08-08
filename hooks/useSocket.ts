@@ -3,7 +3,9 @@ import {
   ConnectionState,
   LANDLORD,
   SERVER_SOCKET_ROOT,
+  SOCKET_ALREADY_CONNECTED,
   SOCKET_BASE_RECONNECT_DELAY,
+  SOCKET_CONNECT,
   SOCKET_GET_CHAT_MESSAGE,
   SOCKET_GET_LANDLORD_REPORT,
   SOCKET_GET_PENDING_LEASE,
@@ -27,7 +29,7 @@ import {
 } from '@/emitter/event-name';
 import { ISocketMessage, TIdentity } from '@/global';
 import { authStore, socketStore, userStore } from '@/stores';
-import { autorun } from 'mobx';
+import { reaction } from 'mobx';
 import { useCallback, useEffect, useRef } from 'react';
 import { AppState } from 'react-native';
 
@@ -41,6 +43,10 @@ export default function useSocket() {
   const reconnectAttempts = useRef(0);
   const connectionState = useRef<ConnectionState>(ConnectionState.DISCONNECTED);
   const isManualDisconnect = useRef(false);
+  // debounce: delay connection, aggregate multiple changes in a short time
+  const autorunDebounceTimer = useRef<
+    ReturnType<typeof setTimeout> | undefined
+  >(undefined);
 
   const {
     setWebsocketInstance,
@@ -70,6 +76,7 @@ export default function useSocket() {
   const sendMessage = useCallback(
     (message: ISocketMessage) => {
       const ws = socketStore.socketInstance;
+      console.log('websocket: send message', message);
       if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify(message));
         return true;
@@ -81,7 +88,7 @@ export default function useSocket() {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [socketStore]
   );
 
   /**
@@ -257,7 +264,6 @@ export default function useSocket() {
       setWebsocketInstance(ws);
 
       ws.onopen = () => {
-        console.log('websocket: connected successfully');
         connectionState.current = ConnectionState.CONNECTED;
         setConnectionState(ConnectionState.CONNECTED);
         setLastConnectedAt(new Date());
@@ -275,6 +281,12 @@ export default function useSocket() {
           // process business message
           const { active } = parsedData;
           switch (active) {
+            case SOCKET_CONNECT:
+              console.log('websocket: connected successfully');
+              break;
+            case SOCKET_ALREADY_CONNECTED:
+              console.log('websocket: already connected');
+              break;
             case SOCKET_HEARTBEAT:
               if (heartbeatTimeoutTimer.current) {
                 clearTimeout(heartbeatTimeoutTimer.current);
@@ -385,18 +397,29 @@ export default function useSocket() {
       'change',
       handleAppStateChange
     );
-    const disposer = autorun(() => {
-      const currentIdentity = authStore.identity;
-      const currentUserId = userStore.user?.id;
-      if (currentIdentity && currentUserId) {
-        subscribeWebSocketEvent(currentIdentity, currentUserId);
-        connect();
-      }
-    });
-
+    const disposer = reaction(
+      () => ({ identity: authStore.identity, userId: userStore.user?.id }),
+      ({ identity, userId }) => {
+        if (identity && userId) {
+          // debounce: delay connection, aggregate multiple changes in a short time
+          if (autorunDebounceTimer.current) {
+            clearTimeout(autorunDebounceTimer.current);
+          }
+          autorunDebounceTimer.current = setTimeout(() => {
+            subscribeWebSocketEvent(identity, userId);
+            connect();
+          }, 100);
+        }
+      },
+      { fireImmediately: true, delay: 0 }
+    );
     return () => {
       subscription?.remove();
       disconnect();
+      if (autorunDebounceTimer.current) {
+        clearTimeout(autorunDebounceTimer.current);
+        autorunDebounceTimer.current = undefined;
+      }
       disposer();
     };
   }, [connect, subscribeWebSocketEvent, disconnect, handleAppStateChange]);

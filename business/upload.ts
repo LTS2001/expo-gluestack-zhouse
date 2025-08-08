@@ -1,7 +1,7 @@
 import { showToast } from '@/components/ui';
 import { postUploadImgVideoApi, postUploadUserHeadImgApi } from '@/request';
 import * as ImagePicker from 'expo-image-picker';
-import { getUserInfo } from '.';
+import { getUserInfo } from './user';
 
 /**
  * upload user header image

@@ -1,8 +1,8 @@
 import { getUserInfo, userLogout } from '@/business';
-import { useSocket } from '@/hooks';
 import { authStore } from '@/stores';
 import { autorun } from 'mobx';
 import { useEffect } from 'react';
+import useSocket from './useSocket';
 
 export default function useInitialization() {
   // initialize websocket

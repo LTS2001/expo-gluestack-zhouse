@@ -1,7 +1,7 @@
-import { Tag } from '@/components';
 import { Image, Text, View } from '@/components/ui';
 import { formatUtcTime } from '@/utils';
 import { observer } from 'mobx-react-lite';
+import Tag from '../tag';
 
 interface IProps {
   houseName: string;

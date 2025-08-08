@@ -1,7 +1,7 @@
 import { configure, makeAutoObservable } from 'mobx';
 
 configure({
-  enforceActions: 'always',
+  enforceActions: 'never',
 });
 
 class LocationStore {

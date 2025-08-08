@@ -2,6 +2,8 @@
  * websocket message types
  */
 export const SOCKET_MESSAGES = {
+  CONNECT: 'Connect',
+  ALREADY_CONNECTED: 'AlreadyConnected',
   HEARTBEAT: 'Heartbeat',
   GET_PENDING_LEASE: 'GetPendingLease',
   GET_LANDLORD_REPORT: 'GetLandlordReport',
@@ -18,7 +20,8 @@ export const SOCKET_GET_TENANT_LEASE_HOUSE =
 export const SOCKET_GET_TENANT_REPORT = SOCKET_MESSAGES.GET_TENANT_REPORT;
 export const SOCKET_GET_CHAT_MESSAGE = SOCKET_MESSAGES.GET_CHAT_MESSAGE;
 export const SOCKET_HEARTBEAT = SOCKET_MESSAGES.HEARTBEAT;
-
+export const SOCKET_CONNECT = SOCKET_MESSAGES.CONNECT;
+export const SOCKET_ALREADY_CONNECTED = SOCKET_MESSAGES.ALREADY_CONNECTED;
 /**
  * heartbeat configuration
  */

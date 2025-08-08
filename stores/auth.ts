@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { configure, makeAutoObservable } from 'mobx';
 
 configure({
-  enforceActions: 'always',
+  enforceActions: 'never',
 });
 class AuthStore {
   private async initializeStore() {
