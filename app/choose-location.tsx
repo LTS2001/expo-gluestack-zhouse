@@ -1,4 +1,10 @@
-import { Button, ButtonText, Icon, Text, View } from '@/components/ui';
+import {
+  Button,
+  ButtonText,
+  Icon,
+  Text,
+  TouchableOpacity,
+} from '@/components/ui';
 import emitter from '@/emitter';
 import * as EventName from '@/emitter/event-name';
 import { ITencentMapLocation } from '@/global';
@@ -35,13 +41,13 @@ export default function AddHouse() {
         </Button>
       ),
       headerLeft: () => (
-        <View
+        <TouchableOpacity
           className='flex-row items-center gap-1'
-          onTouchEnd={() => router.back()}
+          onPress={() => router.back()}
         >
           <Icon as='AntDesign' name='left' size={16} />
           <Text>返回</Text>
-        </View>
+        </TouchableOpacity>
       ),
     });
   }, [location, navigation, eventName]);

@@ -4,6 +4,7 @@ import { ReactNode } from 'react';
 import { Icon } from '../ui/icon';
 import { Text } from '../ui/text';
 import { showToast } from '../ui/toast';
+import { TouchableOpacity } from '../ui/touchable-opacity';
 import { View } from '../ui/view';
 interface IProps {
   domainList: {
@@ -34,27 +35,31 @@ const Domain = (props: IProps) => {
     <View className='mt-6'>
       {domainList.map((domain, idx) => {
         return (
-          <View
+          <TouchableOpacity
             key={idx}
-            onTouchEnd={() => toDetail(domain.to as Href)}
-            className={cls([
-              'flex-row justify-between mx-6 py-4 border-b-[1px] border-secondary-500 items-center',
-              {
-                'border-t-[1px]': idx === 0,
-              },
-            ])}
+            activeOpacity={0.7}
+            onPress={() => toDetail(domain.to as Href)}
           >
-            <View className='flex-row items-center flex-1' pointerEvents='none'>
-              {domain.icon}
-              <Text className='text-lg ml-2'>{domain.text}</Text>
+            <View
+              className={cls([
+                'flex-row justify-between mx-6 py-4 border-b-[1px] border-secondary-500 items-center bg-white',
+                {
+                  'border-t-[1px]': idx === 0,
+                },
+              ])}
+            >
+              <View className='flex-row items-center flex-1'>
+                {domain.icon}
+                <Text className='text-lg ml-2'>{domain.text}</Text>
+              </View>
+              {domain.notice ? (
+                <Text className='bg-theme-primary text-white rounded-full px-2 text-sm py-0.5 mr-3'>
+                  {domain.notice > 99 ? '99+' : domain.notice}
+                </Text>
+              ) : null}
+              <Icon as='AntDesign' name='right' />
             </View>
-            {domain.notice ? (
-              <Text className='bg-theme-primary text-white rounded-full px-2 text-sm py-0.5 mr-3'>
-                {domain.notice > 99 ? '99+' : domain.notice}
-              </Text>
-            ) : null}
-            <Icon as='AntDesign' name='right' />
-          </View>
+          </TouchableOpacity>
         );
       })}
     </View>

@@ -1,4 +1,4 @@
-import { Image, Text, View } from '@/components/ui';
+import { Image, Text, TouchableOpacity, View } from '@/components/ui';
 import { formatUtcTime } from '@/utils';
 import { observer } from 'mobx-react-lite';
 import Tag from '../tag';
@@ -65,7 +65,10 @@ function TenantHouseCard(props: IProps) {
           </View>
         </View>
       ) : null}
-      <View className='flex-row items-center' onTouchEnd={clickHouseContent}>
+      <TouchableOpacity
+        className='flex-row items-center'
+        onPress={clickHouseContent}
+      >
         <Image
           src={houseImg}
           className='w-[144px] h-[90px] rounded-md'
@@ -91,7 +94,7 @@ function TenantHouseCard(props: IProps) {
             <Text>{formatUtcTime(date, 'day')}</Text>
           </View>
         </View>
-      </View>
+      </TouchableOpacity>
       <View className='flex-row items-center mt-3'>
         <Text>地址：</Text>
         <Text className='info-address'>{address}</Text>

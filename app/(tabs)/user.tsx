@@ -1,6 +1,6 @@
 import { switchIdentity } from '@/business';
 import { Domain, Logout } from '@/components';
-import { Icon, Image, Text, View } from '@/components/ui';
+import { Icon, Image, Text, TouchableOpacity, View } from '@/components/ui';
 import {
   COMPLAINT_LIST_HREF,
   COMPLAINT_LIST_TEXT,
@@ -25,10 +25,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 function SwitchIdentityIcon() {
   const insets = useSafeAreaInsets();
   return (
-    <View
+    <TouchableOpacity
       style={{ marginTop: insets.top + 4 }}
       className='ml-3 relative self-start p-3'
-      onTouchEnd={switchIdentity}
+      onPress={switchIdentity}
     >
       <Icon
         as='FontAwesome6'
@@ -36,7 +36,7 @@ function SwitchIdentityIcon() {
         color='#eee'
         className='self-start'
       />
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -93,9 +93,9 @@ const Landlord = observer(() => {
       <View className='h-80 bg-theme-primary'>
         <SwitchIdentityIcon />
         <View className='justify-center items-center'>
-          <View
+          <TouchableOpacity
             className='items-center -mt-5'
-            onTouchEnd={() => router.push(isLogin ? '/self-info' : '/login')}
+            onPress={() => router.push(isLogin ? '/self-info' : '/login')}
           >
             <Image
               src={user?.headImg}
@@ -106,7 +106,7 @@ const Landlord = observer(() => {
             <Text className='font-bold text-white text-2xl mt-2'>
               {isLogin ? user?.name : '请登录'}
             </Text>
-          </View>
+          </TouchableOpacity>
         </View>
       </View>
       <View className='flex-row justify-center gap-6 -mt-12'>
@@ -186,8 +186,8 @@ const Tenant = observer(() => {
         <SwitchIdentityIcon />
       </View>
       <View className='-m-36 bg-background-0 mx-5 rounded-2xl pb-8' needShadow>
-        <View
-          onTouchEnd={() => router.push(isLogin ? '/self-info' : '/login')}
+        <TouchableOpacity
+          onPress={() => router.push(isLogin ? '/self-info' : '/login')}
           className='items-center'
         >
           <View className='-mt-16'>
@@ -203,7 +203,7 @@ const Tenant = observer(() => {
               {isLogin ? user?.name : '请登录'}
             </Text>
           </View>
-        </View>
+        </TouchableOpacity>
         <Domain domainList={domainList} isLogin={isLogin} />
       </View>
       <View className='mt-44'>

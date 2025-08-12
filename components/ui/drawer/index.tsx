@@ -21,6 +21,7 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
+import { TouchableOpacity } from '..';
 import { Button, ButtonText } from '../button';
 import { Icon } from '../icon';
 import { Text } from '../text';
@@ -352,7 +353,9 @@ const DrawerGroup = (props: IProps) => {
       <DrawerBackdrop />
       <DrawerContent className='rounded-xl'>
         <View className='flex-row items-center justify-between mb-4'>
-          <Icon as='AntDesign' name='close' onTouchEnd={onClose} />
+          <TouchableOpacity onPress={onClose}>
+            <Icon as='AntDesign' name='close' />
+          </TouchableOpacity>
           {onConfirm && (
             <Button size='xs' action='positive' onPress={onConfirm}>
               <ButtonText>确定</ButtonText>

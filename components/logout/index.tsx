@@ -27,7 +27,7 @@ const Logout = (props: IProps) => {
         <Button
           className='mx-6'
           size='lg'
-          onTouchEnd={() => setLogoutPopupVisible(true)}
+          onPress={() => setLogoutPopupVisible(true)}
         >
           <ButtonText>退出登录</ButtonText>
         </Button>

@@ -10,6 +10,7 @@ import {
   InputField,
   showToast,
   Text,
+  TouchableOpacity,
   View,
 } from '@/components/ui';
 import { LANDLORD, TENANT } from '@/constants';
@@ -115,13 +116,9 @@ export default function Login() {
 
   return (
     <View style={{ paddingTop: insets.top + 16 }}>
-      <Icon
-        as='AntDesign'
-        name='home'
-        onTouchEnd={() => router.replace('/(tabs)')}
-        position='start'
-        className='ml-8'
-      />
+      <TouchableOpacity onPress={() => router.replace('/(tabs)')}>
+        <Icon as='AntDesign' name='home' position='start' className='ml-8' />
+      </TouchableOpacity>
       <View className='items-center'>
         <Image source={require('@/assets/images/icon.png')} size='xl' />
       </View>
@@ -242,7 +239,7 @@ export default function Login() {
             </FormControlErrorText>
           </FormControl>
         )}
-        <Button className='mt-4' onTouchEnd={handleSubmit(handleUserSubmit)}>
+        <Button className='mt-4' onPress={handleSubmit(handleUserSubmit)}>
           <ButtonText>{isRegister ? '注册' : '登录'}</ButtonText>
           {isLoading && (
             <Icon
@@ -256,13 +253,13 @@ export default function Login() {
         {!isRegister && (
           <View className='flex-row justify-center mt-6'>
             <Text>新用户？</Text>
-            <View onTouchEnd={() => setIsRegister(true)}>
+            <TouchableOpacity onPress={() => setIsRegister(true)}>
               <Text className='font-bold text-theme-primary'>立即注册</Text>
-            </View>
+            </TouchableOpacity>
           </View>
         )}
         {isRegister && (
-          <Button className='mt-6' onTouchEnd={() => setIsRegister(false)}>
+          <Button className='mt-6' onPress={() => setIsRegister(false)}>
             <ButtonText>返回登录</ButtonText>
           </Button>
         )}

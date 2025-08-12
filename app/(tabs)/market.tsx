@@ -1,6 +1,6 @@
 import { getMarketHouseList } from '@/business';
 import { Empty, HeaderSearch } from '@/components';
-import { Icon, Image, Text, View } from '@/components/ui';
+import { Icon, Image, Text, TouchableOpacity, View } from '@/components/ui';
 import { ASPECT_RATIO } from '@/constants';
 import emitter from '@/emitter';
 import { GET_LOCATION } from '@/emitter/event-name';
@@ -71,9 +71,9 @@ const Market = () => {
       headerLeft: isSearchFocused
         ? undefined
         : () => (
-            <View
+            <TouchableOpacity
               className='flex-row items-center gap-2 py-3 ml-4 absolute left-0'
-              onTouchEnd={() =>
+              onPress={() =>
                 router.push({
                   pathname: '/choose-location',
                   params: {
@@ -90,7 +90,7 @@ const Market = () => {
                 darkColor='white'
               />
               <Text className='py-2 text-lg'>{chooseLocation.poiname}</Text>
-            </View>
+            </TouchableOpacity>
           ),
       headerRight: () => (
         <HeaderSearch
@@ -203,54 +203,54 @@ const Market = () => {
       <View className='flex-row flex-wrap gap-0 pt-6'>
         {marketHouseList?.map((house: IHouse, idx: number) => {
           return (
-            <View
-              style={{
-                width: halfScreenWidth - 18,
-                padding: 12,
-                marginLeft: 12,
-                marginRight: idx % 2 !== 0 ? 12 : 0,
-              }}
-              className='bg-background-0 mb-6 rounded-xl'
-              key={idx}
-              onTouchEnd={() => toHouseInfo(house)}
-              needShadow
-            >
-              <Image
-                src={getHouseFirstImg(house.houseImg)}
+            <TouchableOpacity key={idx} onPress={() => toHouseInfo(house)}>
+              <View
                 style={{
-                  width: '100%',
-                  height: (halfScreenWidth - 42) / ASPECT_RATIO,
-                  borderRadius: 4,
+                  width: halfScreenWidth - 18,
+                  padding: 12,
+                  marginLeft: 12,
+                  marginRight: idx % 2 !== 0 ? 12 : 0,
                 }}
-              />
-              <View className='mt-2'>
-                <Text className='text-xl font-bold'>{house.name}</Text>
-                <View className='flex-row items-center justify-between mt-1'>
-                  <View className='flex-row items-center gap-1'>
-                    <Text className='text-lg'>
-                      {houseCollectList?.find(
-                        (c) => c.houseId === house.houseId
-                      )?.count || 0}
-                    </Text>
-                    <Text>收藏</Text>
+                className='bg-background-0 mb-6 rounded-xl'
+                needShadow
+              >
+                <Image
+                  src={getHouseFirstImg(house.houseImg)}
+                  style={{
+                    width: '100%',
+                    height: (halfScreenWidth - 42) / ASPECT_RATIO,
+                    borderRadius: 4,
+                  }}
+                />
+                <View className='mt-2'>
+                  <Text className='text-xl font-bold'>{house.name}</Text>
+                  <View className='flex-row items-center justify-between mt-1'>
+                    <View className='flex-row items-center gap-1'>
+                      <Text className='text-lg'>
+                        {houseCollectList?.find(
+                          (c) => c.houseId === house.houseId
+                        )?.count || 0}
+                      </Text>
+                      <Text>收藏</Text>
+                    </View>
+                    <View className='flex-row items-center gap-1'>
+                      <Text className='font-bold text-error-700'>
+                        ￥{house.price}
+                      </Text>
+                      <Text>/月</Text>
+                    </View>
                   </View>
-                  <View className='flex-row items-center gap-1'>
-                    <Text className='font-bold text-error-700'>
-                      ￥{house.price}
-                    </Text>
-                    <Text>/月</Text>
+                  <View className='mt-1 flex-row items-center gap-2'>
+                    <Image
+                      src={getLandlordInfo(house.landlordId)?.headImg}
+                      size='2xs'
+                      className='rounded-full'
+                    />
+                    <Text>{getLandlordInfo(house.landlordId)?.name}</Text>
                   </View>
-                </View>
-                <View className='mt-1 flex-row items-center gap-2'>
-                  <Image
-                    src={getLandlordInfo(house.landlordId)?.headImg}
-                    size='2xs'
-                    className='rounded-full'
-                  />
-                  <Text>{getLandlordInfo(house.landlordId)?.name}</Text>
                 </View>
               </View>
-            </View>
+            </TouchableOpacity>
           );
         })}
       </View>

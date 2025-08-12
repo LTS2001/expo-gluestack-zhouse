@@ -1,4 +1,10 @@
-import { Icon, Input, InputField, View } from '@/components/ui';
+import {
+  Icon,
+  Input,
+  InputField,
+  TouchableOpacity,
+  View,
+} from '@/components/ui';
 import { useState } from 'react';
 
 interface IHeaderSearchProps {
@@ -23,21 +29,21 @@ export default function HeaderSearch({
               onChangeText={onChangeText}
               autoFocus={true}
             />
-            <View
-              onTouchEnd={() => {
+            <TouchableOpacity
+              onPress={() => {
                 setIsSearchFocused(false);
                 onChangeFocus(false);
               }}
               className='px-2'
             >
               <Icon as='AntDesign' name='close' size={20} />
-            </View>
+            </TouchableOpacity>
           </Input>
         </View>
       ) : (
-        <View
+        <TouchableOpacity
           className='p-4'
-          onTouchEnd={() => {
+          onPress={() => {
             setIsSearchFocused(true);
             onChangeFocus(true);
           }}
@@ -49,7 +55,7 @@ export default function HeaderSearch({
             lightColor='black'
             darkColor='white'
           />
-        </View>
+        </TouchableOpacity>
       )}
     </View>
   );

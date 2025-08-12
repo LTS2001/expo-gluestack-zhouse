@@ -1,7 +1,7 @@
 import { IPendingLease } from '@/global';
 import { makePhoneCall } from '@/utils';
 import React, { ReactNode } from 'react';
-import { Icon, Image, showToast, Text, View } from '../ui';
+import { Icon, Image, showToast, Text, TouchableOpacity, View } from '../ui';
 
 interface Props {
   lease: IPendingLease;
@@ -50,12 +50,12 @@ const TenantCard = (props: Props & React.PropsWithChildren) => {
             </View>
           </View>
           <View className='flex-row gap-4'>
-            <View onTouchEnd={() => phoneTenant(lease.tenantPhone)}>
+            <TouchableOpacity onPress={() => phoneTenant(lease.tenantPhone)}>
               <Icon as='AntDesign' name='phone' />
-            </View>
-            <View onTouchEnd={toChat}>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={toChat}>
               <Icon as='AntDesign' name='message1' size={22} />
-            </View>
+            </TouchableOpacity>
           </View>
         </View>
         {msgItemNode}

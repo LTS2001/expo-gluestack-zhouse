@@ -4,7 +4,7 @@ import {
   ShowHouseMessages,
   Tag,
 } from '@/components';
-import { Icon, Image, Text, View } from '@/components/ui';
+import { Icon, Image, Text, TouchableOpacity, View } from '@/components/ui';
 import { HouseToStatusMap } from '@/constants';
 import { IUser } from '@/global';
 import { getTenantLeaseHouseApi } from '@/request';
@@ -92,13 +92,13 @@ function LandlordLookHouse() {
             }
             expand
           />
-          <View
+          <TouchableOpacity
             className='flex-row items-center self-end gap-1'
-            onTouchEnd={lookHouseComment}
+            onPress={lookHouseComment}
           >
             <Text>查看房屋评论</Text>
             <Icon as='AntDesign' name='right' size={16} />
-          </View>
+          </TouchableOpacity>
         </View>
       </View>
       <View className='gap-6 pb-10 pt-6'>

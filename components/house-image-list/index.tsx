@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Dimensions, ScrollView, View } from 'react-native';
 import ImagePreview from '../image-preview';
+import { TouchableOpacity } from '../ui';
 import { Image } from '../ui/image';
 
 interface IProps {
@@ -34,7 +35,7 @@ const HouseImageList = (props: IProps) => {
         scrollEventThrottle={16}
       >
         {imgList.map((url: string, idx: number) => (
-          <View key={idx} onTouchEnd={() => openShowPreview(idx)}>
+          <TouchableOpacity key={idx} onPress={() => openShowPreview(idx)}>
             <Image
               src={url}
               style={{
@@ -42,7 +43,7 @@ const HouseImageList = (props: IProps) => {
                 height: imageHeight,
               }}
             />
-          </View>
+          </TouchableOpacity>
         ))}
       </ScrollView>
       {/* dot indicator */}

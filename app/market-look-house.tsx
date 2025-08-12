@@ -20,6 +20,7 @@ import {
   Input,
   InputField,
   Text,
+  TouchableOpacity,
   View,
   showToast,
 } from '@/components/ui';
@@ -224,17 +225,17 @@ const MarketLookHouse = () => {
               />
               <Text className='ml-2'>{landlord?.name}</Text>
             </View>
-            <View
+            <TouchableOpacity
               className='flex-row items-center gap-1 self-end'
-              onTouchEnd={lookHouseAllComment}
+              onPress={lookHouseAllComment}
             >
               <Text>查看房屋评论</Text>
               <Icon as='AntDesign' name='right' size={16} />
-            </View>
+            </TouchableOpacity>
           </View>
           {identity === TENANT && (
             <View className='flex-row items-center gap-8'>
-              <View onTouchEnd={toChangeHouseCollectStatus}>
+              <TouchableOpacity onPress={toChangeHouseCollectStatus}>
                 {collected ? (
                   <Icon
                     as='AntDesign'
@@ -245,13 +246,13 @@ const MarketLookHouse = () => {
                 ) : (
                   <Icon as='AntDesign' name='staro' />
                 )}
-              </View>
-              <View onTouchEnd={phoneLandlord}>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={phoneLandlord}>
                 <Icon as='AntDesign' name='phone' />
-              </View>
-              <View onTouchEnd={toChat}>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={toChat}>
                 <Icon as='AntDesign' name='message1' size={22} />
-              </View>
+              </TouchableOpacity>
             </View>
           )}
           {identity === TENANT ? (

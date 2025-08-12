@@ -18,6 +18,7 @@ import {
   Text,
   Textarea,
   TextareaInput,
+  TouchableOpacity,
   View,
 } from '@/components/ui';
 import emitter from '@/emitter';
@@ -108,7 +109,7 @@ interface IFormConfig {
   leftSlot?: React.ReactNode;
   rightSlot?: React.ReactNode;
   sector?: IFormConfig[];
-  onTouchEnd?: () => void;
+  onPress?: () => void;
 }
 
 const GenerateForm = ({ config }: { config: IFormConfig[] }) => {
@@ -164,19 +165,23 @@ const GenerateForm = ({ config }: { config: IFormConfig[] }) => {
                             ))}
                           </RadioGroup>
                         ) : (
-                          <Input onTouchEnd={c.onTouchEnd}>
-                            {c.leftSlot && (
-                              <View className='ml-2'>{c.leftSlot}</View>
-                            )}
-                            <InputField
-                              onChangeText={onChange}
-                              value={value as string}
-                              placeholder={halfWidth ? '' : `请输入${c.label}`}
-                            />
-                            {c.rightSlot && (
-                              <View className='mr-2'>{c.rightSlot}</View>
-                            )}
-                          </Input>
+                          <TouchableOpacity onPress={c.onPress}>
+                            <Input>
+                              {c.leftSlot && (
+                                <View className='ml-2'>{c.leftSlot}</View>
+                              )}
+                              <InputField
+                                onChangeText={onChange}
+                                value={value as string}
+                                placeholder={
+                                  halfWidth ? '' : `请输入${c.label}`
+                                }
+                              />
+                              {c.rightSlot && (
+                                <View className='mr-2'>{c.rightSlot}</View>
+                              )}
+                            </Input>
+                          </TouchableOpacity>
                         )
                 }
               />
@@ -403,9 +408,9 @@ const AddEditHouse = () => {
       label: '地址名称',
       name: 'addressName',
       rightSlot: (
-        <View
+        <TouchableOpacity
           className='px-3 py-1'
-          onTouchEnd={() =>
+          onPress={() =>
             router.push({
               pathname: '/choose-location',
               params: {
@@ -415,7 +420,7 @@ const AddEditHouse = () => {
           }
         >
           <Icon as='Octicons' name='location' size={22} />
-        </View>
+        </TouchableOpacity>
       ),
     },
     {
@@ -449,9 +454,9 @@ const AddEditHouse = () => {
             {/* image list */}
             {value && Array.isArray(value) && value.length > 0
               ? value.map((item, index) => (
-                  <View
+                  <TouchableOpacity
                     key={index}
-                    onTouchEnd={() => {
+                    onPress={() => {
                       setImagePreview({
                         visible: true,
                         index,
@@ -462,13 +467,13 @@ const AddEditHouse = () => {
                       src={item}
                       className='w-32 h-20 rounded-md border-[1px] border-secondary-300'
                     />
-                  </View>
+                  </TouchableOpacity>
                 ))
               : null}
             {/* add image */}
-            <View
+            <TouchableOpacity
               className='w-32 h-20 bg-secondary-300 flex justify-center items-center rounded-md'
-              onTouchEnd={async () => {
+              onPress={async () => {
                 const res = await uploadImage({
                   allowsEditing: true,
                   aspect: [16, 10],
@@ -481,7 +486,7 @@ const AddEditHouse = () => {
               }}
             >
               <Icon as='AntDesign' name='plus' size={24} />
-            </View>
+            </TouchableOpacity>
             {/* image preview */}
             <ImagePreview
               srcs={value}
@@ -562,7 +567,7 @@ const AddEditHouse = () => {
           paddingBottom: keyboardHeight + 80,
         }}
       >
-        <Button className='mt-8' onTouchEnd={form.handleSubmit(onFinish)}>
+        <Button className='mt-8' onPress={form.handleSubmit(onFinish)}>
           <ButtonText>保存</ButtonText>
         </Button>
       </View>

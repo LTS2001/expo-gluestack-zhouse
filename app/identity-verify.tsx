@@ -15,6 +15,7 @@ import {
   RadioLabel,
   showToast,
   Text,
+  TouchableOpacity,
   View,
 } from '@/components/ui';
 import { putUserApi } from '@/request';
@@ -138,17 +139,15 @@ const IdentityVerify = () => {
             value={value ? new Date(value) : new Date()}
           />
         ) : (
-          <Input
-            variant='underlined'
-            isDisabled={true}
-            onTouchEnd={() => setBornVisible(true)}
-          >
-            <InputField
-              value={value}
-              placeholder={`请选择出生日期`}
-              className='text-lg'
-            ></InputField>
-          </Input>
+          <TouchableOpacity onPress={() => setBornVisible(true)}>
+            <Input variant='underlined' isDisabled={true}>
+              <InputField
+                value={value}
+                placeholder={`请选择出生日期`}
+                className='text-lg'
+              ></InputField>
+            </Input>
+          </TouchableOpacity>
         ),
     },
     {
@@ -167,9 +166,9 @@ const IdentityVerify = () => {
       label: '身份证正面',
       name: 'identityImgFront',
       render: ({ field: { onChange, value } }) => (
-        <View
+        <TouchableOpacity
           className='relative w-32 h-20'
-          onTouchEnd={() => {
+          onPress={() => {
             uploadIdCard(onChange);
           }}
         >
@@ -191,16 +190,16 @@ const IdentityVerify = () => {
           ) : (
             <Image src={value} className='w-32 h-20' />
           )}
-        </View>
+        </TouchableOpacity>
       ),
     },
     {
       label: '身份证反面',
       name: 'identityImgBack',
       render: ({ field: { onChange, value } }) => (
-        <View
+        <TouchableOpacity
           className='relative w-32 h-20'
-          onTouchEnd={() => {
+          onPress={() => {
             uploadIdCard(onChange);
           }}
         >
@@ -222,7 +221,7 @@ const IdentityVerify = () => {
           ) : (
             <Image src={value} className='w-32 h-20' />
           )}
-        </View>
+        </TouchableOpacity>
       ),
     },
   ];
@@ -276,7 +275,7 @@ const IdentityVerify = () => {
           </FormControl>
         );
       })}
-      <Button className='mt-8' onTouchEnd={handleSubmit(onFinish)}>
+      <Button className='mt-8' onPress={handleSubmit(onFinish)}>
         <ButtonText>认证</ButtonText>
       </Button>
     </View>

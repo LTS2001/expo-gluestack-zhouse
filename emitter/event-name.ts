@@ -27,7 +27,3 @@ export const GET_SESSION_VARIOUS = 'GET_SESSION_VARIOUS';
  * get current last one message
  */
 export const GET_CURRENT_LAST_ONE_MESSAGE = 'GET_CURRENT_LAST_ONE_MESSAGE';
-/**
- * disconnect socket
- */
-export const DISCONNECT_SOCKET = 'DISCONNECT_SOCKET';

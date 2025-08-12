@@ -13,6 +13,7 @@ import {
   Input,
   InputField,
   Text,
+  TouchableOpacity,
   View,
   showToast,
 } from '@/components/ui';
@@ -83,8 +84,8 @@ const SelfInfo = () => {
       type: 'image',
       text: '头像',
       content: (
-        <View
-          onTouchEnd={(e) => {
+        <TouchableOpacity
+          onPress={(e) => {
             e.stopPropagation();
             setHeaderImageVisible(true);
           }}
@@ -94,7 +95,7 @@ const SelfInfo = () => {
             size='xs'
             className='rounded-sm overflow-hidden'
           />
-        </View>
+        </TouchableOpacity>
       ),
       event: headImgUploadSuccess,
     },
@@ -185,7 +186,7 @@ const SelfInfo = () => {
         {userInfoConfig.map((info, idx) => {
           const { event, text, type, content } = info;
           return (
-            <View
+            <TouchableOpacity
               className={cls([
                 'flex-row items-center py-5 border-secondary-400 px-2',
                 {
@@ -193,7 +194,7 @@ const SelfInfo = () => {
                 },
               ])}
               key={idx}
-              onTouchEnd={event}
+              onPress={event}
             >
               <Text className='flex-1 text-lg'>{text}</Text>
               {type === 'text' ? (
@@ -209,7 +210,7 @@ const SelfInfo = () => {
                   className='ml-2 -mr-2'
                 />
               )}
-            </View>
+            </TouchableOpacity>
           );
         })}
       </View>
@@ -217,7 +218,7 @@ const SelfInfo = () => {
         {/* 实名信息 */}
         {user?.status === NORMAL &&
           identityInfoConfig.map((info, idx) => (
-            <View
+            <TouchableOpacity
               className={cls([
                 'flex-row items-center py-4 border-secondary-400 px-2',
                 {
@@ -225,7 +226,7 @@ const SelfInfo = () => {
                 },
               ])}
               key={idx}
-              onTouchEnd={info.event}
+              onPress={info.event}
             >
               <Text className='flex-1 text-lg'>{info.text}</Text>
               {info.type === 'text' ? (
@@ -233,19 +234,19 @@ const SelfInfo = () => {
               ) : (
                 info.content
               )}
-            </View>
+            </TouchableOpacity>
           ))}
       </View>
       {/* real name entry */}
       {user?.status === UN_IDENTITY && (
-        <View
+        <TouchableOpacity
           className='mx-4 my-10'
-          onTouchEnd={() => router.push('/identity-verify')}
+          onPress={() => router.push('/identity-verify')}
         >
           <Button>
             <ButtonText>去实名</ButtonText>
           </Button>
-        </View>
+        </TouchableOpacity>
       )}
       <ImagePreview
         srcs={user?.headImg}

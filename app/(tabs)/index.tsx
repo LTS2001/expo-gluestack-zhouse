@@ -6,6 +6,7 @@ import {
   ButtonText,
   Icon,
   Text,
+  TouchableOpacity,
   View,
   showToast,
 } from '@/components/ui';
@@ -183,14 +184,14 @@ const LandlordHome = observer(() => {
                 isFooterSlot={true}
                 FooterSlotComponent={
                   <View className='flex-row mt-4 gap-6'>
-                    <Button onTouchEnd={() => toHouseInfo(item)} size='sm'>
+                    <Button onPress={() => toHouseInfo(item)} size='sm'>
                       <ButtonText>查看</ButtonText>
                     </Button>
-                    <Button onTouchEnd={() => toEditor(item)} size='sm'>
+                    <Button onPress={() => toEditor(item)} size='sm'>
                       <ButtonText>编辑</ButtonText>
                     </Button>
                     <Button
-                      onTouchEnd={() => {
+                      onPress={() => {
                         setChooseHouse(item);
                         setDelHouseAlterVisible(true);
                       }}
@@ -200,7 +201,7 @@ const LandlordHome = observer(() => {
                     </Button>
                     {!isPublish ? (
                       <Button
-                        onTouchEnd={() => {
+                        onPress={() => {
                           setChooseHouse(item);
                           setPublishHouseAlterVisible(true);
                         }}
@@ -221,9 +222,9 @@ const LandlordHome = observer(() => {
         />
       )}
       {isLogin && (
-        <View
+        <TouchableOpacity
           className='absolute bottom-24 right-8 bg-primary-500 rounded-full p-3'
-          onTouchEnd={addHouse}
+          onPress={addHouse}
         >
           <Text>
             <Icon
@@ -233,7 +234,7 @@ const LandlordHome = observer(() => {
               darkColor='black'
             />
           </Text>
-        </View>
+        </TouchableOpacity>
       )}
       <AlertDialogGroup
         visible={delHouseAlterVisible}
@@ -265,7 +266,7 @@ const TenantHome = observer(() => {
     <View>
       <Text>我是租客首页</Text>
       <Button
-        onTouchEnd={() => {
+        onPress={() => {
           socketInstance?.send(
             JSON.stringify({
               toIdentity: LANDLORD,
