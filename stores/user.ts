@@ -26,6 +26,11 @@ class UserStore {
   leasedTenant: IExistLease[] | undefined;
 
   /**
+   * the number of tenant that has rented the landlord's house
+   */
+  landlordTenantCount: number = 0;
+
+  /**
    * @param user user info
    */
   setUser(user: IUser) {
@@ -59,6 +64,21 @@ class UserStore {
    */
   clearLeasedTenant() {
     this.leasedTenant = undefined;
+  }
+
+  /**
+   * set the number of tenant that has rented the landlord's house
+   * @param count
+   */
+  setLandlordTenantCount(count: number) {
+    this.landlordTenantCount = count;
+  }
+
+  /**
+   * clear the number of tenant that has rented the landlord's house
+   */
+  clearLandlordTenantCount() {
+    this.landlordTenantCount = 0;
   }
 }
 

@@ -1,4 +1,6 @@
 import {
+  IExistLease,
+  IHouseLease,
   ILogin,
   IRegister,
   IUpdateBaseUserInfo,
@@ -46,3 +48,19 @@ export const putUserApi = (
  */
 export const getLandlordListApi = (ids: string): Promise<IUser[]> =>
   axios.get(`/landlord/list?ids=${ids}`);
+
+/**
+ * get the landlord's tenant lease information list
+ * @returns tenant's lease info list
+ */
+export const getTenantLeasedListLandlordApi = (): Promise<IExistLease[]> =>
+  axios.get(`/landlord/tenant`);
+
+/**
+ * get tenant's leased house list
+ * @param tenantId tenant id
+ * @returns house list
+ */
+export const getTenantLeasedHouseListApi = (
+  tenantId: number
+): Promise<IHouseLease[]> => axios.get(`/tenant/lease?tenantId=${tenantId}`);

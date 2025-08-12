@@ -1,6 +1,12 @@
-import { getLeasePendingListByLandlord, getUserInfo } from '@/business';
-import { LANDLORD } from '@/constants';
-import { authStore } from '@/stores';
+import {
+  getLeasePendingListByLandlord,
+  getRepairListTenant,
+  getTenantLeasedHouseList,
+  getTenantLeasedListLandlord,
+  getUserInfo,
+} from '@/business';
+import { LANDLORD, TENANT } from '@/constants';
+import { authStore, userStore } from '@/stores';
 import { autorun } from 'mobx';
 import { useEffect, useRef } from 'react';
 import useCurrentPage from './useCurrentPage';
@@ -22,7 +28,10 @@ export default function useInitialization() {
       clearTimeout(debounceTimer.current);
     }
     debounceTimer.current = setTimeout(() => {
-      // get user info when you first enter the app
+      /**
+       * first enter the app, need get below info
+       * 1. user info
+       */
       getUserInfo();
     }, 100);
     return () => {
@@ -35,7 +44,7 @@ export default function useInitialization() {
   useEffect(() => {
     const disposer = autorun(() => {
       const { identity, isLogin } = authStore;
-
+      const { user } = userStore;
       if (autorunDebounceTimer.current) {
         clearTimeout(autorunDebounceTimer.current);
       }
@@ -46,7 +55,14 @@ export default function useInitialization() {
          * 2. get lease pending list when you login (if you are landlord)
          * 3. get lease pending list when you change the landlord identity
          */
-        if (identity === LANDLORD && isLogin) getLeasePendingListByLandlord();
+        if (identity === LANDLORD && isLogin) {
+          getLeasePendingListByLandlord();
+          getTenantLeasedListLandlord();
+        }
+        if (identity === TENANT && isLogin && user?.id) {
+          getTenantLeasedHouseList(user.id);
+          getRepairListTenant(user.id);
+        }
         /**
          * the following situations will trigger the `disconnect` api
          * 1. when you logout

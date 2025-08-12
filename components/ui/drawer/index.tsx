@@ -21,10 +21,10 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
-import { TouchableOpacity } from '..';
 import { Button, ButtonText } from '../button';
 import { Icon } from '../icon';
 import { Text } from '../text';
+import { TouchableOpacity } from '../touchable-opacity';
 
 type IAnimatedPressableProps = React.ComponentProps<typeof Pressable> &
   MotionComponentProps<typeof Pressable, ViewStyle, unknown, unknown, unknown>;

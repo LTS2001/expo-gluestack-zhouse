@@ -52,3 +52,11 @@ export const putLeaseStatusApi = (data: {
   tenantId: number;
   houseId: number;
 }): Promise<void> => axios.put(`/lease`, data);
+
+/**
+ * tenant refund house
+ * @param leaseId lease id
+ * @returns lease info
+ */
+export const tenantRefundApi = (leaseId: number): Promise<ILease> =>
+  axios.put(`/lease/refund`, { leaseId });

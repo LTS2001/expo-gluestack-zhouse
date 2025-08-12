@@ -1,13 +1,10 @@
-import {
-  getCollectHouseStatus,
-  sendMessage,
-  updateCollectHouseStatus,
-} from '@/business';
+import { sendMessage } from '@/business';
 import {
   HouseImageList,
   ShowCollectFees,
   ShowHouseMessages,
 } from '@/components';
+import TenantLookHouseTool from '@/components/tenant-look-house-tool';
 import {
   AlertDialogGroup,
   Button,
@@ -15,12 +12,9 @@ import {
   DrawerGroup,
   FormControl,
   FormControlErrorText,
-  Icon,
-  Image,
   Input,
   InputField,
   Text,
-  TouchableOpacity,
   View,
   showToast,
 } from '@/components/ui';
@@ -30,10 +24,8 @@ import {
   SOCKET_GET_PENDING_LEASE,
   TENANT,
 } from '@/constants';
-import { IHouse, IUser } from '@/global';
 import { getLeaseHouseTenantApi, postLeaseApi } from '@/request';
-import { authStore, chatStore, houseStore, userStore } from '@/stores';
-import { makePhoneCall } from '@/utils';
+import { authStore, houseStore, userStore } from '@/stores';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigation } from '@react-navigation/native';
 import { router } from 'expo-router';
@@ -44,17 +36,9 @@ import { ScrollView } from 'react-native';
 import { z } from 'zod';
 
 const MarketLookHouse = () => {
-  const { updateHouseCollectList, currentHouse } = houseStore;
-  const { user, currentLandlord } = userStore;
+  const { currentHouse: houses } = houseStore;
+  const { user, currentLandlord: landlord } = userStore;
   const { identity } = authStore;
-  const { setChatReceiver } = chatStore;
-  // const { setChatReceiver } = chatStore;
-  // const { useLeaveChatSession } = useChat();
-
-  const [houses, setHouses] = useState<IHouse>();
-  const [landlord, setLandlord] = useState<IUser>();
-  // collect status
-  const [collected, setCollected] = useState(false);
   // lease popup visible
   const [leasePopupVisible, setLeasePopupVisible] = useState(false);
   // lease state
@@ -62,9 +46,6 @@ const MarketLookHouse = () => {
   // lease message popup visible
   const [leaseMsgVisible, setLeaseMsgVisible] = useState(false);
   const [leaseMonths, setLeaseMonths] = useState(0);
-
-  // useLeaveChatSession();
-
   const navigation = useNavigation();
 
   const formSchema = z.object({
@@ -86,52 +67,13 @@ const MarketLookHouse = () => {
 
   useEffect(() => {
     navigation.setOptions({
-      title: currentHouse?.name,
+      title: houses?.name,
     });
-    setHouses(currentHouse);
-    setLandlord(currentLandlord);
     return () => {
       houseStore.clearCurrentHouse();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  /**
-   * make phone call to landlord
-   */
-  const phoneLandlord = async () => {
-    if (landlord?.phone) {
-      await makePhoneCall(landlord.phone);
-    } else {
-      showToast({
-        title: '房东电话信息不可用',
-        action: 'error',
-      });
-    }
-  };
-
-  /**
-   * change house collect status
-   */
-  const toChangeHouseCollectStatus = async () => {
-    const res = await updateCollectHouseStatus(
-      houses?.houseId!,
-      landlord?.id!,
-      Number(!collected)
-    );
-    setCollected(!collected);
-    updateHouseCollectList(res.houseId, res.status);
-  };
-
-  /**
-   * get current house collect status
-   */
-  const getCurrentHouseCollectStatus = async () => {
-    if (houses?.houseId) {
-      const status = await getCollectHouseStatus(houses.houseId);
-      status && setCollected(Boolean(status));
-    }
-  };
 
   /**
    * get current house lease status
@@ -147,7 +89,6 @@ const MarketLookHouse = () => {
 
   // tenant not login, click collect or lease
   useEffect(() => {
-    getCurrentHouseCollectStatus();
     getCurrentHouseLeaseStatue();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [houses, user]);
@@ -189,72 +130,16 @@ const MarketLookHouse = () => {
     setLeaseMsgVisible(true);
   };
 
-  /**
-   * look house all comment
-   */
-  const lookHouseAllComment = () => {
-    router.push({
-      pathname: '/house-all-comment',
-      params: {
-        houseName: houses?.name,
-        houseId: houses?.houseId,
-      },
-    });
-  };
-
-  /**
-   * to chat
-   */
-  const toChat = () => {
-    if (!currentLandlord) return;
-    setChatReceiver(currentLandlord);
-    router.push('/chat-message');
-  };
-
   return (
     <ScrollView className='flex-1' showsVerticalScrollIndicator={false}>
       <View className='gap-6 mb-8'>
         <HouseImageList imgList={JSON.parse(houses?.houseImg || '[]')} />
         <View className='bg-secondary-50 p-4 rounded-lg mx-4 gap-4' needShadow>
-          <View className='flex-row items-center justify-between'>
-            <View className='flex-row items-center'>
-              <Image
-                src={landlord?.headImg}
-                size='2xs'
-                className='rounded-full'
-              />
-              <Text className='ml-2'>{landlord?.name}</Text>
-            </View>
-            <TouchableOpacity
-              className='flex-row items-center gap-1 self-end'
-              onPress={lookHouseAllComment}
-            >
-              <Text>查看房屋评论</Text>
-              <Icon as='AntDesign' name='right' size={16} />
-            </TouchableOpacity>
-          </View>
-          {identity === TENANT && (
-            <View className='flex-row items-center gap-8'>
-              <TouchableOpacity onPress={toChangeHouseCollectStatus}>
-                {collected ? (
-                  <Icon
-                    as='AntDesign'
-                    name='star'
-                    lightColor='#edb83b'
-                    darkColor='#edb83b'
-                  />
-                ) : (
-                  <Icon as='AntDesign' name='staro' />
-                )}
-              </TouchableOpacity>
-              <TouchableOpacity onPress={phoneLandlord}>
-                <Icon as='AntDesign' name='phone' />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={toChat}>
-                <Icon as='AntDesign' name='message1' size={22} />
-              </TouchableOpacity>
-            </View>
-          )}
+          <TenantLookHouseTool
+            landlord={landlord}
+            houseId={houses?.houseId}
+            houseName={houses?.name}
+          />
           {identity === TENANT ? (
             leaseState === HouseToLeaseMap.rejected ||
             leaseState === HouseToLeaseMap.rented ? (

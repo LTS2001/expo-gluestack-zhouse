@@ -69,14 +69,18 @@ function LandlordLookHouse() {
         needShadow
       >
         {isRelease ? (
-          <View className='tenant-info'>
-            <View className='flex items-center'>
-              <Image src={currentTenant?.headImg} className='tenant-head-img' />
-              <Text className='tenant-text'>{currentTenant?.name}</Text>
+          <View className='flex-row justify-between'>
+            <View className='flex-row items-center gap-4'>
+              <Image
+                src={currentTenant?.headImg}
+                size='xs'
+                className='border-[0.5px] rounded border-primary-0'
+              />
+              <Text className='text-lg'>{currentTenant?.name}</Text>
             </View>
-            <View>
-              <Icon as='AntDesign' name='phone' size={16} />
-              <Icon as='AntDesign' name='message1' size={16} />
+            <View className='flex-row gap-8'>
+              <Icon as='AntDesign' name='phone' />
+              <Icon as='AntDesign' name='message1' />
             </View>
           </View>
         ) : null}

@@ -36,7 +36,8 @@ export function formatUtcTime(
 /**
  * 计算某个时间点到现在的天数
  */
-export function getDayNum(date1: string) {
+export function getDayNum(date1?: string | Date | null) {
+  if (!date1) return 0;
   // 将时间点转换为毫秒数
   const oneDay = 1000 * 60 * 60 * 24; // 一天的毫秒数
   const time1 = new Date(date1).getTime();

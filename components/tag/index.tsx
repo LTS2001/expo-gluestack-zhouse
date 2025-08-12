@@ -3,7 +3,7 @@ import { Text } from '../ui/text';
 import { View } from '../ui/view';
 
 interface IProps {
-  content: string;
+  content: string | number;
   className?: string;
   bgColor?: string;
   textSize?: 'text-sm' | 'text-md' | 'text-lg';
@@ -31,7 +31,7 @@ const Tag = (props: IProps) => {
       )}
     >
       <Text className={cls('text-white leading-none', textSize)}>
-        {expand ? content : content[0]}
+        {expand ? content : content.toString()[0]}
       </Text>
     </View>
   );

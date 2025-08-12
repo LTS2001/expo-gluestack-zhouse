@@ -1,4 +1,4 @@
-import { getLandlordHouseList } from '@/business';
+import { getLandlordHouseList, getTenantLeasedHouseList } from '@/business';
 import { Empty, HeaderSearch, HouseCard, Tag } from '@/components';
 import {
   AlertDialogGroup,
@@ -10,15 +10,17 @@ import {
   View,
   showToast,
 } from '@/components/ui';
+import { HouseToRepairMap, HouseToStatusMap } from '@/constants';
+import { IHouse, IHouseLease, IUser } from '@/global';
+import { putHouseApi, tenantRefundApi } from '@/request';
 import {
-  HouseToStatusMap,
-  LANDLORD,
-  SOCKET_GET_PENDING_LEASE,
-} from '@/constants';
-import { IHouse } from '@/global';
-
-import { putHouseApi } from '@/request';
-import { authStore, houseStore, socketStore } from '@/stores';
+  authStore,
+  houseStore,
+  leaseStore,
+  repairStore,
+  userStore,
+} from '@/stores';
+import { makePhoneCall } from '@/utils';
 import { Redirect, router, useNavigation } from 'expo-router';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
@@ -28,7 +30,6 @@ const LandlordHome = observer(() => {
   const navigation = useNavigation();
   const { landlordHouseList, setCurrentHouse, clearCurrentHouse } = houseStore;
   const { isLogin } = authStore;
-  // 删除房屋提示框
   const [delHouseAlterVisible, setDelHouseAlterVisible] = useState(false);
   const [publishHouseAlterVisible, setPublishHouseAlterVisible] =
     useState(false);
@@ -133,26 +134,24 @@ const LandlordHome = observer(() => {
             const { notLeaseNotReleased, notLeaseReleased, release } =
               HouseToStatusMap;
             const status = Number(item.status);
+            // rented
+            const rented = status === release;
             // published (not lease released)
             const isPublish = status === notLeaseReleased;
-
             // waiting for rent (not lease not released or published)
             const forRent = [notLeaseNotReleased, notLeaseReleased].includes(
               status
             );
-            // rented
-            const rented = status === release;
             return (
               <HouseCard
                 key={idx}
-                className='m-4'
                 houseName={item.name}
                 isShowLandlord={false}
                 houseImg={JSON.parse(item.houseImg)[0]}
                 isStatusSlot={true}
                 StatusSlotComponent={
                   <View className='flex-row gap-2'>
-                    {isPublish && (
+                    {(isPublish || rented) && (
                       <Tag
                         content={forRent ? '待租' : rented ? '已租' : '删除'}
                         bgColor={
@@ -165,16 +164,15 @@ const LandlordHome = observer(() => {
                         expand
                       />
                     )}
-
-                    <Tag
-                      content={rented || isPublish ? '已发布' : '未发布'}
-                      bgColor={
-                        rented || isPublish
-                          ? 'bg-theme-primary'
-                          : 'bg-theme-secondary'
-                      }
-                      expand
-                    />
+                    {!rented && (
+                      <Tag
+                        content={isPublish ? '已发布' : '未发布'}
+                        bgColor={
+                          isPublish ? 'bg-theme-primary' : 'bg-theme-secondary'
+                        }
+                        expand
+                      />
+                    )}
                   </View>
                 }
                 housePrice={item.price}
@@ -199,7 +197,7 @@ const LandlordHome = observer(() => {
                     >
                       <ButtonText>删除</ButtonText>
                     </Button>
-                    {!isPublish ? (
+                    {rented || isPublish ? null : (
                       <Button
                         onPress={() => {
                           setChooseHouse(item);
@@ -209,7 +207,7 @@ const LandlordHome = observer(() => {
                       >
                         <ButtonText>发布</ButtonText>
                       </Button>
-                    ) : null}
+                    )}
                   </View>
                 }
               />
@@ -253,31 +251,148 @@ const LandlordHome = observer(() => {
 });
 
 const TenantHome = observer(() => {
+  const { tenantLeasedHouseList, setCurrentLeaseHouse } = leaseStore;
+  const { isLogin } = authStore;
+  const { tenantReportForRepairList } = repairStore;
+  const { setCurrentLandlord } = userStore;
   const navigation = useNavigation();
-  const { socketInstance } = socketStore;
   useEffect(() => {
     navigation.setOptions({
       headerTitle: '我的租房',
       headerRight: null,
     });
   }, [navigation]);
+  const [leaseId, setLeaseId] = useState(0);
+  const [refundAlertVisible, setRefundAlertVisible] = useState(false);
+
+  /**
+   * get house repair status
+   * 1. pending repair return false
+   * 2. complete repair return true
+   */
+  const getRepairStatus = (houseId: number) => {
+    const reportHouseList = tenantReportForRepairList?.filter(
+      (t) =>
+        t.houseId === houseId && t.status === HouseToRepairMap.REPAIR_PENDING
+    );
+    if (reportHouseList?.length !== 0) {
+      return false;
+    } else {
+      return true;
+    }
+  };
+
+  const toReportForRepair = (houseId: number, landlordId: number) => {
+    router.push({
+      pathname: '/report-for-repair',
+      params: { houseId, landlordId },
+    });
+  };
+
+  /**
+   * to look lease house
+   * @param leaseHouse lease house info
+   * @param repairStatus house repair status
+   */
+  const toLookLeaseHouse = (leaseHouse: IHouseLease, repairStatus: boolean) => {
+    setCurrentLandlord({
+      id: leaseHouse.landlordId,
+      name: leaseHouse.landlordName,
+      headImg: leaseHouse.landlordImg,
+      phone: leaseHouse.landlordPhone,
+    } as IUser);
+    setCurrentLeaseHouse(leaseHouse);
+    router.push({
+      pathname: '/tenant-look-lease-house',
+      params: { repairStatus: repairStatus.toString() },
+    });
+  };
+
+  /**
+   * confirm refund house
+   */
+  const confirmRefund = async () => {
+    await tenantRefundApi(leaseId);
+    // update tenant's leased house list
+    getTenantLeasedHouseList(userStore.user?.id);
+    setRefundAlertVisible(false);
+    showToast({
+      title: '退租成功！',
+      icon: 'success',
+    });
+  };
+
+  /**
+   * show refund alert
+   * @param leaseId lease id
+   */
+  const showRefundAlert = (leaseId: number) => {
+    setLeaseId(leaseId);
+    setRefundAlertVisible(true);
+  };
 
   return (
-    <View>
-      <Text>我是租客首页</Text>
-      <Button
-        onPress={() => {
-          socketInstance?.send(
-            JSON.stringify({
-              toIdentity: LANDLORD,
-              toId: 1,
-              active: SOCKET_GET_PENDING_LEASE,
-            })
-          );
-        }}
-      >
-        <ButtonText>发送消息</ButtonText>
-      </Button>
+    <View className='flex-1'>
+      {tenantLeasedHouseList?.length && isLogin ? (
+        <ScrollView>
+          {tenantLeasedHouseList.map((item: IHouseLease, idx: number) => {
+            // get current house repair status
+            const houseRepairStatus = getRepairStatus(item.houseId);
+            return (
+              <HouseCard
+                key={idx}
+                houseName={item.houseName}
+                landlordImg={item.landlordImg}
+                landlordName={item.landlordName}
+                toLookHouse={() => toLookLeaseHouse(item, houseRepairStatus)}
+                houseImg={JSON.parse(item.houseImg)[0]}
+                statusText={houseRepairStatus ? '正常' : '维修中'}
+                housePrice={item.price}
+                date={item.updatedAt}
+                dateText='租赁时间：'
+                address={`${item.provinceName}${item.cityName}${item.areaName}${item.addressName}`}
+                isFooterSlot={true}
+                FooterSlotComponent={
+                  <View className='flex-row gap-6 mt-4'>
+                    <Button
+                      onPress={() => makePhoneCall(item.landlordPhone)}
+                      size='sm'
+                    >
+                      <ButtonText>联系房东</ButtonText>
+                    </Button>
+                    <Button
+                      size='sm'
+                      onPress={() =>
+                        toReportForRepair(item.houseId, item.landlordId)
+                      }
+                    >
+                      <ButtonText>
+                        {houseRepairStatus ? '房间报修' : '已报修'}
+                      </ButtonText>
+                    </Button>
+                    <Button
+                      size='sm'
+                      onPress={() => showRefundAlert(item.leaseId)}
+                    >
+                      <ButtonText>退租</ButtonText>
+                    </Button>
+                  </View>
+                }
+              />
+            );
+          })}
+        </ScrollView>
+      ) : (
+        <Empty
+          text={isLogin ? '暂无租赁房屋，去房屋市场看看吧！' : '请登陆后查看'}
+        />
+      )}
+      <AlertDialogGroup
+        visible={refundAlertVisible}
+        onClose={() => setRefundAlertVisible(false)}
+        onConfirm={confirmRefund}
+        content='您确定要退租吗？'
+      />
     </View>
   );
 });

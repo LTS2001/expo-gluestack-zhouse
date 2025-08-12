@@ -1,12 +1,22 @@
+import {
+  getLandlordHouseList,
+  getTenantLeasedListLandlord,
+  sendMessage,
+} from '@/business';
 import { Empty, TenantCard } from '@/components';
 import {
   AlertDialogGroup,
   Button,
   ButtonText,
+  showToast,
   Text,
   View,
 } from '@/components/ui';
-import { HouseToLeaseMap } from '@/constants';
+import {
+  HouseToLeaseMap,
+  SOCKET_GET_TENANT_LEASE_HOUSE,
+  TENANT,
+} from '@/constants';
 import { IPendingLease } from '@/global';
 import { getLeasePendingListApi, putLeaseStatusApi } from '@/request';
 import { leaseStore } from '@/stores';
@@ -16,10 +26,7 @@ import { useState } from 'react';
 import { ScrollView } from 'react-native';
 
 function LeaseNotice() {
-  // const { getTenantsByLandlordId } = useLandlord();
-  // const { againGetLandlordHouseList } = useHouse();
   const { landlordPendingLeaseList, setLandlordPendingLeaseList } = leaseStore;
-  // const { websocketInstance } = socketStore;
   const [leasePopupVisible, setLeasePopupVisible] = useState(false);
   const [currentLease, setCurrentLease] = useState<IPendingLease>();
   const [currentStatus, setCurrentStatus] = useState<number>();
@@ -39,19 +46,20 @@ function LeaseNotice() {
     setLandlordPendingLeaseList(_pendingLeaseList);
     setLeasePopupVisible(false);
     if (currentStatus === HouseToLeaseMap.leased) {
-      // // 通知该租客的首页进行租赁房屋数据刷新
-      // websocketInstance &&
-      //   websocketInstance.send({
-      //     data: JSON.stringify({
-      //       toIdentity: AuthConstant.TENANT,
-      //       toId: currentLease?.tenantId!,
-      //       active: BusinessConstant.SOCKET_GET_TENANT_LEASE_HOUSE,
-      //     }),
-      //   });
-      // // 更新该房东的租客信息（人数）
-      // getTenantsByLandlordId();
-      // // 更新该房东的房屋
-      // againGetLandlordHouseList();
+      // update the tenant's rental housing data
+      sendMessage({
+        toIdentity: TENANT,
+        toId: currentLease?.tenantId!,
+        active: SOCKET_GET_TENANT_LEASE_HOUSE,
+      });
+      // update the landlord's tenant information
+      getTenantLeasedListLandlord();
+      // update the landlord's house
+      getLandlordHouseList();
+      showToast({
+        title: `${currentLease?.tenantName}已入住${currentLease?.houseName}`,
+        icon: 'success',
+      });
     }
   };
 

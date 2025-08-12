@@ -1,5 +1,10 @@
 import { IUpdateBaseUserInfo, IUserVerify } from '@/global';
-import { getUserApi, putUserApi } from '@/request';
+import {
+  getTenantLeasedHouseListApi,
+  getTenantLeasedListLandlordApi,
+  getUserApi,
+  putUserApi,
+} from '@/request';
 import {
   authStore,
   chatStore,
@@ -15,7 +20,8 @@ import { router } from 'expo-router';
  */
 export const userLogout = async () => {
   const { setLoginState, setToken } = authStore;
-  const { clearLeaseHouse, clearLandlordPendingLeaseList } = leaseStore;
+  const { clearTenantLeasedHouseList, clearLandlordPendingLeaseList } =
+    leaseStore;
   const { clearUser, clearLeasedTenant } = userStore;
   // const {websocketInstance, clearWebsocketInstance} = socketStore;
   const { clearCurrentChatSession, clearChatSessionList } = chatStore;
@@ -26,7 +32,7 @@ export const userLogout = async () => {
   setToken('');
   clearUser();
   // clear the house rented by the tenant
-  clearLeaseHouse();
+  clearTenantLeasedHouseList();
   // close websocket
   // websocketInstance?.close();
   // clear websocket instance
@@ -77,4 +83,21 @@ export const switchIdentity = async (e: any) => {
   setPreIdentityState(identity!);
   await clearIdentityState();
   router.replace('/identity');
+};
+
+/**
+ * get the landlord's tenant lease information list
+ */
+export const getTenantLeasedListLandlord = async () => {
+  const tenantList = (await getTenantLeasedListLandlordApi()) || [];
+  userStore.setLeasedTenant(tenantList);
+  userStore.setLandlordTenantCount(
+    [...new Set(tenantList?.map((i) => i?.tenantId))].length
+  );
+};
+
+export const getTenantLeasedHouseList = async (tenantId?: number) => {
+  if (!tenantId) return;
+  const res = await getTenantLeasedHouseListApi(tenantId);
+  leaseStore.setTenantLeasedHouseList(res);
 };

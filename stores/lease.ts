@@ -13,7 +13,7 @@ class LeaseStore {
   /**
    * list of houses rented by tenants
    */
-  leaseHouseList: IHouseLease[] | undefined = undefined;
+  tenantLeasedHouseList: IHouseLease[] | undefined = undefined;
 
   /**
    * current rentail house
@@ -45,15 +45,15 @@ class LeaseStore {
    * set up the house rented by the tenant
    * @param leaseHouseList
    */
-  setLeaseHouse(leaseHouseList: IHouseLease[]) {
-    this.leaseHouseList = leaseHouseList;
+  setTenantLeasedHouseList(leaseHouseList: IHouseLease[]) {
+    this.tenantLeasedHouseList = leaseHouseList;
   }
 
   /**
    * clear the house rented by the tenant
    */
-  clearLeaseHouse() {
-    this.leaseHouseList = undefined;
+  clearTenantLeasedHouseList() {
+    this.tenantLeasedHouseList = undefined;
   }
 
   /**

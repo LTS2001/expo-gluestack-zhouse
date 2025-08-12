@@ -1,6 +1,8 @@
 import { Image, Text, TouchableOpacity, View } from '@/components/ui';
+import { ASPECT_RATIO } from '@/constants';
 import { formatUtcTime } from '@/utils';
 import { observer } from 'mobx-react-lite';
+import { Dimensions } from 'react-native';
 import Tag from '../tag';
 
 interface IProps {
@@ -23,7 +25,7 @@ interface IProps {
   className?: string;
 }
 
-function TenantHouseCard(props: IProps) {
+function HouseCard(props: IProps) {
   const {
     houseName,
     isShowLandlord = true,
@@ -38,70 +40,65 @@ function TenantHouseCard(props: IProps) {
     isFooterSlot,
     FooterSlotComponent,
     statusText = '',
-    statusBg = 'var(--mini-first)',
+    statusBg,
     isStatusSlot,
     StatusSlotComponent,
     className,
   } = props;
-
-  /**
-   * 点击房屋详情内容
-   */
-  const clickHouseContent = () => {
-    toLookHouse && toLookHouse();
-  };
-
+  const screenWidth = Dimensions.get('window').width;
+  const imageWidth = (screenWidth - 64) * 0.42;
   return (
-    <View
-      className={`mb-5 pt-3 px-4 pb-4 rounded-lg bg-background-0 ${className}`}
-      needShadow
-    >
-      <Text className='text-2xl font-bold mb-2'>{houseName}</Text>
-      {isShowLandlord ? (
-        <View className='home-landlord-info'>
-          <View className='flex items-center'>
-            <Image src={landlordImg} className='landlord-head-img' />
-            <Text className='landlord-text'>{landlordName}</Text>
-          </View>
-        </View>
-      ) : null}
-      <TouchableOpacity
-        className='flex-row items-center'
-        onPress={clickHouseContent}
+    <TouchableOpacity onPress={() => toLookHouse?.()}>
+      <View
+        className={`m-4 p-4 rounded-lg bg-background-0 ${className}`}
+        needShadow
       >
-        <Image
-          src={houseImg}
-          className='w-[144px] h-[90px] rounded-md'
-          needShadow
-        />
-        <View className='flex-1 ml-4 gap-2'>
-          <View className='flex-row items-center'>
-            <Text>状态：</Text>
-            {isStatusSlot ? (
-              StatusSlotComponent
-            ) : (
-              <Tag content={statusText} bgColor={statusBg} />
-            )}
+        <Text className='text-2xl font-bold mb-2'>{houseName}</Text>
+        {isShowLandlord ? (
+          <View className='flex-row items-center gap-2 mb-3'>
+            <Image src={landlordImg} size='3xs' className='rounded-full' />
+            <Text className=''>{landlordName}</Text>
           </View>
-          <View className='flex-row items-center'>
-            <Text>租金：</Text>
-            <Text className='font-bold text-error-700 text-lg'>
-              ￥{housePrice}
-            </Text>
-          </View>
-          <View className='flex-row items-center'>
-            <Text>{dateText}</Text>
-            <Text>{formatUtcTime(date, 'day')}</Text>
+        ) : null}
+        <View className='flex-row items-center'>
+          <Image
+            src={houseImg}
+            className='rounded-md'
+            style={{
+              width: imageWidth,
+              height: imageWidth / ASPECT_RATIO,
+            }}
+            needShadow
+          />
+          <View className='flex-1 ml-4 gap-2'>
+            <View className='flex-row items-center'>
+              <Text>状态：</Text>
+              {isStatusSlot ? (
+                StatusSlotComponent
+              ) : (
+                <Tag content={statusText} bgColor={statusBg} expand />
+              )}
+            </View>
+            <View className='flex-row items-center'>
+              <Text>租金：</Text>
+              <Text className='font-bold text-error-700 text-lg'>
+                ￥{housePrice}
+              </Text>
+            </View>
+            <View className='flex-row items-center'>
+              <Text>{dateText}</Text>
+              <Text>{formatUtcTime(date, 'day')}</Text>
+            </View>
           </View>
         </View>
-      </TouchableOpacity>
-      <View className='flex-row items-center mt-3'>
-        <Text>地址：</Text>
-        <Text className='info-address'>{address}</Text>
+        <View className='flex-row items-center mt-3'>
+          <Text>地址：</Text>
+          <Text className='info-address'>{address}</Text>
+        </View>
+        {isFooterSlot ? FooterSlotComponent : null}
       </View>
-      {isFooterSlot ? FooterSlotComponent : null}
-    </View>
+    </TouchableOpacity>
   );
 }
 
-export default observer(TenantHouseCard);
+export default observer(HouseCard);

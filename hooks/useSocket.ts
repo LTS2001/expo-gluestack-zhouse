@@ -334,6 +334,7 @@ export default function useSocket() {
       clearWebsocketInstance();
       connectionState.current = ConnectionState.DISCONNECTED;
       setConnectionState(ConnectionState.DISCONNECTED);
+      emitter.all.clear();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []

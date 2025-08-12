@@ -111,3 +111,15 @@ export const HouseToLeaseMap = {
    */
   rented: 2,
 };
+
+export const HouseToRepairMap = {
+  /**
+   * house pending repair
+   */
+  REPAIR_PENDING: 0,
+
+  /**
+   * house complete repair
+   */
+  REPAIR_COMPLETE: 1,
+};

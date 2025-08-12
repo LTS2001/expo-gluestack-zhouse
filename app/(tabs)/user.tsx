@@ -129,7 +129,9 @@ const Landlord = observer(() => {
           //   navigateTo({ url: '/pages/existTenant/index' });
           // }}
         >
-          <Text className='font-bold text-theme-primary text-6xl'>{0}</Text>
+          <Text className='font-bold text-theme-primary text-6xl'>
+            {userStore.landlordTenantCount}
+          </Text>
           <Text>已有租客</Text>
         </View>
       </View>
