@@ -18,4 +18,4 @@ export const SERVER_SOCKET_ROOT = `ws://172.63.48.66:7003`;
 /**
  * image and video server root
  */
-export const SERVER_IMAGE_ROOT = `http://172.63.48.66:59538`;
+export const SERVER_IMAGE_ROOT = `http://172.63.48.66:3000`;

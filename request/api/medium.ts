@@ -10,7 +10,7 @@ export const postUploadUserHeadImgApi = (data: FormData) =>
 /**
  * upload image or video
  */
-export const postUploadImgVideoApi = (data: FormData) =>
+export const postUploadImgVideoApi = (data: FormData):Promise<string> =>
   axios.post('/medium', data);
 
 /**

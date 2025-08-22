@@ -1,13 +1,13 @@
 'use client';
-import React from 'react';
-import { createTextarea } from '@gluestack-ui/textarea';
-import { View, TextInput } from 'react-native';
+import type { VariantProps } from '@gluestack-ui/nativewind-utils';
 import { tva } from '@gluestack-ui/nativewind-utils/tva';
 import {
-  withStyleContext,
   useStyleContext,
+  withStyleContext,
 } from '@gluestack-ui/nativewind-utils/withStyleContext';
-import type { VariantProps } from '@gluestack-ui/nativewind-utils';
+import { createTextarea } from '@gluestack-ui/textarea';
+import React from 'react';
+import { TextInput, View } from 'react-native';
 
 const SCOPE = 'TEXTAREA';
 const UITextarea = createTextarea({
@@ -33,7 +33,7 @@ const textareaStyle = tva({
 });
 
 const textareaInputStyle = tva({
-  base: 'p-2 web:outline-0 web:outline-none flex-1 color-typography-900 align-text-top placeholder:text-typography-500 web:cursor-text web:data-[disabled=true]:cursor-not-allowed',
+  base: 'p-2 web:outline-0 web:outline-none color-typography-900 align-text-top placeholder:text-typography-500 web:cursor-text web:data-[disabled=true]:cursor-not-allowed',
   parentVariants: {
     size: {
       sm: 'text-sm',

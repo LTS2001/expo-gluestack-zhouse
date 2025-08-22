@@ -1,12 +1,11 @@
-import { getLandlordHouseList, uploadImage } from '@/business';
-import { ImagePreview, Tag } from '@/components';
+import { getLandlordHouseList } from '@/business';
+import { Tag, UploadImages } from '@/components';
 import {
   Button,
   ButtonText,
   FormControl,
   FormControlErrorText,
   Icon,
-  Image,
   Input,
   InputField,
   Radio,
@@ -236,13 +235,6 @@ const AddEditHouse = () => {
     },
   });
   const scrollViewRef = useRef<ScrollView>(null);
-  const [imagePreview, setImagePreview] = useState<{
-    visible: boolean;
-    index: number;
-  }>({
-    visible: false,
-    index: 0,
-  });
   const { keyboardHeight } = useKeyboardHeight();
   const [chooseLocation, setChooseLocation] = useState<ITencentMapLocation>();
   useEffect(() => {
@@ -448,60 +440,9 @@ const AddEditHouse = () => {
     {
       label: '图片',
       name: 'houseImg',
-      render: ({ field: { onChange, value } }) => {
-        return (
-          <View className='flex-row flex-wrap gap-4'>
-            {/* image list */}
-            {value && Array.isArray(value) && value.length > 0
-              ? value.map((item, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    onPress={() => {
-                      setImagePreview({
-                        visible: true,
-                        index,
-                      });
-                    }}
-                  >
-                    <Image
-                      src={item}
-                      className='w-32 h-20 rounded-md border-[1px] border-secondary-300'
-                    />
-                  </TouchableOpacity>
-                ))
-              : null}
-            {/* add image */}
-            <TouchableOpacity
-              className='w-32 h-20 bg-secondary-300 flex justify-center items-center rounded-md'
-              onPress={async () => {
-                const res = await uploadImage({
-                  allowsEditing: true,
-                  aspect: [16, 10],
-                });
-                if (value instanceof Array) {
-                  onChange([...value, res]);
-                } else {
-                  onChange([res]);
-                }
-              }}
-            >
-              <Icon as='AntDesign' name='plus' size={24} />
-            </TouchableOpacity>
-            {/* image preview */}
-            <ImagePreview
-              srcs={value}
-              visible={imagePreview.visible}
-              onClose={() =>
-                setImagePreview({
-                  visible: false,
-                  index: 0,
-                })
-              }
-              index={imagePreview.index}
-            />
-          </View>
-        );
-      },
+      render: ({ field: { onChange, value } }) => (
+        <UploadImages value={value as string[]} onChange={onChange} />
+      ),
     },
   ];
 

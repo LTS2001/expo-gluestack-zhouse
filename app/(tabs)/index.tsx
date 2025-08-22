@@ -284,7 +284,7 @@ const TenantHome = observer(() => {
 
   const toReportForRepair = (houseId: number, landlordId: number) => {
     router.push({
-      pathname: '/report-for-repair',
+      pathname: '/tenant-report-for-repair',
       params: { houseId, landlordId },
     });
   };
