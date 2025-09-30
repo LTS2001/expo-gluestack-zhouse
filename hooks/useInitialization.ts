@@ -1,10 +1,4 @@
-import {
-  getLeasePendingListByLandlord,
-  getRepairListTenant,
-  getTenantLeasedHouseList,
-  getTenantLeasedListLandlord,
-  getUserInfo,
-} from '@/business';
+import { getUserInfo, landlordInitialApi, tenantInitialApi } from '@/business';
 import { LANDLORD, TENANT } from '@/constants';
 import { authStore, userStore } from '@/stores';
 import { autorun } from 'mobx';
@@ -43,32 +37,27 @@ export default function useInitialization() {
 
   useEffect(() => {
     const disposer = autorun(() => {
+      /**
+       * xxxStore must be placed in autorun to remain responsive,
+       * and if it is placed in setTimeout, it will lose its responsiveness.
+       */
       const { identity, isLogin } = authStore;
       const { user } = userStore;
       if (autorunDebounceTimer.current) {
         clearTimeout(autorunDebounceTimer.current);
       }
       autorunDebounceTimer.current = setTimeout(() => {
-        /**
-         * the following situations will trigger the `get lease pending list` api
-         * 1. get lease pending list when you first enter the app (if you are landlord and login)
-         * 2. get lease pending list when you login (if you are landlord)
-         * 3. get lease pending list when you change the landlord identity
-         */
         if (identity === LANDLORD && isLogin) {
-          getLeasePendingListByLandlord();
-          getTenantLeasedListLandlord();
+          landlordInitialApi(user?.id);
         }
-        if (identity === TENANT && isLogin && user?.id) {
-          getTenantLeasedHouseList(user.id);
-          getRepairListTenant(user.id);
+        if (identity === TENANT && isLogin) {
+          tenantInitialApi(user?.id);
         }
         /**
          * the following situations will trigger the `disconnect` api
          * 1. when you logout
          * 2. when you change the identity to other identity === logout
          */
-
         if (!isLogin || isIdentityPage) disconnect();
       }, 100);
     });

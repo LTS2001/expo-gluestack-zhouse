@@ -1,3 +1,4 @@
+import { useMediaPreview } from '@/hooks';
 import { useState } from 'react';
 import { Dimensions, ScrollView, View } from 'react-native';
 import ImagePreview from '../image-preview';
@@ -10,15 +11,19 @@ interface IProps {
 
 const HouseImageList = (props: IProps) => {
   const { imgList } = props;
-  const [showPreview, setShowPreview] = useState(false);
-  const [previewPoint, setPreviewPoint] = useState(1);
+  const {
+    imagePreviewVisible,
+    setImagePreviewVisible,
+    imagePreviewIndex,
+    setImagePreviewIndex,
+  } = useMediaPreview();
   const windowWidth = Dimensions.get('window').width;
   const imageHeight = windowWidth / 1.6;
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const openShowPreview = (idx: number) => {
-    setPreviewPoint(idx);
-    setShowPreview(true);
+    setImagePreviewVisible(true);
+    setImagePreviewIndex(idx);
   };
 
   return (
@@ -59,9 +64,9 @@ const HouseImageList = (props: IProps) => {
       </View>
       <ImagePreview
         srcs={imgList}
-        visible={showPreview}
-        index={previewPoint}
-        onClose={() => setShowPreview(false)}
+        visible={imagePreviewVisible}
+        index={imagePreviewIndex}
+        onClose={() => setImagePreviewVisible(false)}
       />
     </View>
   );

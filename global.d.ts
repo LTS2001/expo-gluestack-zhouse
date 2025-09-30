@@ -243,6 +243,7 @@ declare module '@/global' {
    * a house base info
    */
   interface IBaseHouse {
+    id: number;
     /**
      * house name
      */
@@ -304,6 +305,14 @@ declare module '@/global' {
      */
     balcony: number;
     /**
+     * house landlord id
+     */
+    landlordId: number;
+    /**
+     * house address id
+     */
+    addressId: number;
+    /**
      * house address name
      */
     addressName: string;
@@ -319,12 +328,24 @@ declare module '@/global' {
      * house status -1(not lease not public) 0(delete) 1(leased) 2(not lease but public)
      */
     status?: number;
+    /**
+     * create time
+     */
+    createdAt: Date;
+    /**
+     * update time
+     */
+    updatedAt: Date;
   }
 
   /**
    * request params interface when add house
    */
-  interface IAddHouseReq extends IBaseHouse {
+  interface IAddHouseReq
+    extends Omit<
+      IBaseHouse,
+      'id' | 'createdAt' | 'updatedAt' | 'landlordId' | 'addressId'
+    > {
     /**
      * house longitude
      */
@@ -362,11 +383,7 @@ declare module '@/global' {
   /**
    * house all message
    */
-  interface IHouse extends Omit<IBaseHouse, 'addressDetail'> {
-    /**
-     * house address id
-     */
-    addressId: number;
+  interface IHouse extends Omit<IBaseHouse, 'addressDetail' | 'id'> {
     /**
      * the province where the house is located
      */
@@ -379,10 +396,6 @@ declare module '@/global' {
      * the area where the house is area
      */
     areaName: string;
-    /**
-     * house address name
-     */
-    addressName: string;
     /**
      * house address detail info
      */
@@ -399,18 +412,6 @@ declare module '@/global' {
      * house id
      */
     houseId: number;
-    /**
-     * landlord id
-     */
-    landlordId: number;
-    /**
-     * house create time
-     */
-    createdAt: Date;
-    /**
-     * house update time
-     */
-    updatedAt: Date;
   }
 
   /**
@@ -802,5 +803,41 @@ declare module '@/global' {
     toIdentity: TIdentity;
     toId: number;
     active: SocketMessageActionType;
+  }
+
+  /**
+   * video thumbnail info interface
+   */
+  interface IVideoThumbnail {
+    /**
+     * server path of video thumbnail
+     */
+    path: string;
+    /**
+     * video thumbnail width
+     */
+    width: number;
+    /**
+     * video thumbnail height
+     */
+    height: number;
+    /**
+     * video thumbnail aspect ratio
+     */
+    aspectRatio: number;
+  }
+
+  /**
+   * video info interface
+   */
+  interface IVideo extends IVideoThumbnail {
+    /**
+     * video thumbnail info
+     */
+    thumbnail: IVideoThumbnail;
+    /**
+     * video duration (millisecond)
+     */
+    duration: number;
   }
 }

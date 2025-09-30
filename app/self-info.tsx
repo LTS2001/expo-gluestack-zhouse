@@ -18,6 +18,7 @@ import {
   showToast,
 } from '@/components/ui';
 import { DELETE, NORMAL, STOP_USING, UN_IDENTITY } from '@/constants';
+import { useMediaPreview } from '@/hooks';
 import { userStore } from '@/stores';
 import { formatUtcTime } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -39,7 +40,7 @@ type IUserIdentityConfig = IUserInfoConfig;
 
 const SelfInfo = () => {
   const { user } = userStore;
-  const [headerImageVisible, setHeaderImageVisible] = useState(false);
+  const { imagePreviewVisible, setImagePreviewVisible } = useMediaPreview();
   const [changeNameVisible, setChangeNameVisible] = useState(false);
   const formSchema = z.object({
     name: z.string().min(1, { message: '请输入你要更改的名字' }).max(12),
@@ -87,7 +88,7 @@ const SelfInfo = () => {
         <TouchableOpacity
           onPress={(e) => {
             e.stopPropagation();
-            setHeaderImageVisible(true);
+            setImagePreviewVisible(true);
           }}
         >
           <Image
@@ -250,8 +251,8 @@ const SelfInfo = () => {
       )}
       <ImagePreview
         srcs={user?.headImg}
-        visible={headerImageVisible}
-        onClose={() => setHeaderImageVisible(false)}
+        visible={imagePreviewVisible}
+        onClose={() => setImagePreviewVisible(false)}
       />
       <DrawerGroup
         visible={changeNameVisible}

@@ -1,4 +1,8 @@
-import { getLeasePendingListByLandlord, sendMessage } from '@/business';
+import {
+  getLeasePendingListByLandlord,
+  getRepairListLandlord,
+  sendMessage,
+} from '@/business';
 import {
   ConnectionState,
   LANDLORD,
@@ -361,7 +365,7 @@ export default function useSocket() {
         });
         // get the repair request that needs to be processed by the landlord
         emitter.on(GET_LANDLORD_REPORT, () => {
-          // getLandlordRepairList(currentUserId);
+          getRepairListLandlord(currentUserId);
         });
       }
       // someone send message, need to get session list, latest message, other info

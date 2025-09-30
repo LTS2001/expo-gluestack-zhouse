@@ -37,6 +37,6 @@ export const putRepairStatusApi = (
   status: number
 ): Promise<IRepair> =>
   axios.put('/report', {
-    repairId,
+    reportId: repairId,
     status,
   });

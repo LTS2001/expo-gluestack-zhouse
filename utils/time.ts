@@ -178,11 +178,34 @@ export function addMonthsToDate(
  * 获取给定日期的上一个月份
  * @param yearMonth 年月比如：2024-12
  */
-export function getPreviousMonth(yearMonth) {
+export function getPreviousMonth(yearMonth: string) {
   const [year, month] = yearMonth.split('-').map(Number);
   const date = new Date(year, month - 1, 1); // 当前月份的第一天
   date.setMonth(date.getMonth() - 1); // 设置为上一个月
   const previousYear = date.getFullYear();
   const previousMonth = String(date.getMonth() + 1).padStart(2, '0'); // 保证两位
   return `${previousYear}-${previousMonth}`;
+}
+
+/**
+ * format video duration
+ * @param duration video duration (millisecond)
+ * @returns formatted video duration
+ */
+export function formatVideoDuration(duration: number) {
+  // Convert milliseconds to seconds first
+  const totalSeconds = Math.round(duration / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+    .toString()
+    .padStart(2, '0');
+  const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+
+  // if duration is greater than or equal to 1 hour, display hours
+  if (hours > 0) {
+    return `${hours}:${minutes}:${seconds}`;
+  } else {
+    // otherwise, only display minutes and seconds
+    return `${minutes}:${seconds}`;
+  }
 }

@@ -5,7 +5,7 @@ import { authStore } from '@/stores';
 import _, { AxiosResponse } from 'axios';
 const axios = _.create({
   baseURL: SERVER_API_ROOT,
-  timeout: 5000,
+  timeout: 30000,
 });
 
 axios.interceptors.request.use(
@@ -48,10 +48,10 @@ axios.interceptors.response.use(
           authStore.setIsAlreadyTipNotLogin(true);
           showToast({ title: '未登录' });
         }
-        return new Promise(() => {});
+        return Promise.reject(data.message);
       } else {
         showToast({ title: res.data.message });
-        return new Promise(() => {});
+        return Promise.reject(res.data.message);
       }
     }
   },
@@ -59,8 +59,7 @@ axios.interceptors.response.use(
   (error) => {
     console.log('axios error', JSON.stringify(error));
     showToast({ title: '请求出错了！', icon: 'error' });
-    // interrupt promise chain
-    return new Promise(() => {});
+    return Promise.reject(error);
   }
 );
 

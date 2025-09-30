@@ -4,19 +4,26 @@ import { Icon, Image, Text, TouchableOpacity, View } from '@/components/ui';
 import {
   COMPLAINT_LIST_HREF,
   COMPLAINT_LIST_TEXT,
-  LANDLORD_REPORT_HREF,
-  LANDLORD_REPORT_TEXT,
+  LANDLORD_REPAIR_HREF,
+  LANDLORD_REPAIR_TEXT,
   LEASE_NOTICE_HREF,
   LEASE_NOTICE_TEXT,
   SELF_INFO_HREF,
   SELF_INFO_TEXT,
   TENANT_COLLECT_HREF,
+  TENANT_COLLECT_TEXT,
   TENANT_HISTORY_HREF,
   TENANT_HISTORY_TEXT,
-  TENANT_REPORT_HREF,
-  TENANT_REPORT_TEXT,
+  TENANT_REPAIR_HREF,
+  TENANT_REPAIR_TEXT,
 } from '@/constants';
-import { authStore, houseStore, leaseStore, userStore } from '@/stores';
+import {
+  authStore,
+  houseStore,
+  leaseStore,
+  repairStore,
+  userStore,
+} from '@/stores';
 import { Redirect, router } from 'expo-router';
 import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
@@ -45,6 +52,7 @@ const Landlord = observer(() => {
   const { isLogin } = authStore;
   const { houseNumberTotal } = houseStore;
   const { landlordPendingLeaseList } = leaseStore;
+  const { landlordPendingRepairList } = repairStore;
   // const { leasePendingNoticeNum } = useLease();
   // const { landlordReportPendingNoticeNum } = useReport();
   // const { getTenantsByLandlordId } = useLandlord();
@@ -60,9 +68,9 @@ const Landlord = observer(() => {
       },
       {
         icon: <Icon as='MaterialIcons' name='auto-fix-high' />,
-        text: LANDLORD_REPORT_TEXT,
-        to: LANDLORD_REPORT_HREF,
-        notice: 0,
+        text: LANDLORD_REPAIR_TEXT,
+        to: LANDLORD_REPAIR_HREF,
+        notice: landlordPendingRepairList?.length ?? 0,
       },
       {
         icon: (
@@ -79,7 +87,7 @@ const Landlord = observer(() => {
         notice: 0,
       },
     ],
-    [landlordPendingLeaseList]
+    [landlordPendingLeaseList, landlordPendingRepairList]
   );
 
   // useEffect(() => {
@@ -156,13 +164,13 @@ const Tenant = observer(() => {
       },
       {
         icon: <Icon as='MaterialIcons' name='auto-fix-high' />,
-        text: TENANT_REPORT_TEXT,
-        to: TENANT_REPORT_HREF,
+        text: TENANT_REPAIR_TEXT,
+        to: TENANT_REPAIR_HREF,
         notice: 0,
       },
       {
         icon: <Icon as='AntDesign' name='staro' />,
-        text: TENANT_REPORT_TEXT,
+        text: TENANT_COLLECT_TEXT,
         to: TENANT_COLLECT_HREF,
         notice: 0,
       },

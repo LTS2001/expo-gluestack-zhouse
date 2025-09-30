@@ -1,5 +1,5 @@
 import { LANDLORD, TENANT } from '@/constants';
-import { authStore, leaseStore } from '@/stores';
+import { authStore, leaseStore, repairStore } from '@/stores';
 import { autorun } from 'mobx';
 import { useEffect, useRef, useState } from 'react';
 
@@ -16,11 +16,13 @@ export default function useTabBarBadgeNum() {
     const disposer = autorun(() => {
       const { identity, isLogin } = authStore;
       const { landlordPendingLeaseList } = leaseStore;
-
+      const { landlordPendingRepairList } = repairStore;
       autorunDebounceTimer.current = setTimeout(() => {
         if (!isLogin) return;
         if (identity === LANDLORD) {
-          const _mineNum = landlordPendingLeaseList?.length;
+          const _mineNum =
+            (landlordPendingLeaseList?.length ?? 0) +
+            (landlordPendingRepairList?.length ?? 0);
           setMineNum(_mineNum ? _mineNum : undefined);
         } else if (identity === TENANT) {
         }

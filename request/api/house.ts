@@ -1,4 +1,4 @@
-import { IAddHouseReq, IHouse, IUpdateHouseReq } from '@/global';
+import { IAddHouseReq, IBaseHouse, IHouse, IUpdateHouseReq } from '@/global';
 import { axios } from '../axios';
 
 /**
@@ -35,3 +35,12 @@ export const getHouseListPageApi = (params: {
   minLng: number;
   maxLng: number;
 }): Promise<IHouse[]> => axios.get(`/house/page`, { params });
+
+/**
+ * get house list by house id list
+ * @param houseIdList house id list
+ * @returns house list
+ */
+export const getHouseListByHouseIdsApi = (
+  houseIdList: string
+): Promise<IBaseHouse[]> => axios.get(`/house/list?houseIdList=${houseIdList}`);

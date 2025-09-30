@@ -2,8 +2,8 @@ import { GluestackUIProvider, Toast } from '@/components/ui';
 import {
   COMPLAINT_LIST_HREF,
   COMPLAINT_LIST_TEXT,
-  LANDLORD_REPORT_HREF,
-  LANDLORD_REPORT_TEXT,
+  LANDLORD_REPAIR_HREF,
+  LANDLORD_REPAIR_TEXT,
   LEASE_NOTICE_HREF,
   LEASE_NOTICE_TEXT,
   SELF_INFO_HREF,
@@ -12,8 +12,8 @@ import {
   TENANT_COLLECT_TEXT,
   TENANT_HISTORY_HREF,
   TENANT_HISTORY_TEXT,
-  TENANT_REPORT_HREF,
-  TENANT_REPORT_TEXT,
+  TENANT_REPAIR_HREF,
+  TENANT_REPAIR_TEXT,
 } from '@/constants';
 import '@/global.css';
 import { useInitialization } from '@/hooks';
@@ -55,8 +55,8 @@ export default function RootLayout() {
             options={{ title: SELF_INFO_TEXT }}
           />
           <Stack.Screen
-            name={TENANT_REPORT_HREF}
-            options={{ title: TENANT_REPORT_TEXT }}
+            name={TENANT_REPAIR_HREF}
+            options={{ title: TENANT_REPAIR_TEXT }}
           />
           <Stack.Screen
             name={TENANT_COLLECT_HREF}
@@ -71,8 +71,8 @@ export default function RootLayout() {
             options={{ title: COMPLAINT_LIST_TEXT }}
           />
           <Stack.Screen
-            name={LANDLORD_REPORT_HREF}
-            options={{ title: LANDLORD_REPORT_TEXT }}
+            name={LANDLORD_REPAIR_HREF}
+            options={{ title: LANDLORD_REPAIR_TEXT }}
           />
           <Stack.Screen
             name={LEASE_NOTICE_HREF}
@@ -90,6 +90,10 @@ export default function RootLayout() {
           />
           <Stack.Screen name='add-edit-house' />
           <Stack.Screen name='landlord-look-house' />
+          <Stack.Screen
+            name='tenant-report-for-repair'
+            options={{ title: '房屋报修' }}
+          />
           <Stack.Screen name='+not-found' />
         </Stack>
         <StatusBar style='auto' />

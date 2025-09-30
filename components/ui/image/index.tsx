@@ -7,7 +7,7 @@ import React from 'react';
 import { Platform, Image as RNImage, useColorScheme } from 'react-native';
 
 const imageStyle = tva({
-  base: 'max-w-full',
+  base: 'max-w-full rounded-md',
   variants: {
     size: {
       '3xs': 'h-8 w-8',

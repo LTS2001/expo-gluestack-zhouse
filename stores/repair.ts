@@ -1,3 +1,4 @@
+import { HouseToRepairMap } from '@/constants';
 import { IRepair } from '@/global';
 import { configure, makeAutoObservable } from 'mobx';
 
@@ -21,6 +22,11 @@ class RepairStore {
   landlordRepairList: IRepair[] | undefined = undefined;
 
   /**
+   * landlord pending repair application
+   */
+  landlordPendingRepairList: IRepair[] | undefined = undefined;
+
+  /**
    * set list of all repair applications of tenants
    * @param tenantReportList
    */
@@ -40,6 +46,9 @@ class RepairStore {
    */
   setLandlordRepairList(landlordRepairList: IRepair[]) {
     this.landlordRepairList = landlordRepairList;
+    this.landlordPendingRepairList = landlordRepairList?.filter(
+      (t) => t.status === HouseToRepairMap.REPAIR_PENDING
+    );
   }
 
   /**
@@ -47,6 +56,7 @@ class RepairStore {
    */
   clearLandlordRepairList() {
     this.landlordRepairList = undefined;
+    this.landlordPendingRepairList = undefined;
   }
 }
 

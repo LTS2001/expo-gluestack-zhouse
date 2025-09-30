@@ -1,4 +1,9 @@
-import { getLandlordHouseList, getTenantLeasedHouseList } from '@/business';
+import {
+  getLandlordHouseList,
+  getRepairStatus,
+  getTenantLeasedHouseList,
+  tenantInitialApi,
+} from '@/business';
 import { Empty, HeaderSearch, HouseCard, Tag } from '@/components';
 import {
   AlertDialogGroup,
@@ -10,21 +15,16 @@ import {
   View,
   showToast,
 } from '@/components/ui';
-import { HouseToRepairMap, HouseToStatusMap } from '@/constants';
+import { HouseToStatusMap } from '@/constants';
 import { IHouse, IHouseLease, IUser } from '@/global';
+import { useRefresh } from '@/hooks';
 import { putHouseApi, tenantRefundApi } from '@/request';
-import {
-  authStore,
-  houseStore,
-  leaseStore,
-  repairStore,
-  userStore,
-} from '@/stores';
+import { authStore, houseStore, leaseStore, userStore } from '@/stores';
 import { makePhoneCall } from '@/utils';
 import { Redirect, router, useNavigation } from 'expo-router';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
-import { ScrollView } from 'react-native';
+import { RefreshControl, ScrollView } from 'react-native';
 
 const LandlordHome = observer(() => {
   const navigation = useNavigation();
@@ -253,8 +253,7 @@ const LandlordHome = observer(() => {
 const TenantHome = observer(() => {
   const { tenantLeasedHouseList, setCurrentLeaseHouse } = leaseStore;
   const { isLogin } = authStore;
-  const { tenantReportForRepairList } = repairStore;
-  const { setCurrentLandlord } = userStore;
+  const { setCurrentLandlord, user } = userStore;
   const navigation = useNavigation();
   useEffect(() => {
     navigation.setOptions({
@@ -264,30 +263,7 @@ const TenantHome = observer(() => {
   }, [navigation]);
   const [leaseId, setLeaseId] = useState(0);
   const [refundAlertVisible, setRefundAlertVisible] = useState(false);
-
-  /**
-   * get house repair status
-   * 1. pending repair return false
-   * 2. complete repair return true
-   */
-  const getRepairStatus = (houseId: number) => {
-    const reportHouseList = tenantReportForRepairList?.filter(
-      (t) =>
-        t.houseId === houseId && t.status === HouseToRepairMap.REPAIR_PENDING
-    );
-    if (reportHouseList?.length !== 0) {
-      return false;
-    } else {
-      return true;
-    }
-  };
-
-  const toReportForRepair = (houseId: number, landlordId: number) => {
-    router.push({
-      pathname: '/tenant-report-for-repair',
-      params: { houseId, landlordId },
-    });
-  };
+  const { refreshing, onRefresh } = useRefresh();
 
   /**
    * to look lease house
@@ -314,7 +290,7 @@ const TenantHome = observer(() => {
   const confirmRefund = async () => {
     await tenantRefundApi(leaseId);
     // update tenant's leased house list
-    getTenantLeasedHouseList(userStore.user?.id);
+    getTenantLeasedHouseList(user?.id);
     setRefundAlertVisible(false);
     showToast({
       title: '退租成功！',
@@ -333,9 +309,18 @@ const TenantHome = observer(() => {
 
   return (
     <View className='flex-1'>
-      {tenantLeasedHouseList?.length && isLogin ? (
-        <ScrollView>
-          {tenantLeasedHouseList.map((item: IHouseLease, idx: number) => {
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerClassName='flex-grow'
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh(() => tenantInitialApi(user?.id))}
+          />
+        }
+      >
+        {tenantLeasedHouseList?.length && isLogin ? (
+          tenantLeasedHouseList.map((item: IHouseLease, idx: number) => {
             // get current house repair status
             const houseRepairStatus = getRepairStatus(item.houseId);
             return (
@@ -362,9 +347,17 @@ const TenantHome = observer(() => {
                     </Button>
                     <Button
                       size='sm'
-                      onPress={() =>
-                        toReportForRepair(item.houseId, item.landlordId)
-                      }
+                      onPress={() => {
+                        if (houseRepairStatus)
+                          router.push({
+                            pathname: '/tenant-report-for-repair',
+                            params: {
+                              houseId: item.houseId,
+                              landlordId: item.landlordId,
+                            },
+                          });
+                        else router.push('/tenant-repair');
+                      }}
                     >
                       <ButtonText>
                         {houseRepairStatus ? '房间报修' : '已报修'}
@@ -380,13 +373,13 @@ const TenantHome = observer(() => {
                 }
               />
             );
-          })}
-        </ScrollView>
-      ) : (
-        <Empty
-          text={isLogin ? '暂无租赁房屋，去房屋市场看看吧！' : '请登陆后查看'}
-        />
-      )}
+          })
+        ) : (
+          <Empty
+            text={isLogin ? '暂无租赁房屋，去房屋市场看看吧！' : '请登陆后查看'}
+          />
+        )}
+      </ScrollView>
       <AlertDialogGroup
         visible={refundAlertVisible}
         onClose={() => setRefundAlertVisible(false)}

@@ -1,3 +1,4 @@
+import { getRepairStatus } from '@/business';
 import {
   HouseImageList,
   ShowCollectFees,
@@ -9,41 +10,24 @@ import { Button, ButtonText, Text, View } from '@/components/ui';
 import { leaseStore, userStore } from '@/stores';
 import { formatUtcTime, getDayNum } from '@/utils';
 import { useNavigation } from '@react-navigation/native';
-import { useLocalSearchParams } from 'expo-router';
+import { router } from 'expo-router';
 import { observer } from 'mobx-react-lite';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { ScrollView } from 'react-native';
 
 const TenantLookLeaseHouse = () => {
   const { currentLeaseHouse: houses } = leaseStore;
   const { currentLandlord: landlord } = userStore;
+
   // const { setChatReceiver } = chatStore;
   // const { currentLandlord } = userStore;
   // const { changeCollectStatus, getHouseCollectStatus } = useCollect();
   // const { useLeaveChatSession } = useChat();
-  const { repairStatus: _repairStatus } = useLocalSearchParams();
-
-  // false: pending repair, true: repaired
-  const repairStatus = useMemo(
-    () => (_repairStatus === 'false' ? false : true),
-    [_repairStatus]
-  );
 
   const navigation = useNavigation();
   useEffect(() => {
     navigation.setOptions({ title: houses?.houseName });
   }, [navigation, houses]);
-
-  /**
-   * 房屋报修
-   */
-  const toReportHouse = () => {
-    // 房屋已处于维修状态
-    // if (!reportStatus) return;
-    // navigateTo({
-    //   url: `/pages/report/index?houseId=${currentLeaseHouse.houseId}&landlordId=${currentLeaseHouse.landlordId}`,
-    // });
-  };
 
   /**
    * 获取当前房屋的收藏状态
@@ -87,10 +71,21 @@ const TenantLookLeaseHouse = () => {
           </View>
           <Button
             action='secondary'
-            onPress={toReportHouse}
-            disabled={!repairStatus}
+            onPress={() => {
+              const { houseId, landlordId } = houses || {};
+              if (houseId && landlordId) {
+                if (getRepairStatus(houseId))
+                  router.push({
+                    pathname: '/tenant-report-for-repair',
+                    params: { houseId, landlordId },
+                  });
+                else router.push('/tenant-repair');
+              }
+            }}
           >
-            <ButtonText>{repairStatus ? '房间报修' : '已报修'}</ButtonText>
+            <ButtonText>
+              {getRepairStatus(houses?.houseId) ? '房间报修' : '已报修'}
+            </ButtonText>
           </Button>
         </View>
         <ShowCollectFees houses={houses} />

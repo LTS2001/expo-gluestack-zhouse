@@ -1,27 +1,43 @@
-import { UploadImages } from '@/components';
+import { getRepairListTenant, sendMessage } from '@/business';
+import { UploadImages, UploadVideos } from '@/components';
 import {
   Button,
   ButtonText,
   FormControl,
   FormControlErrorText,
+  showToast,
   Text,
   Textarea,
   TextareaInput,
   TouchableOpacity,
   View,
-  showToast,
 } from '@/components/ui';
+import { LANDLORD, SOCKET_GET_LANDLORD_REPORT } from '@/constants';
+import { postRepairApi } from '@/request';
 import { userStore } from '@/stores';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigation } from '@react-navigation/native';
-import { useEffect, useRef } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { ScrollView } from 'react-native';
 import { z } from 'zod';
 
 const formSchema = z.object({
   reason: z.string().min(1, { message: '问题描述不允许为空！' }),
   imgList: z.array(z.string()),
-  video: z.string(),
+  video: z.object({
+    thumbnail: z.object({
+      path: z.string(),
+      width: z.number(),
+      height: z.number(),
+      aspectRatio: z.number(),
+    }),
+    path: z.string(),
+    width: z.number(),
+    height: z.number(),
+    aspectRatio: z.number(),
+    duration: z.number(),
+  }),
 });
 
 type TFormSchema = z.infer<typeof formSchema>;
@@ -29,12 +45,7 @@ type TFormSchema = z.infer<typeof formSchema>;
 const TenantReportForRepair = () => {
   const { user } = userStore;
   const textareaInputRef = useRef<any>(null);
-  const navigation = useNavigation();
-  useEffect(() => {
-    navigation.setOptions({
-      title: '房屋报修',
-    });
-  }, [navigation]);
+  const { houseId, landlordId } = useLocalSearchParams();
   const {
     control,
     handleSubmit,
@@ -44,126 +55,108 @@ const TenantReportForRepair = () => {
     defaultValues: {
       reason: '',
       imgList: [],
-      video: '',
+      video: {
+        thumbnail: {
+          path: '',
+          width: 0,
+          height: 0,
+          aspectRatio: 0,
+        },
+        path: '',
+        width: 0,
+        height: 0,
+        aspectRatio: 0,
+        duration: 0,
+      },
     },
   });
-  // /**
-  //  * 维修图片上传成功回调
-  //  */
-  // const maintenanceImgUploadSuccess = ({ responseText }) => {
-  //   const res: any = JSON.parse(responseText.data);
-  //   if (res.code !== CodeConstant.SUCCESS) {
-  //     showToast({ title: '图片上传失败！', icon: 'error' });
-  //     return;
-  //   }
-  //   showToast({ title: '图片上传成功！', icon: 'success' });
-  //   setImgList((imgList) => [...imgList, res.data]);
-  // };
-
-  // /**
-  //  * 维修视频上传成功回调
-  //  */
-  // const maintenanceVideoUploadSuccess = ({ responseText }) => {
-  //   const res: any = JSON.parse(responseText.data);
-  //   if (res.code !== CodeConstant.SUCCESS) {
-  //     showToast({ title: '视频上传失败！', icon: 'error' });
-  //     return;
-  //   }
-  //   showToast({ title: '视频上传成功！', icon: 'success' });
-  //   setVideo(res.data);
-  // };
 
   /**
-   * 提交房屋维修
+   * submit maintenance for tenant
+   * @param params - the form data
    */
-  const submitMaintenance = async () => {
-    // if (!reason) {
-    //   showToast({
-    //     title: '问题描述不允许为空！',
-    //     icon: 'error',
-    //   });
-    // }
-    // if (!routerParams?.houseId) {
-    //   showToast({
-    //     title: '房屋id不存在！',
-    //     icon: 'error',
-    //   });
-    //   return;
-    // }
-    // await HouseReportBusiness.addReport({
-    //   reason,
-    //   image: JSON.stringify(imgList),
-    //   video: video,
-    //   houseId: Number(routerParams.houseId),
-    //   landlordId: Number(routerParams.landlordId),
-    //   tenantId: user.id,
-    // });
-    // // 重新获取租客的房屋维修信息
-    // await getReportByTenantId(user.id!);
-    // // 向房东发送维修消息
-    // websocketInstance &&
-    //   websocketInstance.send({
-    //     data: JSON.stringify({
-    //       toIdentity: AuthConstant.LANDLORD,
-    //       toId: Number(routerParams.landlordId),
-    //       active: BusinessConstant.SOCKET_GET_LANDLORD_REPORT,
-    //     }),
-    //   });
-    // router.back();
+  const submitMaintenance = async (params: TFormSchema) => {
+    const { reason, imgList, video: videoInfo } = params;
+    await postRepairApi({
+      reason,
+      image: JSON.stringify(imgList),
+      video: JSON.stringify(videoInfo),
+      houseId: Number(houseId),
+      landlordId: Number(landlordId),
+      tenantId: user?.id!,
+    });
+    // again get tenant's repair list
+    await getRepairListTenant(user?.id);
+    // send message to landlord
+    sendMessage({
+      toIdentity: LANDLORD,
+      toId: Number(landlordId),
+      active: SOCKET_GET_LANDLORD_REPORT,
+    });
+    router.back();
     showToast({ title: '提交成功', icon: 'success' });
   };
 
   return (
-    <View className='bg-background-0 flex-1 p-4 gap-8'>
-      <FormControl>
-        <View className='gap-4'>
-          <Text>问题描述：</Text>
-          <Controller
-            control={control}
-            name='reason'
-            render={({ field: { onChange, value } }) => (
-              <TouchableOpacity
-                onPress={() => {
-                  console.log('onpress');
-                  textareaInputRef.current?.focus();
-                }}
-              >
-                <Textarea className='bg-blue-200'>
-                  <TextareaInput
-                    ref={textareaInputRef}
-                    className='bg-pink-200 '
-                    onChangeText={onChange}
-                    value={value}
-                    placeholder='请输入遇到的问题'
-                  />
-                </Textarea>
-              </TouchableOpacity>
-            )}
-          />
-          <FormControlErrorText className='absolute -bottom-6'>
-            {errors?.reason?.message}
-          </FormControlErrorText>
-        </View>
-      </FormControl>
-      <FormControl>
-        <View className='gap-4'>
-          <Text>问题图片：</Text>
-          <Controller
-            control={control}
-            name='imgList'
-            render={({ field: { onChange, value } }) => (
-              <UploadImages value={value} onChange={onChange} />
-            )}
-          />
-        </View>
-      </FormControl>
-      <View className='gap-4'>
-        <Text>问题视频：</Text>
+    <ScrollView>
+      <View className='bg-background-0 flex-1 p-4 gap-8'>
+        <FormControl>
+          <View className='gap-4'>
+            <Text>问题描述：</Text>
+            <Controller
+              control={control}
+              name='reason'
+              render={({ field: { onChange, value } }) => (
+                <TouchableOpacity
+                  onPress={() => {
+                    textareaInputRef.current?.focus();
+                  }}
+                >
+                  <Textarea>
+                    <TextareaInput
+                      ref={textareaInputRef}
+                      onChangeText={onChange}
+                      value={value}
+                      placeholder='请输入遇到的问题'
+                    />
+                  </Textarea>
+                </TouchableOpacity>
+              )}
+            />
+            <FormControlErrorText className='absolute -bottom-6'>
+              {errors?.reason?.message}
+            </FormControlErrorText>
+          </View>
+        </FormControl>
+        <FormControl>
+          <View className='gap-4'>
+            <Text>问题图片：</Text>
+            <Controller
+              control={control}
+              name='imgList'
+              render={({ field: { onChange, value } }) => (
+                <UploadImages value={value} onChange={onChange} />
+              )}
+            />
+          </View>
+        </FormControl>
+        <FormControl>
+          <View className='gap-4'>
+            <Text>问题视频：</Text>
+            <Controller
+              control={control}
+              name='video'
+              render={({ field: { onChange, value } }) => (
+                <UploadVideos value={value} onChange={onChange} />
+              )}
+            />
+          </View>
+        </FormControl>
+        <Button onPress={() => handleSubmit(submitMaintenance)()}>
+          <ButtonText>提交</ButtonText>
+        </Button>
       </View>
-      <Button onPress={submitMaintenance}>
-        <ButtonText>提交</ButtonText>
-      </Button>
-    </View>
+    </ScrollView>
   );
 };
 
