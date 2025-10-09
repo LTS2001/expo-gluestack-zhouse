@@ -1,5 +1,6 @@
 export * from './auth';
 export * from './code';
+export * from './complaint';
 export * from './domain';
 export * from './house';
 export * from './image';

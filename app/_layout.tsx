@@ -94,6 +94,10 @@ export default function RootLayout() {
             name='tenant-report-for-repair'
             options={{ title: '房屋报修' }}
           />
+          <Stack.Screen
+            name='user-report-for-complaint'
+            options={{ title: '投诉建议填写' }}
+          />
           <Stack.Screen name='+not-found' />
         </Stack>
         <StatusBar style='auto' />

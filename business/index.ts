@@ -1,5 +1,6 @@
 export * from './chat';
 export * from './collect';
+export * from './complaint';
 export * from './house';
 export * from './initial';
 export * from './lease';

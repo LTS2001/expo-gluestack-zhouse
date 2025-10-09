@@ -1,3 +1,4 @@
+export { default as ComplaintCard } from './complaint-card';
 export { default as Domain } from './domain';
 export { default as Empty } from './empty';
 export { default as HeaderSearch } from './header-search';
