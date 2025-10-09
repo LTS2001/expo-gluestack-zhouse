@@ -50,7 +50,7 @@ function HouseCard(props: IProps) {
   return (
     <TouchableOpacity onPress={() => toLookHouse?.()}>
       <View
-        className={`m-4 p-4 rounded-lg bg-background-0 ${className}`}
+        className={`mx-4 p-4 rounded-lg bg-background-0 ${className}`}
         needShadow
       >
         <Text className='text-2xl font-bold mb-2'>{houseName}</Text>

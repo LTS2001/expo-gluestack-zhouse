@@ -1,4 +1,4 @@
-import { ICollect, ICollectList } from '@/global';
+import { ICollect, ICollectList, IHouseCollect } from '@/global';
 import { axios } from '../axios';
 
 /**
@@ -6,8 +6,9 @@ import { axios } from '../axios';
  * @param houseIds house id list
  * @returns collect number list
  */
-export const getCollectHouseNumApi = (houseIds: string): Promise<ICollectList[]> =>
-  axios.get(`/collect/num?houseIdList=${houseIds}`);
+export const getCollectHouseNumApi = (
+  houseIds: string
+): Promise<ICollectList[]> => axios.get(`/collect/num?houseIdList=${houseIds}`);
 
 /**
  * get the collection information of the tenant in this house
@@ -31,3 +32,13 @@ export const putCollectHouseStatusApi = (data: {
   status: number;
   landlordId: number;
 }): Promise<ICollect> => axios.put(`/collect`, data);
+
+/**
+ * get the collected house list by tenant id
+ * @param tenantId tenant id
+ * @returns collected house list
+ */
+export const getCollectedHouseListApi = (
+  tenantId: number
+): Promise<IHouseCollect[]> =>
+  axios.get(`/collect/tenant`, { params: { tenantId } });

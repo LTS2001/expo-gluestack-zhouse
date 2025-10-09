@@ -313,72 +313,78 @@ const TenantHome = observer(() => {
         showsVerticalScrollIndicator={false}
         contentContainerClassName='flex-grow'
         refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh(() => tenantInitialApi(user?.id))}
-          />
+          isLogin ? (
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh(() => tenantInitialApi(user?.id))}
+            />
+          ) : undefined
         }
       >
-        {tenantLeasedHouseList?.length && isLogin ? (
-          tenantLeasedHouseList.map((item: IHouseLease, idx: number) => {
-            // get current house repair status
-            const houseRepairStatus = getRepairStatus(item.houseId);
-            return (
-              <HouseCard
-                key={idx}
-                houseName={item.houseName}
-                landlordImg={item.landlordImg}
-                landlordName={item.landlordName}
-                toLookHouse={() => toLookLeaseHouse(item, houseRepairStatus)}
-                houseImg={JSON.parse(item.houseImg)[0]}
-                statusText={houseRepairStatus ? '正常' : '维修中'}
-                housePrice={item.price}
-                date={item.updatedAt}
-                dateText='租赁时间：'
-                address={`${item.provinceName}${item.cityName}${item.areaName}${item.addressName}`}
-                isFooterSlot={true}
-                FooterSlotComponent={
-                  <View className='flex-row gap-6 mt-4'>
-                    <Button
-                      onPress={() => makePhoneCall(item.landlordPhone)}
-                      size='sm'
-                    >
-                      <ButtonText>联系房东</ButtonText>
-                    </Button>
-                    <Button
-                      size='sm'
-                      onPress={() => {
-                        if (houseRepairStatus)
-                          router.push({
-                            pathname: '/tenant-report-for-repair',
-                            params: {
-                              houseId: item.houseId,
-                              landlordId: item.landlordId,
-                            },
-                          });
-                        else router.push('/tenant-repair');
-                      }}
-                    >
-                      <ButtonText>
-                        {houseRepairStatus ? '房间报修' : '已报修'}
-                      </ButtonText>
-                    </Button>
-                    <Button
-                      size='sm'
-                      onPress={() => showRefundAlert(item.leaseId)}
-                    >
-                      <ButtonText>退租</ButtonText>
-                    </Button>
-                  </View>
-                }
-              />
-            );
-          })
-        ) : (
-          <Empty
-            text={isLogin ? '暂无租赁房屋，去房屋市场看看吧！' : '请登陆后查看'}
-          />
-        )}
+        <View className='gap-6 py-4 flex-1'>
+          {tenantLeasedHouseList?.length && isLogin ? (
+            tenantLeasedHouseList.map((item: IHouseLease, idx: number) => {
+              // get current house repair status
+              const houseRepairStatus = getRepairStatus(item.houseId);
+              return (
+                <HouseCard
+                  key={idx}
+                  houseName={item.houseName}
+                  landlordImg={item.landlordImg}
+                  landlordName={item.landlordName}
+                  toLookHouse={() => toLookLeaseHouse(item, houseRepairStatus)}
+                  houseImg={JSON.parse(item.houseImg)[0]}
+                  statusText={houseRepairStatus ? '正常' : '维修中'}
+                  housePrice={item.price}
+                  date={item.updatedAt}
+                  dateText='租赁时间：'
+                  address={`${item.provinceName}${item.cityName}${item.areaName}${item.addressName}`}
+                  isFooterSlot={true}
+                  FooterSlotComponent={
+                    <View className='flex-row gap-6 mt-4'>
+                      <Button
+                        onPress={() => makePhoneCall(item.landlordPhone)}
+                        size='sm'
+                      >
+                        <ButtonText>联系房东</ButtonText>
+                      </Button>
+                      <Button
+                        size='sm'
+                        onPress={() => {
+                          if (houseRepairStatus)
+                            router.push({
+                              pathname: '/tenant-report-for-repair',
+                              params: {
+                                houseId: item.houseId,
+                                landlordId: item.landlordId,
+                              },
+                            });
+                          else router.push('/tenant-repair');
+                        }}
+                      >
+                        <ButtonText>
+                          {houseRepairStatus ? '房间报修' : '已报修'}
+                        </ButtonText>
+                      </Button>
+                      <Button
+                        size='sm'
+                        onPress={() => showRefundAlert(item.leaseId)}
+                      >
+                        <ButtonText>退租</ButtonText>
+                      </Button>
+                    </View>
+                  }
+                />
+              );
+            })
+          ) : (
+            <Empty
+              text={
+                isLogin ? '暂无租赁房屋，去房屋市场看看吧！' : '请登陆后查看'
+              }
+            />
+          )}
+        </View>
       </ScrollView>
       <AlertDialogGroup
         visible={refundAlertVisible}
