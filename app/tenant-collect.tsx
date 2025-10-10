@@ -47,7 +47,6 @@ function TenantCollect() {
                 date={updatedAt}
                 dateText='收藏时间：'
                 statusText='已收藏'
-                statusBg='var(--mini-first)'
                 address={`${provinceName}${cityName}${areaName}${addressInfo}`}
               />
             );

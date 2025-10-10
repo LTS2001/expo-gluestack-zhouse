@@ -9,6 +9,7 @@ export { default as Logout } from './logout';
 export { default as RepairCard } from './repair-card';
 export { default as ShowCollectFees } from './show-collect-fees';
 export { default as ShowHouseMessages } from './show-house-messages';
+export { default as StarRating } from './star-rating';
 export { default as Tag } from './tag';
 export { default as TenantCard } from './tenant-card';
 export { default as TenantLookLeaseHouse } from './tenant-look-house-tool';

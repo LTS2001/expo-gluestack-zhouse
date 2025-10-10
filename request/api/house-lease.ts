@@ -1,4 +1,4 @@
-import { ILease, IPendingLease, IUser } from '@/global';
+import { IHouseLease, ILease, IPendingLease, IUser } from '@/global';
 import { axios } from '../axios';
 
 /**
@@ -60,3 +60,12 @@ export const putLeaseStatusApi = (data: {
  */
 export const tenantRefundApi = (leaseId: number): Promise<ILease> =>
   axios.put(`/lease/refund`, { leaseId });
+
+/**
+ * get the tenant's refund history list
+ * @param tenantId
+ */
+export const getTenantRefundHistoryListApi = (
+  tenantId: number
+): Promise<IHouseLease[]> =>
+  axios.get(`/lease/refund`, { params: { tenantId } });

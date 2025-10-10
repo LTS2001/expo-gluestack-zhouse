@@ -16,10 +16,8 @@ interface IProps {
   date: Date | string;
   dateText: string;
   address: string;
-  isFooterSlot?: boolean;
-  FooterSlotComponent?: React.ReactNode;
-  isStatusSlot?: boolean;
-  StatusSlotComponent?: React.ReactNode;
+  footerSlotNode?: React.ReactNode;
+  statusSlotNode?: React.ReactNode;
   statusText?: string;
   statusBg?: string;
   className?: string;
@@ -37,12 +35,10 @@ function HouseCard(props: IProps) {
     date,
     dateText,
     address,
-    isFooterSlot,
-    FooterSlotComponent,
+    footerSlotNode,
     statusText = '',
     statusBg,
-    isStatusSlot,
-    StatusSlotComponent,
+    statusSlotNode,
     className,
   } = props;
   const screenWidth = Dimensions.get('window').width;
@@ -73,8 +69,8 @@ function HouseCard(props: IProps) {
           <View className='flex-1 ml-4 gap-2'>
             <View className='flex-row items-center'>
               <Text>状态：</Text>
-              {isStatusSlot ? (
-                StatusSlotComponent
+              {statusSlotNode ? (
+                statusSlotNode
               ) : (
                 <Tag content={statusText} bgColor={statusBg} expand />
               )}
@@ -95,7 +91,7 @@ function HouseCard(props: IProps) {
           <Text>地址：</Text>
           <Text className='info-address'>{address}</Text>
         </View>
-        {isFooterSlot ? FooterSlotComponent : null}
+        {footerSlotNode}
       </View>
     </TouchableOpacity>
   );

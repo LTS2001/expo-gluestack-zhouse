@@ -130,89 +130,91 @@ const LandlordHome = observer(() => {
     <View className='flex-1 relative'>
       {landlordHouseList?.length && isLogin ? (
         <ScrollView showsVerticalScrollIndicator={false}>
-          {landlordHouseList.map((item: IHouse, idx: number) => {
-            const { notLeaseNotReleased, notLeaseReleased, release } =
-              HouseToStatusMap;
-            const status = Number(item.status);
-            // rented
-            const rented = status === release;
-            // published (not lease released)
-            const isPublish = status === notLeaseReleased;
-            // waiting for rent (not lease not released or published)
-            const forRent = [notLeaseNotReleased, notLeaseReleased].includes(
-              status
-            );
-            return (
-              <HouseCard
-                key={idx}
-                houseName={item.name}
-                isShowLandlord={false}
-                houseImg={JSON.parse(item.houseImg)[0]}
-                isStatusSlot={true}
-                StatusSlotComponent={
-                  <View className='flex-row gap-2'>
-                    {(isPublish || rented) && (
-                      <Tag
-                        content={forRent ? '待租' : rented ? '已租' : '删除'}
-                        bgColor={
-                          forRent
-                            ? 'bg-theme-tertiary'
-                            : rented
-                            ? 'bg-theme-primary'
-                            : 'bg-theme-secondary'
-                        }
-                        expand
-                      />
-                    )}
-                    {!rented && (
-                      <Tag
-                        content={isPublish ? '已发布' : '未发布'}
-                        bgColor={
-                          isPublish ? 'bg-theme-primary' : 'bg-theme-secondary'
-                        }
-                        expand
-                      />
-                    )}
-                  </View>
-                }
-                housePrice={item.price}
-                dateText='创建时间：'
-                date={item.createdAt}
-                address={`${item.provinceName}${item.cityName}${item.areaName}${item.addressName}`}
-                isFooterSlot={true}
-                FooterSlotComponent={
-                  <View className='flex-row mt-4 gap-6'>
-                    <Button onPress={() => toHouseInfo(item)} size='sm'>
-                      <ButtonText>查看</ButtonText>
-                    </Button>
-                    <Button onPress={() => toEditor(item)} size='sm'>
-                      <ButtonText>编辑</ButtonText>
-                    </Button>
-                    <Button
-                      onPress={() => {
-                        setChooseHouse(item);
-                        setDelHouseAlterVisible(true);
-                      }}
-                      size='sm'
-                    >
-                      <ButtonText>删除</ButtonText>
-                    </Button>
-                    {rented || isPublish ? null : (
+          <View className='gap-6 py-4'>
+            {landlordHouseList.map((item: IHouse, idx: number) => {
+              const { notLeaseNotReleased, notLeaseReleased, release } =
+                HouseToStatusMap;
+              const status = Number(item.status);
+              // rented
+              const rented = status === release;
+              // published (not lease released)
+              const isPublish = status === notLeaseReleased;
+              // waiting for rent (not lease not released or published)
+              const forRent = [notLeaseNotReleased, notLeaseReleased].includes(
+                status
+              );
+              return (
+                <HouseCard
+                  key={idx}
+                  houseName={item.name}
+                  isShowLandlord={false}
+                  houseImg={JSON.parse(item.houseImg)[0]}
+                  statusSlotNode={
+                    <View className='flex-row gap-2'>
+                      {(isPublish || rented) && (
+                        <Tag
+                          content={forRent ? '待租' : rented ? '已租' : '删除'}
+                          bgColor={
+                            forRent
+                              ? 'bg-theme-tertiary'
+                              : rented
+                              ? 'bg-theme-primary'
+                              : 'bg-theme-secondary'
+                          }
+                          expand
+                        />
+                      )}
+                      {!rented && (
+                        <Tag
+                          content={isPublish ? '已发布' : '未发布'}
+                          bgColor={
+                            isPublish
+                              ? 'bg-theme-primary'
+                              : 'bg-theme-secondary'
+                          }
+                          expand
+                        />
+                      )}
+                    </View>
+                  }
+                  housePrice={item.price}
+                  dateText='创建时间：'
+                  date={item.createdAt}
+                  address={`${item.provinceName}${item.cityName}${item.areaName}${item.addressName}`}
+                  footerSlotNode={
+                    <View className='flex-row mt-4 gap-6'>
+                      <Button onPress={() => toHouseInfo(item)} size='sm'>
+                        <ButtonText>查看</ButtonText>
+                      </Button>
+                      <Button onPress={() => toEditor(item)} size='sm'>
+                        <ButtonText>编辑</ButtonText>
+                      </Button>
                       <Button
                         onPress={() => {
                           setChooseHouse(item);
-                          setPublishHouseAlterVisible(true);
+                          setDelHouseAlterVisible(true);
                         }}
                         size='sm'
                       >
-                        <ButtonText>发布</ButtonText>
+                        <ButtonText>删除</ButtonText>
                       </Button>
-                    )}
-                  </View>
-                }
-              />
-            );
-          })}
+                      {rented || isPublish ? null : (
+                        <Button
+                          onPress={() => {
+                            setChooseHouse(item);
+                            setPublishHouseAlterVisible(true);
+                          }}
+                          size='sm'
+                        >
+                          <ButtonText>发布</ButtonText>
+                        </Button>
+                      )}
+                    </View>
+                  }
+                />
+              );
+            })}
+          </View>
         </ScrollView>
       ) : (
         <Empty
@@ -339,8 +341,7 @@ const TenantHome = observer(() => {
                   date={item.updatedAt}
                   dateText='租赁时间：'
                   address={`${item.provinceName}${item.cityName}${item.areaName}${item.addressName}`}
-                  isFooterSlot={true}
-                  FooterSlotComponent={
+                  footerSlotNode={
                     <View className='flex-row gap-6 mt-4'>
                       <Button
                         onPress={() => makePhoneCall(item.landlordPhone)}

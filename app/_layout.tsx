@@ -98,6 +98,8 @@ export default function RootLayout() {
             name='user-report-for-complaint'
             options={{ title: '投诉建议填写' }}
           />
+          <Stack.Screen name='comment-house' />
+          <Stack.Screen name='house-all-comment' />
           <Stack.Screen name='+not-found' />
         </Stack>
         <StatusBar style='auto' />

@@ -41,6 +41,8 @@ class LeaseStore {
     tenantPhone: '18453793540',
   };
 
+  tenantLeaseRefundList: IHouseLease[] | undefined = undefined;
+
   /**
    * set up the house rented by the tenant
    * @param leaseHouseList
@@ -83,6 +85,21 @@ class LeaseStore {
    */
   setCurrentRentBillTenant(leaseTenant: IExistLease) {
     this.currentRentBillTenant = leaseTenant;
+  }
+
+  /**
+   * set the tenant lease refund list
+   * @param tenantLeaseRefundList
+   */
+  setTenantLeaseRefundList(tenantLeaseRefundList: IHouseLease[]) {
+    this.tenantLeaseRefundList = tenantLeaseRefundList;
+  }
+
+  /**
+   * clear the tenant lease refund list
+   */
+  clearTenantLeaseRefundList() {
+    this.tenantLeaseRefundList = undefined;
   }
 }
 
