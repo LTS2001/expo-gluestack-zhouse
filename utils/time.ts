@@ -64,8 +64,13 @@ export function isCertainMinuteAge(date1: Date, date2: Date, interval: number) {
  * 格式化聊天时间
  * @param formatDate 时间（格式化的时间）
  * @param isSession 是否是会话
+ * @param isShowSeconds 是否显示秒数
  */
-export function formatChatDate(formatDate: Date, isSession?: boolean) {
+export function formatChatDate(
+  formatDate: Date,
+  opt?: { isShowSeconds?: boolean; isSession?: boolean }
+) {
+  const { isShowSeconds = false, isSession = false } = opt ?? {};
   if (!formatDate) return;
   // 今天的日期
   const today = new Date();
@@ -81,29 +86,37 @@ export function formatChatDate(formatDate: Date, isSession?: boolean) {
   hours = hours < 10 ? '0' + hours : hours;
   let minutes: number | string = date.getMinutes();
   minutes = minutes < 10 ? '0' + minutes : minutes;
+  let seconds: number | string = date.getSeconds();
+  seconds = seconds < 10 ? '0' + seconds : seconds;
+
+  // 构建时间字符串
+  const timeString = isShowSeconds
+    ? `${hours}:${minutes}:${seconds}`
+    : `${hours}:${minutes}`;
+
   if (
     year === today.getFullYear() &&
     date.getMonth() === today.getMonth() &&
     date.getDate() === today.getDate()
   ) {
     // 今天
-    return `${hours}:${minutes}`;
+    return timeString;
   } else if (
     year === yesterday.getFullYear() &&
     date.getMonth() === yesterday.getMonth() &&
     date.getDate() === yesterday.getDate()
   ) {
     // 昨天
-    return isSession ? '昨天' : `昨天 ${hours}:${minutes}`;
+    return isSession ? '昨天' : `昨天 ${timeString}`;
   } else if (year === today.getFullYear()) {
     // 今年
     return isSession
       ? `${month}月${day}日`
-      : `${month}月${day}日 ${hours}:${minutes}`;
+      : `${month}月${day}日 ${timeString}`;
   } else {
     return isSession
       ? `${year}年${month}月${day}日`
-      : `${year}年${month}月${day}日 ${hours}:${minutes}`;
+      : `${year}年${month}月${day}日 ${timeString}`;
   }
 }
 

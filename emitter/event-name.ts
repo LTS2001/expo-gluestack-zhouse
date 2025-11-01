@@ -16,14 +16,6 @@ export const GET_PENDING_LEASE = 'GET_PENDING_LEASE';
  */
 export const GET_LANDLORD_REPORT = 'GET_LANDLORD_REPORT';
 /**
- * get chat message
+ * get chat message list and chat session list
  */
 export const GET_CHAT_MESSAGE = 'GET_CHAT_MESSAGE';
-/**
- * get session various
- */
-export const GET_SESSION_VARIOUS = 'GET_SESSION_VARIOUS';
-/**
- * get current last one message
- */
-export const GET_CURRENT_LAST_ONE_MESSAGE = 'GET_CURRENT_LAST_ONE_MESSAGE';

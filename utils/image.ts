@@ -1,14 +1,14 @@
 import { THUMBNAIL_MIDDLE_SIZE } from '@/constants';
-import { IVideoThumbnail } from '@/global';
+import { IMediumThumbnail } from '@/global';
 
 /**
  * handle video thumbnail
  * @param ThumbnailInfo video thumbnail info
  * @returns
  */
-export const handleVideoThumbnail = (
-  thumbnailInfo: IVideoThumbnail
-): IVideoThumbnail => {
+export const handleMediumThumbnail = (
+  thumbnailInfo: IMediumThumbnail
+): IMediumThumbnail => {
   const { aspectRatio } = thumbnailInfo;
   let size = {
     width: Math.round(THUMBNAIL_MIDDLE_SIZE * aspectRatio),

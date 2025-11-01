@@ -1,3 +1,4 @@
+export * from './api/chat';
 export * from './api/common';
 export * from './api/complaint';
 export * from './api/house';

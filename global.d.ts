@@ -1,6 +1,20 @@
-import { SOCKET_MESSAGES } from '@/constants';
+import { ECHAT_MESSAGE_TYPE, SOCKET_MESSAGES } from '@/constants';
 declare module '@/global' {
   type TIdentity = 'landlord' | 'tenant';
+
+  /**
+   * message model type
+   */
+  type TMessageModel =
+    | { type: ECHAT_MESSAGE_TYPE.TEXT; content: string }
+    | { type: ECHAT_MESSAGE_TYPE.IMAGE; content: IMediumThumbnail }
+    | { type: ECHAT_MESSAGE_TYPE.VIDEO; content: IVideo };
+
+  /**
+   * add chat message type
+   */
+  type TAddChatMessage = Omit<ISendChatMessage, 'content' | 'type'> &
+    TMessageModel;
 
   /**
    * user send chat message interface
@@ -35,7 +49,7 @@ declare module '@/global' {
     /**
      * chat message id
      */
-    id: number;
+    id: number | string;
     /**
      * create time
      */
@@ -65,7 +79,7 @@ declare module '@/global' {
    */
   interface IChatSession extends IAddChatSession {
     /**
-     * chat_list id
+     * chat_session id
      */
     id: number;
     /**
@@ -735,7 +749,7 @@ declare module '@/global' {
     /**
      * chat session receiver id
      */
-    otherId: string;
+    receiverId: string;
   }
 
   /**
@@ -806,23 +820,23 @@ declare module '@/global' {
   }
 
   /**
-   * video thumbnail info interface
+   * medium thumbnail (video or image) info interface
    */
-  interface IVideoThumbnail {
+  interface IMediumThumbnail {
     /**
-     * server path of video thumbnail
+     * server path of medium thumbnail
      */
     path: string;
     /**
-     * video thumbnail width
+     * medium thumbnail width
      */
     width: number;
     /**
-     * video thumbnail height
+     * medium thumbnail height
      */
     height: number;
     /**
-     * video thumbnail aspect ratio
+     * medium thumbnail aspect ratio
      */
     aspectRatio: number;
   }
@@ -830,11 +844,11 @@ declare module '@/global' {
   /**
    * video info interface
    */
-  interface IVideo extends IVideoThumbnail {
+  interface IVideo extends IMediumThumbnail {
     /**
      * video thumbnail info
      */
-    thumbnail: IVideoThumbnail;
+    thumbnail: IMediumThumbnail;
     /**
      * video duration (millisecond)
      */

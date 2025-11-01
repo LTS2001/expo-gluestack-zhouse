@@ -3,15 +3,23 @@ import { useState } from 'react';
 
 export default function useRefresh() {
   const [refreshing, setRefreshing] = useState(false);
-  const onRefresh = (executeRefresh: () => Promise<any>) => {
+  const onRefresh = (
+    executeRefresh: () => Promise<any>,
+    options?: {
+      successTitle?: string;
+      toastVisible?: boolean;
+    }
+  ) => {
+    const { successTitle = '刷新成功！', toastVisible = true } = options || {};
     return async () => {
       setRefreshing(true);
       await executeRefresh();
       setRefreshing(false);
-      showToast({
-        title: '刷新成功！',
-        icon: 'success',
-      });
+      toastVisible &&
+        showToast({
+          title: successTitle,
+          icon: 'success',
+        });
     };
   };
 

@@ -1,10 +1,35 @@
-import { IChatMessage, IChatSession, IUser } from '@/global';
-import { makeAutoObservable } from 'mobx';
+import {
+  CHAT_SIGN_LANDLORD,
+  CHAT_SIGN_TENANT,
+  LANDLORD,
+  TENANT,
+} from '@/constants';
+import { IChatMessage, IChatSession, IChatSessionUser, IUser } from '@/global';
+import { configure, makeAutoObservable } from 'mobx';
+import authStore from './auth';
 
+configure({
+  enforceActions: 'never',
+});
 class ChatStore {
   constructor() {
     makeAutoObservable(this, {}, { autoBind: true });
   }
+
+  /**
+   * whether to load more messages
+   */
+  isLoadingMessage: boolean = false;
+
+  /**
+   * whether to continue getting information
+   */
+  continueGetMessage: boolean = true;
+
+  /**
+   * the number of unread messages of the current user
+   */
+  chatUnreadNum: number | undefined = undefined;
 
   /**
    * sender id in chat
@@ -14,43 +39,62 @@ class ChatStore {
   /**
    * sender info
    */
-  chatSender: IUser | undefined;
+  chatSender: IUser | undefined = undefined;
+
+  /**
+   * receiver id in chat
+   */
+  receiverId = '';
 
   /**
    * receiver info
    */
-  chatReceiver: IUser | undefined;
+  chatReceiver: IUser | undefined = undefined;
 
   /**
    * current chat session
    */
-  currentChatSession: IChatSession | undefined;
+  currentChatSession: IChatSession | undefined = undefined;
 
   /**
    * current user chat session list
    */
-  chatSessionList: IChatSession[] | undefined;
+  chatSessionList: IChatSession[] | undefined = undefined;
 
   /**
    * current chat session history
    */
-  chatMessageList: IChatMessage[] | undefined;
+  chatMessageList: IChatMessage[] | undefined = undefined;
 
   /**
    * receiver info of chat session list
    */
-  chatReceiverInfoList: any[] | undefined;
+  chatReceiverInfoList: IChatSessionUser[] | undefined = undefined;
 
   /**
    * the latest message in the chat session list.
    */
-  chatSessionLastOneMessageList: IChatMessage[] | undefined;
+  chatSessionLastOneMessageList: IChatMessage[] | undefined = undefined;
 
   /**
-   * @param senderId
+   * set whether to load more messages
    */
-  setSenderId(senderId: string) {
-    this.senderId = senderId;
+  setIsLoadingMessage(isLoadingMessage: boolean) {
+    this.isLoadingMessage = isLoadingMessage;
+  }
+
+  /**
+   * set continue get message
+   */
+  setContinueGetMessage(continueGetMessage: boolean) {
+    this.continueGetMessage = continueGetMessage;
+  }
+
+  /**
+   * set the number of unread messages of the current user
+   */
+  setChatUnreadNum(unreadNum: number) {
+    this.chatUnreadNum = unreadNum;
   }
 
   /**
@@ -58,6 +102,14 @@ class ChatStore {
    * @param sender
    */
   setChatSender(sender: IUser) {
+    const { identity } = authStore;
+    if (identity === LANDLORD) {
+      // sender is landlord
+      this.senderId = `${CHAT_SIGN_LANDLORD},${sender.id}`;
+    } else if (identity === TENANT) {
+      // sender is tenant
+      this.senderId = `${CHAT_SIGN_TENANT},${sender.id}`;
+    }
     this.chatSender = sender;
   }
 
@@ -66,6 +118,14 @@ class ChatStore {
    * @param receiver
    */
   setChatReceiver(receiver: IUser) {
+    const { identity } = authStore;
+    if (identity === LANDLORD) {
+      // sender is landlord, receiver is tenant
+      this.receiverId = `${CHAT_SIGN_TENANT},${receiver.id}`;
+    } else if (identity === TENANT) {
+      // sender is tenant, receiver is landlord
+      this.receiverId = `${CHAT_SIGN_LANDLORD},${receiver.id}`;
+    }
     this.chatReceiver = receiver;
   }
 
@@ -73,6 +133,11 @@ class ChatStore {
    * set the current user session list
    */
   setChatSessionList(chatSessionList: IChatSession[]) {
+    let unreadNum = 0;
+    chatSessionList.forEach((item) => {
+      unreadNum += item.unread;
+    });
+    this.setChatUnreadNum(unreadNum);
     this.chatSessionList = chatSessionList;
   }
 
@@ -116,7 +181,7 @@ class ChatStore {
   /**
    * set receiver info of chat session list
    */
-  setChatReceiverInfoList(receiverInfoList: any) {
+  setChatReceiverInfoList(receiverInfoList: IChatSessionUser[]) {
     this.chatReceiverInfoList = receiverInfoList;
   }
 

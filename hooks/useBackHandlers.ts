@@ -1,5 +1,5 @@
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { BackHandler } from 'react-native';
 
 interface IBackHandlerProps {
@@ -31,22 +31,49 @@ export default function useBackHandlers(
   props: IBackHandlerProps | TBackHandlerProps
 ) {
   let options: IBackHandlerProps = {};
-  if (typeof props === 'function')
+  let isSingleFunction = false;
+
+  if (typeof props === 'function') {
+    isSingleFunction = true;
     options = {
       onHardwareBack: props,
       onGestureBack: props,
       onNavigationBack: props,
     };
-  else options = props;
+  } else {
+    options = props;
+  }
 
   const { onHardwareBack, onGestureBack, onNavigationBack } = options;
   const navigation = useNavigation();
+  const hasExecuted = useRef(false);
+  const firstResult = useRef<boolean>(false);
 
   // Listen for hardware back key events
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
-        return onHardwareBack ? onHardwareBack() : false;
+        if (isSingleFunction) {
+          // single function case: need to prevent duplication and remember the result
+          if (hasExecuted.current) {
+            return firstResult.current;
+          }
+          if (onHardwareBack) {
+            const result = onHardwareBack();
+            hasExecuted.current = true;
+            firstResult.current = result;
+            // Reset after a short delay to allow for next navigation
+            setTimeout(() => {
+              hasExecuted.current = false;
+              firstResult.current = false;
+            }, 100);
+            return result;
+          }
+          return false;
+        } else {
+          // multiple different functions case: directly execute
+          return onHardwareBack ? onHardwareBack() : false;
+        }
       };
 
       const subscription = BackHandler.addEventListener(
@@ -54,7 +81,7 @@ export default function useBackHandlers(
         onBackPress
       );
       return () => subscription.remove();
-    }, [onHardwareBack])
+    }, [onHardwareBack, isSingleFunction])
   );
 
   // Listen for all navigation events
@@ -62,14 +89,44 @@ export default function useBackHandlers(
     if (!navigation) return;
     const unsubscribe = navigation.addListener('beforeRemove', (e) => {
       const action = e.data.action;
+      let shouldPrevent = firstResult.current;
 
-      let shouldPrevent = false;
-      if (action.type === 'GO_BACK' || action.type === 'POP') {
-        // Gesture back
-        shouldPrevent = onGestureBack ? onGestureBack() : false;
+      if (isSingleFunction) {
+        // single function case: need to prevent duplication and remember the result
+        if (!hasExecuted.current) {
+          if (action.type === 'GO_BACK' || action.type === 'POP') {
+            // Gesture back
+            if (onGestureBack) {
+              shouldPrevent = onGestureBack();
+              hasExecuted.current = true;
+              firstResult.current = shouldPrevent;
+              setTimeout(() => {
+                hasExecuted.current = false;
+                firstResult.current = false;
+              }, 100);
+            }
+          } else {
+            // Other navigation operations
+            if (onNavigationBack) {
+              shouldPrevent = onNavigationBack();
+              hasExecuted.current = true;
+              firstResult.current = shouldPrevent;
+              setTimeout(() => {
+                hasExecuted.current = false;
+                firstResult.current = false;
+              }, 100);
+            }
+          }
+        }
       } else {
-        // Other navigation operations
-        shouldPrevent = onNavigationBack ? onNavigationBack() : false;
+        // multiple different functions case: directly execute
+        if (action.type === 'GO_BACK' || action.type === 'POP') {
+          // Gesture back
+          shouldPrevent = onGestureBack ? onGestureBack() : false;
+        } else {
+          // Other navigation operations
+          shouldPrevent = onNavigationBack ? onNavigationBack() : false;
+        }
       }
 
       if (shouldPrevent) {
@@ -78,5 +135,5 @@ export default function useBackHandlers(
     });
 
     return unsubscribe;
-  }, [navigation, onGestureBack, onNavigationBack]);
+  }, [navigation, onGestureBack, onNavigationBack, isSingleFunction]);
 }

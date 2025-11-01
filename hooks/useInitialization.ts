@@ -1,4 +1,9 @@
-import { getUserInfo, landlordInitialApi, tenantInitialApi } from '@/business';
+import {
+  getUserInfo,
+  initializeChat,
+  landlordInitialApi,
+  tenantInitialApi,
+} from '@/business';
 import { LANDLORD, TENANT } from '@/constants';
 import { authStore, userStore } from '@/stores';
 import { autorun } from 'mobx';
@@ -53,6 +58,7 @@ export default function useInitialization() {
         if (identity === TENANT && isLogin) {
           tenantInitialApi(user?.id);
         }
+        if (isLogin) initializeChat();
         /**
          * the following situations will trigger the `disconnect` api
          * 1. when you logout

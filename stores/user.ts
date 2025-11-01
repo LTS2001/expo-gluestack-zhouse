@@ -1,5 +1,6 @@
 import { IExistLease, IUser } from '@/global';
 import { configure, makeAutoObservable } from 'mobx';
+import chatStore from './chat';
 
 configure({
   enforceActions: 'never',
@@ -34,6 +35,7 @@ class UserStore {
    * @param user user info
    */
   setUser(user: IUser) {
+    chatStore.setChatSender(user);
     this.user = user;
   }
 

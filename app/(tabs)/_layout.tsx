@@ -1,9 +1,39 @@
 import { Icon } from '@/components/ui';
+import { TAB_BAR_BADGE_COLOR } from '@/constants';
 import { useTabBarBadgeNum } from '@/hooks';
 import { Tabs } from 'expo-router';
+import { useCallback } from 'react';
+import { StyleProp, TextStyle } from 'react-native';
+
 export default function Layout() {
-  const getIconColor = (focused: boolean) => (focused ? '#f2a536' : '#999');
+  const getIconColor = useCallback(
+    (focused: boolean) => (focused ? '#f2a536' : '#999'),
+    []
+  );
+
+  const getTabBarBadgeText = useCallback<
+    (n: number | undefined) => string | number | undefined
+  >(
+    (n: number | undefined = 0) =>
+      n < 100 ? (n === 0 ? undefined : n) : `99+`,
+    []
+  );
+
+  const getTabBarBadgeStyle = useCallback<
+    (n: number | undefined) => StyleProp<TextStyle>
+  >(
+    (n: number | undefined = 0) => ({
+      backgroundColor: TAB_BAR_BADGE_COLOR,
+      color: '#fff',
+      overflow: 'hidden',
+      marginRight: n >= 100 ? -12 : n > 9 && n < 100 ? -8 : -7,
+      fontSize: 10,
+    }),
+    []
+  );
+
   const { mineNum, chatNum } = useTabBarBadgeNum();
+
   return (
     <Tabs
       screenOptions={{
@@ -48,14 +78,8 @@ export default function Layout() {
               color={getIconColor(focused)}
             />
           ),
-          tabBarBadge: chatNum,
-          tabBarBadgeStyle: {
-            backgroundColor: '#f2a536',
-            color: '#fff',
-            overflow: 'hidden',
-            marginRight: -8,
-            fontSize: 10,
-          },
+          tabBarBadge: getTabBarBadgeText(chatNum),
+          tabBarBadgeStyle: getTabBarBadgeStyle(chatNum),
         }}
       />
       <Tabs.Screen
@@ -66,14 +90,8 @@ export default function Layout() {
           tabBarIcon: ({ focused }) => (
             <Icon as='FontAwesome' name='user' color={getIconColor(focused)} />
           ),
-          tabBarBadge: mineNum,
-          tabBarBadgeStyle: {
-            backgroundColor: '#f2a536',
-            color: '#fff',
-            overflow: 'hidden',
-            marginRight: -8,
-            fontSize: 10,
-          },
+          tabBarBadge: getTabBarBadgeText(mineNum),
+          tabBarBadgeStyle: getTabBarBadgeStyle(mineNum),
         }}
       />
     </Tabs>

@@ -1,11 +1,11 @@
 import { LANDLORD, TENANT } from '@/constants';
-import { authStore, leaseStore, repairStore } from '@/stores';
+import { authStore, chatStore, leaseStore, repairStore } from '@/stores';
 import { autorun } from 'mobx';
 import { useEffect, useRef, useState } from 'react';
 
 export default function useTabBarBadgeNum() {
   const [mineNum, setMineNum] = useState<number | undefined>();
-  const [chatNum] = useState<number | undefined>();
+  const [chatNum, setChatNum] = useState<number | undefined>();
   const autorunDebounceTimer = useRef<
     ReturnType<typeof setTimeout> | undefined
   >(undefined);
@@ -17,6 +17,7 @@ export default function useTabBarBadgeNum() {
       const { identity, isLogin } = authStore;
       const { landlordPendingLeaseList } = leaseStore;
       const { landlordPendingRepairList } = repairStore;
+      const { chatUnreadNum } = chatStore;
       autorunDebounceTimer.current = setTimeout(() => {
         if (!isLogin) return;
         if (identity === LANDLORD) {
@@ -26,6 +27,8 @@ export default function useTabBarBadgeNum() {
           setMineNum(_mineNum ? _mineNum : undefined);
         } else if (identity === TENANT) {
         }
+        
+        setChatNum(chatUnreadNum);
       }, 100);
     });
     return () => {

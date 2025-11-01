@@ -16,7 +16,13 @@ axios.interceptors.request.use(
     if (/(\/headImg|medium)$/.test(config.url!)) {
       config.headers['Content-Type'] = 'multipart/form-data';
     }
-    console.log('axios url', config.url);
+    console.log(
+      `${config.method} => ${config.url} => ${
+        config.data
+          ? JSON.stringify(config.data)
+          : JSON.stringify(config.params)
+      }`
+    );
     return config;
   },
   (error) => {

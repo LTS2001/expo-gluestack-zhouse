@@ -1,16 +1,40 @@
 import { showToast } from '@/components/ui';
-import { IVideo, IVideoThumbnail } from '@/global';
+import { IMediumThumbnail, IVideo } from '@/global';
 import { postUploadImgVideoApi, postUploadUserHeadImgApi } from '@/request';
 import * as ImagePicker from 'expo-image-picker';
 import * as VideoThumbnails from 'expo-video-thumbnails';
 import { getUserInfo } from './user';
 
 /**
+ * take medium file
+ * @param options image picker options
+ * @returns image picker result
+ */
+export const takeMediumFile = async (
+  options: ImagePicker.ImagePickerOptions
+): Promise<ImagePicker.ImagePickerResult> => {
+  try {
+    // request permission
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      showToast({ title: '需要相机权限才能拍照' });
+      return Promise.reject('需要相机权限才能拍照');
+    }
+    // open medium camera
+    const result = await ImagePicker.launchCameraAsync(options);
+    return Promise.resolve(result);
+  } catch (error) {
+    console.log('takeMediumFile error:', error);
+    return Promise.reject(error);
+  }
+};
+
+/**
  * pick medium file
  * @param options image picker options
  * @returns image picker result
  */
-const pickMediumFile = async (
+export const pickMediumFile = async (
   options: ImagePicker.ImagePickerOptions
 ): Promise<ImagePicker.ImagePickerResult> => {
   try {
@@ -35,7 +59,7 @@ const pickMediumFile = async (
  * @param onProgress on progress callback function
  * @returns server image url
  */
-const uploadImageToServer = async ({
+export const uploadImageToServer = async ({
   uri,
   onProgress,
 }: {
@@ -132,7 +156,7 @@ export const uploadImage = async (
 export const generateVideoThumbnail = async (
   videoUri: string,
   timeMs: number = 1000
-): Promise<IVideoThumbnail> => {
+): Promise<IMediumThumbnail> => {
   try {
     const { uri, width, height } = await VideoThumbnails.getThumbnailAsync(
       videoUri,
@@ -161,7 +185,7 @@ export const generateVideoThumbnail = async (
  * @param onProgress on progress callback function
  * @returns server video url
  */
-const uploadVideoToServer = async ({
+export const uploadVideoToServer = async ({
   uri,
   onProgress,
 }: {
@@ -199,7 +223,7 @@ const uploadVideoToServer = async ({
 export interface IUploadVideoParams {
   options?: ImagePicker.ImagePickerOptions;
   onProgress?: (progress: number) => void;
-  onThumbnailGenerated?: (thumbnailInfo: IVideoThumbnail) => void;
+  onThumbnailGenerated?: (thumbnailInfo: IMediumThumbnail) => void;
 }
 /**
  * upload video

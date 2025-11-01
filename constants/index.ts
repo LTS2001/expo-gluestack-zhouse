@@ -1,4 +1,5 @@
 export * from './auth';
+export * from './chat';
 export * from './code';
 export * from './complaint';
 export * from './domain';

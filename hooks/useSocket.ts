@@ -1,4 +1,6 @@
 import {
+  getChatSessionLastOneMessageList,
+  getChatSessionList,
   getLeasePendingListByLandlord,
   getRepairListLandlord,
   sendMessage,
@@ -24,15 +26,14 @@ import {
 } from '@/constants';
 import emitter from '@/emitter';
 import {
-  GET_CURRENT_LAST_ONE_MESSAGE,
+  GET_CHAT_MESSAGE,
   GET_LANDLORD_REPORT,
   GET_PENDING_LEASE,
-  GET_SESSION_VARIOUS,
   GET_TENANT_LEASE_HOUSE,
   GET_TENANT_REPORT,
 } from '@/emitter/event-name';
 import { TIdentity } from '@/global';
-import { authStore, socketStore, userStore } from '@/stores';
+import { authStore, chatStore, socketStore, userStore } from '@/stores';
 import { autorun } from 'mobx';
 import { useCallback, useEffect, useRef } from 'react';
 import { AppState } from 'react-native';
@@ -291,8 +292,7 @@ export default function useSocket() {
               emitter.emit(GET_LANDLORD_REPORT);
               break;
             case SOCKET_GET_CHAT_MESSAGE:
-              emitter.emit(GET_CURRENT_LAST_ONE_MESSAGE);
-              emitter.emit(GET_SESSION_VARIOUS);
+              emitter.emit(GET_CHAT_MESSAGE);
               break;
           }
         } catch (error) {
@@ -352,7 +352,7 @@ export default function useSocket() {
       // cancel all websocket events
       emitter.off(GET_PENDING_LEASE);
       emitter.off(GET_LANDLORD_REPORT);
-      emitter.off(GET_SESSION_VARIOUS);
+      emitter.off(GET_CHAT_MESSAGE);
 
       // tenant
       if (currentIdentity === TENANT) {
@@ -369,9 +369,34 @@ export default function useSocket() {
         });
       }
       // someone send message, need to get session list, latest message, other info
-      emitter.on(GET_SESSION_VARIOUS, () => {
+      emitter.on(GET_CHAT_MESSAGE, async () => {
         // get session list
-        // getChatSessionList();
+        await getChatSessionList();
+        // get the latest one message in the chat session list
+        await getChatSessionLastOneMessageList();
+
+        /**
+         * The logic of "setchatMessageList" inside is specifically for chat pages
+         */
+        // start region
+        const {
+          currentChatSession: c,
+          chatMessageList,
+          setChatMessageList,
+          chatSessionLastOneMessageList,
+        } = chatStore;
+        const lastOneMessage = chatSessionLastOneMessageList?.find(
+          (i) =>
+            (i?.senderId === c?.senderId && i?.receiverId === c?.receiverId) ||
+            (i?.senderId === c?.receiverId && i?.receiverId === c?.senderId)
+        );
+        if (
+          lastOneMessage?.id &&
+          !chatMessageList?.find((chat) => chat.id === lastOneMessage.id)
+        ) {
+          setChatMessageList([lastOneMessage, ...(chatMessageList ?? [])]);
+        }
+        // start region
       });
     },
     []

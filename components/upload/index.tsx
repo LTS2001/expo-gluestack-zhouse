@@ -8,9 +8,9 @@ import {
   View,
 } from '@/components/ui';
 import { SERVER_IMAGE_ROOT } from '@/constants';
-import { IVideo, IVideoThumbnail } from '@/global';
+import { IMediumThumbnail, IVideo } from '@/global';
 import { useMediaPreview } from '@/hooks';
-import { handleVideoThumbnail } from '@/utils';
+import { handleMediumThumbnail } from '@/utils';
 import { useEffect, useState } from 'react';
 import ImagePreview from '../image-preview';
 import VideoPreview from '../video-preview';
@@ -144,7 +144,7 @@ export const UploadVideos = ({
     isUploading: false,
     progress: 0,
   });
-  const [thumbnailInfo, setThumbnailInfo] = useState<IVideoThumbnail | null>(
+  const [thumbnailInfo, setThumbnailInfo] = useState<IMediumThumbnail | null>(
     null
   );
   const [videoInfo, setVideoInfo] = useState<Omit<IVideo, 'thumbnail'> | null>(
@@ -175,7 +175,7 @@ export const UploadVideos = ({
           setUploadProgress({ isUploading: true, progress });
         },
         onThumbnailGenerated(thumbnail) {
-          setThumbnailInfo(handleVideoThumbnail(thumbnail));
+          setThumbnailInfo(handleMediumThumbnail(thumbnail));
         },
       });
       if (!res) return;

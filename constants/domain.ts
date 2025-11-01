@@ -31,3 +31,5 @@ export const COMPLAINT_LIST_HREF = 'complaint-list';
 export const LANDLORD_REPAIR_HREF = 'landlord-repair';
 
 export const LEASE_NOTICE_HREF = 'lease-notice';
+
+export const TAB_BAR_BADGE_COLOR = '#dc2626';

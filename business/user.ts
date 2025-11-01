@@ -1,7 +1,15 @@
-import { IUpdateBaseUserInfo, IUserVerify } from '@/global';
 import {
+  CHAT_SIGN_LANDLORD,
+  CHAT_SIGN_TENANT,
+  LANDLORD,
+  TENANT,
+} from '@/constants';
+import { IChatSessionUser, IUpdateBaseUserInfo, IUserVerify } from '@/global';
+import {
+  getLandlordListByIdListApi,
   getTenantLeasedHouseListApi,
   getTenantLeasedListLandlordApi,
+  getTenantListByIdListApi,
   getUserApi,
   putUserApi,
 } from '@/request';
@@ -96,8 +104,53 @@ export const getTenantLeasedListLandlord = async () => {
   );
 };
 
+/**
+ * get tenant leased house list
+ * @param tenantId tenant id
+ */
 export const getTenantLeasedHouseList = async (tenantId?: number) => {
   if (!tenantId) return;
   const res = await getTenantLeasedHouseListApi(tenantId);
   leaseStore.setTenantLeasedHouseList(res);
+};
+
+/**
+ * get receiver info list by id list
+ */
+export const getReceiverInfoListByIdList = async (
+  params: { id: number; identity: string }[]
+) => {
+  const landlordId: number[] = [];
+  const tenantId: number[] = [];
+  // category the id of the landlord and the tenant
+  params.forEach((item) => {
+    if (item.identity === TENANT) {
+      tenantId.push(item.id);
+    } else if (item.identity === LANDLORD) {
+      landlordId.push(item.id);
+    }
+  });
+
+  const [tenantList, landlordList] = await Promise.all([
+    tenantId.length
+      ? getTenantListByIdListApi(tenantId.join(','))
+      : Promise.resolve([]),
+    landlordId.length
+      ? getLandlordListByIdListApi(landlordId.join(','))
+      : Promise.resolve([]),
+  ]);
+  const userInfoList: IChatSessionUser[] = [];
+  tenantList.forEach((tenant) => {
+    userInfoList.push({
+      ...tenant,
+      receiverId: `${CHAT_SIGN_TENANT},${tenant.id}`,
+    });
+  });
+  landlordList.forEach((landlord) => {
+    userInfoList.push({
+      ...landlord,
+      receiverId: `${CHAT_SIGN_LANDLORD},${landlord.id}`,
+    });
+  });
+  return userInfoList;
 };

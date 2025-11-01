@@ -64,3 +64,19 @@ export const getTenantLeasedListLandlordApi = (): Promise<IExistLease[]> =>
 export const getTenantLeasedHouseListApi = (
   tenantId: number
 ): Promise<IHouseLease[]> => axios.get(`/tenant/lease?tenantId=${tenantId}`);
+
+/**
+ * get tenant list by ids
+ * @param tenantIdList tenant id list
+ * @returns tenant list
+ */
+export const getTenantListByIdListApi = (tenantIdList: string): Promise<IUser[]> =>
+  axios.get(`/tenant/list`, { params: { tenantIdList } });
+
+/**
+ * get landlord list by ids
+ * @param ids landlord id list
+ * @returns landlord list
+ */
+export const getLandlordListByIdListApi = (ids: string): Promise<IUser[]> =>
+  axios.get(`/landlord/list`, { params: { ids } });
