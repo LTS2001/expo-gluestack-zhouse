@@ -7,7 +7,7 @@ import { showToast } from '../ui/toast';
 interface IProps {
   isLogin: boolean;
 }
-const Logout = (props: IProps) => {
+const UserLogout = (props: IProps) => {
   const { isLogin } = props;
   const [logoutPopupVisible, setLogoutPopupVisible] = useState(false);
   /**
@@ -42,4 +42,4 @@ const Logout = (props: IProps) => {
   );
 };
 
-export default observer(Logout);
+export default observer(UserLogout);
