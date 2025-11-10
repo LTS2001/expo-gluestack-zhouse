@@ -1,13 +1,15 @@
 import {
   addChatMessage,
   addChatSession,
-  generateVideoThumbnail,
+  generateVideoThumbnailLocal,
   getChatMessageList,
   getChatSessionLastOneMessageList,
   getChatSessionList,
   pickMediumFile,
-  sendMessage,
+  sendMessage as sendWebSocketMessage,
   takeMediumFile,
+  updateChatMessageContent,
+  updateChatMessageUploadProgress,
   uploadImageToServer,
   uploadVideoToServer,
 } from '@/business';
@@ -23,7 +25,7 @@ import {
 import { IMediumThumbnail, IVideo, TMessageModel } from '@/global';
 import { putLeaveChatMessageApi } from '@/request';
 import { chatStore } from '@/stores';
-import { handleMediumThumbnail } from '@/utils';
+import { handleMediumThumbnail, isLocalPath } from '@/utils';
 import { useNavigation } from '@react-navigation/native';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FlatList, Keyboard } from 'react-native';
@@ -150,12 +152,22 @@ export default function useChatMessage(props: IUseChatMessageProps) {
   }, []);
 
   /**
+   * @description send websocket message to receiver
+   */
+  const sendMessage = useCallback(() => {
+    const [identity, id] = receiverId.split(',');
+    sendWebSocketMessage({
+      toIdentity: identity === CHAT_SIGN_TENANT ? TENANT : LANDLORD,
+      toId: Number(id),
+      active: SOCKET_GET_CHAT_MESSAGE,
+    });
+  }, [receiverId]);
+
+  /**
    * @description handle send message
    */
   const handleSendMessage = useCallback(
     async (messageModel?: TMessageModel) => {
-      console.log('messageModel', messageModel);
-
       setChatInputVal('');
       setInputHeight(CHAT_INPUT_MIN_HEIGHT);
       // Build the message data based on whether messageModel is provided
@@ -180,14 +192,7 @@ export default function useChatMessage(props: IUseChatMessageProps) {
           },
           { msgIdCount: msgIdCount.current++ }
         );
-
-      const [identity, id] = receiverId.split(',');
-      // send message to receiver via websocket
-      sendMessage({
-        toIdentity: identity === CHAT_SIGN_TENANT ? TENANT : LANDLORD,
-        toId: Number(id),
-        active: SOCKET_GET_CHAT_MESSAGE,
-      });
+      sendMessage();
       // scroll to bottom after sending message
       setTimeout(() => {
         handleChatAreaScrollToBottom();
@@ -199,7 +204,81 @@ export default function useChatMessage(props: IUseChatMessageProps) {
       receiverId,
       chatInputVal,
       handleChatAreaScrollToBottom,
+      sendMessage,
     ]
+  );
+
+  /**
+   * @description upload image and update message content
+   */
+  const uploadImageAndUpdateMessage = useCallback(
+    async (
+      messageId: number | string,
+      imageUri: string,
+      initialContent: IMediumThumbnail
+    ) => {
+      try {
+        const imageUrl = await uploadImageToServer({
+          uri: imageUri,
+          onProgress(progress) {
+            updateChatMessageUploadProgress(messageId, progress, 'uploading');
+          },
+        });
+
+        const finalContent = handleMediumThumbnail({
+          ...initialContent,
+          path: imageUrl,
+        });
+        await updateChatMessageContent(messageId, JSON.stringify(finalContent));
+        sendMessage();
+      } catch (error) {
+        console.error('upload image failed:', error);
+        updateChatMessageUploadProgress(messageId, 0, 'failed');
+        throw error;
+      }
+    },
+    [sendMessage]
+  );
+
+  /**
+   * @description upload video (thumbnail and video file) and update message content
+   */
+  const uploadVideoAndUpdateMessage = useCallback(
+    async (
+      messageId: number | string,
+      videoUri: string,
+      thumbnailUri: string,
+      initialContent: IVideo
+    ) => {
+      try {
+        const [thumbnailUrl, videoUrl] = await Promise.all([
+          uploadImageToServer({
+            uri: thumbnailUri,
+          }),
+          uploadVideoToServer({
+            uri: videoUri,
+            onProgress(progress) {
+              updateChatMessageUploadProgress(messageId, progress, 'uploading');
+            },
+          }),
+        ]);
+        const finalContent = {
+          ...initialContent,
+          path: videoUrl,
+          thumbnail: {
+            ...initialContent.thumbnail,
+            path: thumbnailUrl,
+          },
+        };
+        await updateChatMessageContent(messageId, JSON.stringify(finalContent));
+        sendMessage();
+      } catch (error) {
+        console.error('upload video or thumbnail failed:', error);
+        updateChatMessageUploadProgress(messageId, 0, 'failed');
+        throw error;
+      }
+    },
+    [sendMessage]
   );
 
   /**
@@ -213,58 +292,129 @@ export default function useChatMessage(props: IUseChatMessageProps) {
       selectionLimit: 3,
     });
     if (canceled) return;
-    // 处理所有选中的文件（并发上传）
-    const uploadPromises = assets.map(
-      async (asset): Promise<IMediumThumbnail | IVideo | null> => {
-        const assetType = asset.type;
-        const { uri, width, height, duration } = asset;
-        if (assetType === 'image') {
-          const imageUrl = await uploadImageToServer({ uri });
-          return handleMediumThumbnail({
-            path: imageUrl,
-            width,
-            height,
-            aspectRatio: Number((width / height).toFixed(2)),
-          });
-        } else if (assetType === 'video') {
-          const [thumbnail, videoUrl] = await Promise.all([
-            generateVideoThumbnail(uri),
-            uploadVideoToServer({ uri }),
-          ]);
-          return {
-            thumbnail: handleMediumThumbnail(thumbnail),
-            path: videoUrl,
-            width,
-            height,
-            aspectRatio: Number((width / height).toFixed(2)),
+
+    // add messages to list and start uploading
+    assets.map(async (asset) => {
+      const { uri, width, height, duration, type: assetType } = asset;
+      const rawContent: IMediumThumbnail = {
+        path: uri,
+        width,
+        height,
+        aspectRatio: Number((width / height).toFixed(2)),
+      };
+
+      let messageId: number | string;
+      let messageType: ECHAT_MESSAGE_TYPE;
+      let initialContent: IMediumThumbnail | IVideo;
+
+      if (assetType === 'image') {
+        messageType = ECHAT_MESSAGE_TYPE.IMAGE;
+        initialContent = handleMediumThumbnail(rawContent);
+        // add message to list with local path and uploading status
+        messageId = await addChatMessage(
+          {
+            sessionId: currentChatSession?.id!,
+            senderId,
+            receiverId,
+            type: messageType,
+            content: initialContent,
+          },
+          {
+            msgIdCount: msgIdCount.current++,
+            skipApiCall: true, // call API after upload completes
+          }
+        );
+        // set uploading status
+        updateChatMessageUploadProgress(messageId, 0, 'uploading');
+
+        // upload image and update message
+        await uploadImageAndUpdateMessage(messageId, uri, initialContent);
+      } else if (assetType === 'video') {
+        messageType = ECHAT_MESSAGE_TYPE.VIDEO;
+        let messageId: number | string | undefined;
+
+        try {
+          // generate video thumbnail local
+          const localThumbnail = await generateVideoThumbnailLocal(uri, 3000);
+          const thumbnailData = handleMediumThumbnail(localThumbnail);
+          initialContent = {
+            ...rawContent,
+            thumbnail: thumbnailData,
             duration: duration ?? 0,
           };
+
+          // add message to list with local thumbnail path
+          messageId = await addChatMessage(
+            {
+              sessionId: currentChatSession?.id!,
+              senderId,
+              receiverId,
+              type: messageType,
+              content: initialContent,
+            },
+            {
+              msgIdCount: msgIdCount.current++,
+              skipApiCall: true,
+            }
+          );
+          // set upload status
+          updateChatMessageUploadProgress(messageId, 0, 'uploading');
+
+          // upload video and update message
+          await uploadVideoAndUpdateMessage(
+            messageId,
+            uri,
+            localThumbnail.path,
+            initialContent
+          );
+        } catch {
+          // error already handled in uploadVideoAndUpdateMessage
+          if (!messageId) {
+            // if message wasn't created yet, try to create a failed message
+            try {
+              messageId = await addChatMessage(
+                {
+                  sessionId: currentChatSession?.id!,
+                  senderId,
+                  receiverId,
+                  type: messageType,
+                  content: {
+                    ...rawContent,
+                    thumbnail: {
+                      path: '',
+                      width: 0,
+                      height: 0,
+                      aspectRatio: 1,
+                    },
+                    duration: duration ?? 0,
+                  },
+                },
+                {
+                  msgIdCount: msgIdCount.current++,
+                  skipApiCall: true,
+                }
+              );
+              updateChatMessageUploadProgress(messageId, 0, 'failed');
+            } catch (err) {
+              console.error('add video message failed:', err);
+            }
+          }
         }
-        return null;
       }
-    );
-    const mediumContents = (await Promise.all(uploadPromises)).filter(
-      Boolean
-    ) as (IMediumThumbnail | IVideo)[];
-    mediumContents.forEach((content) => {
-      // is video
-      if ('thumbnail' in content && content.thumbnail)
-        handleSendMessage({
-          content,
-          type: ECHAT_MESSAGE_TYPE.VIDEO,
-        });
-      // is image
-      else
-        handleSendMessage({
-          content,
-          type: ECHAT_MESSAGE_TYPE.IMAGE,
-        });
     });
 
     setTimeout(() => {
       handleChatAreaScrollToBottom();
     }, 100);
-  }, [handleChatAreaScrollToBottom, handleSendMessage]);
+  }, [
+    currentChatSession,
+    senderId,
+    receiverId,
+    handleChatAreaScrollToBottom,
+    msgIdCount,
+    uploadImageAndUpdateMessage,
+    uploadVideoAndUpdateMessage,
+  ]);
 
   /**
    * @description handle take photo or record video
@@ -296,6 +446,136 @@ export default function useChatMessage(props: IUseChatMessageProps) {
     }, 100);
   }, [handleChatAreaScrollToBottom, handleSendMessage]);
 
+  /**
+   * @description handle retry failed message
+   */
+  const handleRetryMessage = useCallback(
+    async (messageId: number | string) => {
+      const { chatMessageList } = chatStore;
+      if (!chatMessageList) return;
+
+      const failedMessage = chatMessageList.find((msg) => msg.id === messageId);
+      if (!failedMessage || failedMessage.uploadStatus !== 'failed') return;
+
+      const { type, content } = failedMessage;
+      const parsedContent =
+        type === ECHAT_MESSAGE_TYPE.TEXT
+          ? content
+          : JSON.parse(content as string);
+
+      // set uploading status to uploading
+      updateChatMessageUploadProgress(messageId, 0, 'uploading');
+
+      try {
+        if (type === ECHAT_MESSAGE_TYPE.TEXT) {
+          // text message, just resend
+          await handleSendMessage({
+            type: ECHAT_MESSAGE_TYPE.TEXT,
+            content: parsedContent,
+          });
+        } else if (type === ECHAT_MESSAGE_TYPE.IMAGE) {
+          const imagePath = parsedContent.path;
+          const isImageLocal = isLocalPath(imagePath);
+          if (isImageLocal) {
+            // upload image and update message
+            await uploadImageAndUpdateMessage(
+              messageId,
+              imagePath,
+              parsedContent
+            );
+          } else {
+            // send message to receiver via websocket
+            sendMessage();
+          }
+        } else if (type === ECHAT_MESSAGE_TYPE.VIDEO) {
+          const videoPath = parsedContent.path;
+          const thumbnailPath = parsedContent.thumbnail?.path;
+          // check if video and thumbnail are local paths
+          const isVideoLocal = isLocalPath(videoPath);
+          const isThumbnailLocal = isLocalPath(thumbnailPath);
+
+          if (isVideoLocal || isThumbnailLocal) {
+            // determine the URI to upload
+            const finalVideoUri = isVideoLocal ? videoPath : undefined;
+            const finalThumbnailUri = isThumbnailLocal
+              ? thumbnailPath!
+              : parsedContent.thumbnail?.path || '';
+
+            if (finalVideoUri && finalThumbnailUri) {
+              // both need to upload, use the unified upload function
+              await uploadVideoAndUpdateMessage(
+                messageId,
+                finalVideoUri,
+                finalThumbnailUri,
+                parsedContent
+              );
+            } else if (finalVideoUri) {
+              // only upload video (thumbnail is already server path)
+              const videoUrl = await uploadVideoToServer({
+                uri: finalVideoUri,
+                onProgress(progress) {
+                  updateChatMessageUploadProgress(
+                    messageId,
+                    progress,
+                    'uploading'
+                  );
+                },
+              });
+
+              const finalContent = {
+                ...parsedContent,
+                path: videoUrl,
+              };
+              await updateChatMessageContent(
+                messageId,
+                JSON.stringify(finalContent)
+              );
+
+              sendMessage();
+            } else if (
+              finalThumbnailUri &&
+              finalThumbnailUri !== thumbnailPath
+            ) {
+              // only upload thumbnail (video is already server path)
+              const thumbnailUrl = await uploadImageToServer({
+                uri: finalThumbnailUri,
+              });
+
+              const finalContent = {
+                ...parsedContent,
+                thumbnail: {
+                  ...parsedContent.thumbnail,
+                  path: thumbnailUrl,
+                },
+              };
+              await updateChatMessageContent(
+                messageId,
+                JSON.stringify(finalContent)
+              );
+
+              sendMessage();
+            }
+          } else {
+            // if neither are local paths, just resend
+            await handleSendMessage({
+              type: ECHAT_MESSAGE_TYPE.VIDEO,
+              content: parsedContent,
+            });
+          }
+        }
+      } catch (error) {
+        console.error('retry message failed:', error);
+        updateChatMessageUploadProgress(messageId, 0, 'failed');
+      }
+    },
+    [
+      handleSendMessage,
+      uploadImageAndUpdateMessage,
+      uploadVideoAndUpdateMessage,
+      sendMessage,
+    ]
+  );
+
   return {
     chatAreaScrollViewRef,
     // adaptive height of chat input box in bottom area
@@ -321,5 +601,6 @@ export default function useChatMessage(props: IUseChatMessageProps) {
     handleSendMessage,
     handleSelectMediumFile,
     handleTakePhoto,
+    handleRetryMessage,
   };
 }

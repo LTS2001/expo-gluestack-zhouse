@@ -5,6 +5,7 @@ import {
   Spinner,
   Text,
   TouchableOpacity,
+  UploadProgress,
   View,
 } from '@/components/ui';
 import { SERVER_IMAGE_ROOT } from '@/constants';
@@ -195,12 +196,7 @@ export const UploadVideos = ({
           disabled={disabled || uploadProgress.isUploading}
         >
           {uploadProgress.isUploading ? (
-            <View className='justify-center items-center'>
-              <Spinner size={40} color='gray' className='absolute' />
-              <Text className='text-xs scale-95'>
-                {uploadProgress.progress}%
-              </Text>
-            </View>
+            <UploadProgress progress={uploadProgress.progress} />
           ) : (
             <Icon as='AntDesign' name='plus' size={24} />
           )}

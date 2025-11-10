@@ -25,3 +25,23 @@ export const handleMediumThumbnail = (
     ...size,
   };
 };
+
+/**
+ * check if the path is a local path
+ * @param path path to check
+ * @returns true if the path is a local path, false otherwise
+ */
+export const isLocalPath = (path: string) => {
+  if (!path) return false;
+  return (
+    path.startsWith('file://') ||
+    path.startsWith('/storage/') ||
+    path.startsWith('/data/') ||
+    path.startsWith('/sdcard/') ||
+    (path.startsWith('/') &&
+      !path.startsWith('/uploads/') &&
+      !path.startsWith('/upload_') &&
+      !path.startsWith('/images/') &&
+      !path.startsWith('/media/'))
+  );
+};

@@ -52,6 +52,8 @@ export default function useSocket() {
   const autorunDebounceTimer = useRef<
     ReturnType<typeof setTimeout> | undefined
   >(undefined);
+  // store connect function reference to avoid dependency issues
+  const connectRef = useRef<() => void>(() => {});
 
   const {
     setWebsocketInstance,
@@ -168,20 +170,33 @@ export default function useSocket() {
   const handleAppStateChange = useCallback(
     (nextAppState: string) => {
       console.log('websocket: app state changed to ', nextAppState);
-      if (
-        nextAppState === 'active' &&
-        connectionState.current === ConnectionState.DISCONNECTED
-      ) {
-        console.log('websocket: app became active, attempting to reconnect...');
-        resetReconnectState();
-        // delay connection to avoid calling connect function before it's defined
-        setTimeout(() => {
-          connect();
-        }, 1000);
+      if (nextAppState === 'active') {
+        // when the app comes back to the foreground, check the actual WebSocket connection status
+        const ws = socketStore.socketInstance;
+        const isConnectionAlive = ws?.readyState === WebSocket.OPEN;
+
+        if (isConnectionAlive) {
+          // the connection is still alive, update the status and resume heartbeat
+          console.log(
+            'websocket: connection still alive, resuming heartbeat...'
+          );
+          connectionState.current = ConnectionState.CONNECTED;
+          setConnectionState(ConnectionState.CONNECTED);
+          startHeartbeat(ws);
+        } else if (connectionState.current !== ConnectionState.CONNECTED) {
+          // the connection is lost, try to reconnect
+          console.log(
+            'websocket: app became active, connection lost, attempting to reconnect...'
+          );
+          resetReconnectState();
+          // delay connection to avoid calling connect function before it's defined
+          setTimeout(() => {
+            connectRef.current();
+          }, 1000);
+        }
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [resetReconnectState, startHeartbeat, setConnectionState]
   );
 
   /**
@@ -322,6 +337,11 @@ export default function useSocket() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
+
+  // update connectRef when connect function changes
+  useEffect(() => {
+    connectRef.current = connect;
+  }, [connect]);
 
   /**
    * manually disconnect

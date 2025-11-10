@@ -148,10 +148,41 @@ export const uploadImage = async (
 };
 
 /**
- * generate video thumbnail
+ * generate video thumbnail (only generate, not upload)
+ * @param videoUri video file uri
+ * @param timeMs specified time point (milliseconds), default 1 second
+ * @returns thumbnail info with local path (contains src, dimensions and aspect ratio)
+ */
+export const generateVideoThumbnailLocal = async (
+  videoUri: string,
+  timeMs: number = 1000
+): Promise<IMediumThumbnail> => {
+  try {
+    const { uri, width, height } = await VideoThumbnails.getThumbnailAsync(
+      videoUri,
+      {
+        time: timeMs,
+        quality: 1, 
+      }
+    );
+    return {
+      path: uri,
+      width,
+      height,
+      aspectRatio: Number((width / height).toFixed(2)),
+    };
+  } catch (error) {
+    console.log('generate video thumbnail failed:', error);
+    return Promise.reject(error);
+  }
+};
+
+/**
+ * generate video thumbnail and upload to server
  * @param videoUri video file uri
  * @param timeMs specified time point (milliseconds), default 1 second
  * @returns thumbnail info (contains src, dimensions and aspect ratio)
+ * @deprecated use generateVideoThumbnailLocal and uploadImageToServer separately
  */
 export const generateVideoThumbnail = async (
   videoUri: string,

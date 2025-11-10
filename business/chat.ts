@@ -5,7 +5,12 @@ import {
   LANDLORD,
   TENANT,
 } from '@/constants';
-import { ISendChatMessage, ISocketMessage, TAddChatMessage } from '@/global';
+import {
+  IChatMessage,
+  ISendChatMessage,
+  ISocketMessage,
+  TAddChatMessage,
+} from '@/global';
 import {
   getChatMessageListApi,
   getChatSessionLastOneMessageListApi,
@@ -81,27 +86,111 @@ export const addChatSession = async () => {
  */
 export const addChatMessage = async (
   data: TAddChatMessage,
-  opt: { msgIdCount: number }
+  opt: { msgIdCount: number; skipApiCall?: boolean }
 ) => {
   const { chatMessageList, setChatMessageList } = chatStore;
   const { content, type, ...rest } = data;
-  const { msgIdCount } = opt;
+  const { msgIdCount, skipApiCall } = opt;
   const _data: ISendChatMessage = {
     ...rest,
     type,
     content:
       type === ECHAT_MESSAGE_TYPE.TEXT ? content : JSON.stringify(content),
   };
+  const messageId = Date.now() + msgIdCount;
   setChatMessageList([
     {
       ..._data,
-      id: Date.now() + msgIdCount,
+      id: messageId,
       createdAt: new Date(),
       updatedAt: new Date(),
     },
     ...(chatMessageList ?? []),
   ]);
-  await postChatMessageApi(_data);
+  if (!skipApiCall) {
+    await postChatMessageApi(_data);
+  }
+  return messageId;
+};
+
+/**
+ * update chat message (internal common function)
+ * @param messageId message id
+ * @param options update options
+ */
+const updateChatMessageInternal = (
+  messageId: number | string,
+  options: {
+    progress?: number;
+    status?: 'pending' | 'uploading' | 'success' | 'failed';
+    content?: string;
+    shouldCallApi?: boolean;
+  }
+) => {
+  const { chatMessageList, setChatMessageList } = chatStore;
+  if (!chatMessageList) return;
+  const { progress, status, content, shouldCallApi } = options;
+  const updatedList = chatMessageList.map((msg) => {
+    if (msg.id === messageId) {
+      const updatedMsg: IChatMessage = {
+        ...msg,
+        ...(progress !== undefined && { uploadProgress: progress }),
+        ...(status !== undefined && {
+          uploadStatus: status ?? msg.uploadStatus ?? 'uploading',
+        }),
+        ...(content !== undefined && { content }),
+      };
+
+      // call API if needed
+      if (shouldCallApi && content !== undefined) {
+        postChatMessageApi({
+          sessionId: msg.sessionId,
+          senderId: msg.senderId,
+          receiverId: msg.receiverId,
+          type: msg.type,
+          content,
+        });
+      }
+
+      return updatedMsg;
+    }
+    return msg;
+  });
+  setChatMessageList(updatedList);
+};
+
+/**
+ * update chat message upload progress and status
+ * @param messageId message id
+ * @param progress upload progress (0-100)
+ * @param status upload status
+ */
+export const updateChatMessageUploadProgress = (
+  messageId: number | string,
+  progress: number,
+  status?: 'pending' | 'uploading' | 'success' | 'failed'
+) => {
+  updateChatMessageInternal(messageId, {
+    progress,
+    status: status ?? 'uploading',
+  });
+};
+
+/**
+ * update chat message content (e.g., update path from local to server url)
+ * @param messageId message id
+ * @param content new content
+ */
+export const updateChatMessageContent = async (
+  messageId: number | string,
+  content: string
+) => {
+  updateChatMessageInternal(messageId, {
+    content,
+    status: 'success',
+    progress: 100,
+    shouldCallApi: true,
+  });
 };
 
 /**

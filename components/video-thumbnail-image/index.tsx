@@ -7,10 +7,18 @@ interface IProps {
   path: string;
   videoDuration: number;
   handlePress?: () => void;
+  uploaded?: boolean;
 }
 
 export default function VideoThumbnailImage(props: IProps) {
-  const { width, height, path, videoDuration, handlePress } = props;
+  const {
+    width,
+    height,
+    path,
+    videoDuration,
+    handlePress,
+    uploaded = true,
+  } = props;
   return (
     <TouchableOpacity
       className='relative'
@@ -25,12 +33,19 @@ export default function VideoThumbnailImage(props: IProps) {
           height,
         }}
       />
-      <View className='absolute inset-0 z-50 flex items-center justify-center'>
-        <Icon as='Ionicons' name='play-circle-outline' size={36} color='white' />
-        <Text className='text-white absolute right-2 bottom-0 text-sm'>
-          {formatVideoDuration(videoDuration)}
-        </Text>
-      </View>
+      {uploaded ? (
+        <View className='absolute inset-0 z-50 flex items-center justify-center'>
+          <Icon
+            as='Ionicons'
+            name='play-circle-outline'
+            size={36}
+            color='white'
+          />
+          <Text className='text-white absolute right-2 bottom-0 text-sm'>
+            {formatVideoDuration(videoDuration)}
+          </Text>
+        </View>
+      ) : null}
     </TouchableOpacity>
   );
 }

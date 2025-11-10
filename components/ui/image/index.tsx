@@ -1,5 +1,6 @@
 'use client';
 import { SERVER_IMAGE_ROOT } from '@/constants';
+import { isLocalPath } from '@/utils/image';
 import { createImage } from '@gluestack-ui/image';
 import type { VariantProps } from '@gluestack-ui/nativewind-utils';
 import { tva } from '@gluestack-ui/nativewind-utils/tva';
@@ -52,11 +53,12 @@ const Image = React.forwardRef<
   ref
 ) {
   const colorSchema = useColorScheme();
+  const uri = (isLocalPath(src) ? src : SERVER_IMAGE_ROOT + src) || '';
   return (
     <UIImage
       className={imageStyle({ size, class: className })}
       alt=''
-      source={src ? { uri: SERVER_IMAGE_ROOT + src } : { uri: ' ' }}
+      source={{ uri }}
       {...props}
       ref={ref}
       style={Object.assign(

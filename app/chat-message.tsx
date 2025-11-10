@@ -44,6 +44,7 @@ const ChatMessage = () => {
     handleSendMessage,
     handleSelectMediumFile,
     handleTakePhoto,
+    handleRetryMessage,
   } = useChatMessage({
     title: chatReceiver?.name ?? '',
   });
@@ -71,7 +72,8 @@ const ChatMessage = () => {
         onEndReachedThreshold={0.5}
         onScroll={handleHideControlPanel}
         renderItem={({ item: chatMessage, index: idx }) => {
-          const { type, content, createdAt } = chatMessage;
+          const { type, content, createdAt, uploadStatus, uploadProgress } =
+            chatMessage;
           const nextDate = chatMessageList?.[idx + 1]?.createdAt;
           const identity =
             senderId === chatMessage.senderId ? 'sender' : 'receiver';
@@ -103,6 +105,8 @@ const ChatMessage = () => {
                     : chatReceiver?.headImg!
                 }
                 messageTime={createdAt}
+                uploadStatus={uploadStatus}
+                uploadProgress={uploadProgress}
                 handleImagePress={(m) => {
                   if (m.type === ECHAT_MESSAGE_TYPE.IMAGE) {
                     setImages([m.content.path]);
@@ -116,6 +120,7 @@ const ChatMessage = () => {
                     setVideoPreviewVisible(true);
                   }
                 }}
+                onRetry={() => handleRetryMessage(chatMessage.id)}
               />
             </View>
           );

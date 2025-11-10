@@ -16,6 +16,18 @@ declare module '@/global' {
   type TAddChatMessage = Omit<ISendChatMessage, 'content' | 'type'> &
     TMessageModel;
 
+  type TUploadState = {
+    /**
+     * upload progress (0-100)
+     */
+    uploadProgress: number;
+
+    /**
+     * upload status
+     */
+    uploadStatus: 'pending' | 'uploading' | 'success' | 'failed';
+  };
+
   /**
    * user send chat message interface
    */
@@ -45,7 +57,7 @@ declare module '@/global' {
   /**
    * a chat message interface
    */
-  interface IChatMessage extends ISendChatMessage {
+  interface IChatMessage extends ISendChatMessage, Partial<TUploadState> {
     /**
      * chat message id
      */
@@ -822,7 +834,7 @@ declare module '@/global' {
   /**
    * medium thumbnail (video or image) info interface
    */
-  interface IMediumThumbnail {
+  interface IMediumThumbnail extends Partial<TUploadState> {
     /**
      * server path of medium thumbnail
      */
@@ -844,7 +856,7 @@ declare module '@/global' {
   /**
    * video info interface
    */
-  interface IVideo extends IMediumThumbnail {
+  interface IVideo extends IMediumThumbnail, Partial<TUploadState> {
     /**
      * video thumbnail info
      */
