@@ -42,6 +42,7 @@ export const isLocalPath = (path: string) => {
       !path.startsWith('/uploads/') &&
       !path.startsWith('/upload_') &&
       !path.startsWith('/images/') &&
-      !path.startsWith('/media/'))
+      !path.startsWith('/media/')) &&
+      !path.startsWith('/common')
   );
 };

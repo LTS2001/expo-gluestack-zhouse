@@ -7,6 +7,7 @@ export * from './house';
 export * from './image';
 export * from './map';
 export * from './socket';
+export * from './webrtc';
 /**
  * api server root
  */

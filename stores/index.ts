@@ -8,4 +8,5 @@ export { default as locationStore } from './location';
 export { default as repairStore } from './repair';
 export { default as socketStore } from './socket';
 export { default as userStore } from './user';
+export { default as webrtcStore } from './webrtc';
 

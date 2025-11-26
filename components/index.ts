@@ -17,4 +17,7 @@ export { default as Logout } from './user-logout';
 export { default as VideoControls } from './video-controls';
 export { default as VideoPreview } from './video-preview';
 export { default as VideoThumbnailImage } from './video-thumbnail-image';
+export { default as WebrtcCallToolbar } from './webrtc-call-toolbar';
+export { default as WebrtcFloatWindow } from './webrtc-float-window';
+export { default as WebrtcTimer } from './webrtc-timer';
 

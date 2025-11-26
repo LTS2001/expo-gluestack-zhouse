@@ -8,7 +8,8 @@ declare module '@/global' {
   type TMessageModel =
     | { type: ECHAT_MESSAGE_TYPE.TEXT; content: string }
     | { type: ECHAT_MESSAGE_TYPE.IMAGE; content: IMediumThumbnail }
-    | { type: ECHAT_MESSAGE_TYPE.VIDEO; content: IVideo };
+    | { type: ECHAT_MESSAGE_TYPE.VIDEO; content: IVideo }
+    | { type: ECHAT_MESSAGE_TYPE.WEBRTC_VIDEO; content: string };
 
   /**
    * add chat message type
@@ -829,6 +830,9 @@ declare module '@/global' {
     toIdentity: TIdentity;
     toId: number;
     active: SocketMessageActionType;
+    fromIdentity?: TIdentity;
+    fromId?: number;
+    data?: string;
   }
 
   /**

@@ -6,4 +6,6 @@ export { default as useMediaPreview } from './useMediaPreview';
 export { default as useRefresh } from './useRefresh';
 export { default as useSocket } from './useSocket';
 export { default as useTabBarBadgeNum } from './useTabBarBadgeNum';
+export { default as useWebrtc } from './useWebrtc';
+export { default as useWebrtcLife } from './useWebrtcLife';
 

@@ -1,7 +1,6 @@
 import {
   CHAT_MESSAGE_LIMIT,
   CHAT_SIGN_LANDLORD,
-  ECHAT_MESSAGE_TYPE,
   LANDLORD,
   TENANT,
 } from '@/constants';
@@ -94,8 +93,7 @@ export const addChatMessage = async (
   const _data: ISendChatMessage = {
     ...rest,
     type,
-    content:
-      type === ECHAT_MESSAGE_TYPE.TEXT ? content : JSON.stringify(content),
+    content: JSON.stringify(content),
   };
   const messageId = Date.now() + msgIdCount;
   setChatMessageList([

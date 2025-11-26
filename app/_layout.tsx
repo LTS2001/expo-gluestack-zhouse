@@ -1,3 +1,4 @@
+import { WebrtcFloatWindow } from '@/components';
 import { GluestackUIProvider, Toast } from '@/components/ui';
 import {
   COMPLAINT_LIST_HREF,
@@ -102,10 +103,12 @@ export default function RootLayout() {
             />
             <Stack.Screen name='comment-house' />
             <Stack.Screen name='house-all-comment' />
+            <Stack.Screen name='chat-webrtc' options={{ headerShown: false }} />
             <Stack.Screen name='+not-found' />
           </Stack>
           <StatusBar style='auto' />
           <Toast />
+          <WebrtcFloatWindow />
         </KeyboardProvider>
       </ThemeProvider>
     </GluestackUIProvider>

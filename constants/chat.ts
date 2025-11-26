@@ -30,6 +30,10 @@ export const CHAT_MESSAGE_TYPE_IMAGE = 2;
  * chat message type video
  */
 export const CHAT_MESSAGE_TYPE_VIDEO = 3;
+/**
+ * webrtc video call
+ */
+export const CHAT_MESSAGE_TYPE_WEBRTC_VIDEO = 4;
 
 /**
  * chat message type enum
@@ -38,6 +42,7 @@ export enum ECHAT_MESSAGE_TYPE {
   TEXT = CHAT_MESSAGE_TYPE_TEXT,
   IMAGE = CHAT_MESSAGE_TYPE_IMAGE,
   VIDEO = CHAT_MESSAGE_TYPE_VIDEO,
+  WEBRTC_VIDEO = CHAT_MESSAGE_TYPE_WEBRTC_VIDEO,
 }
 
 export const CHAT_MESSAGE_LIMIT = 50;

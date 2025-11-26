@@ -5,6 +5,7 @@ import {
   Button,
   ButtonText,
   Icon,
+  showToast,
   Text,
   Textarea,
   TextareaInput,
@@ -19,8 +20,9 @@ import {
 import { IChatMessage, IVideo } from '@/global';
 import { useMediaPreview } from '@/hooks';
 import useChatMessage from '@/hooks/useChatMessage';
-import { chatStore } from '@/stores';
+import { chatStore, webrtcStore } from '@/stores';
 import { formatChatDate, isCertainMinuteAge } from '@/utils';
+import { router } from 'expo-router';
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
@@ -92,10 +94,7 @@ const ChatMessage = () => {
                 id={chatMessage.id}
                 model={{
                   type,
-                  content:
-                    type === ECHAT_MESSAGE_TYPE.TEXT
-                      ? content
-                      : JSON.parse(content),
+                  content: JSON.parse(content),
                 }}
                 identity={identity}
                 index={idx}
@@ -172,6 +171,18 @@ const ChatMessage = () => {
             onPress={handleSelectMediumFile}
           >
             <Icon as='FontAwesome' name='photo' size={28} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            className='bg-background-0 rounded-md p-3'
+            onPress={() => {
+              if (webrtcStore.peerConnection) {
+                showToast({ title: '当前正在通话' });
+                return;
+              }
+              router.push('/chat-webrtc');
+            }}
+          >
+            <Icon as='FontAwesome' name='video-camera' size={28} />
           </TouchableOpacity>
         </View>
       )}

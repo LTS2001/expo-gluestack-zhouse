@@ -128,6 +128,31 @@ const Message = memo(
                 </View>
               </View>
             );
+
+          case ECHAT_MESSAGE_TYPE.WEBRTC_VIDEO:
+            return (
+              <View
+                className={cls([
+                  'bg-background-0 rounded-md py-2 px-3 self-start border-[1px] border-background-100 flex-row items-center gap-2',
+                  { 'bg-background-800 self-end': identity === 'sender' },
+                ])}
+              >
+                <Icon
+                  as='Ionicons'
+                  name='videocam-outline'
+                  lightColor={identity === 'sender' ? 'white' : 'black'}
+                  darkColor={identity === 'sender' ? 'white' : 'black'}
+                />
+                <Text
+                  className={cls([
+                    'text-xl text-background-900',
+                    { 'text-background-0': identity === 'sender' },
+                  ])}
+                >
+                  {content}
+                </Text>
+              </View>
+            );
           default:
             return null;
         }

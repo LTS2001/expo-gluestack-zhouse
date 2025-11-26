@@ -7,4 +7,5 @@ export * from './lease';
 export * from './repair';
 export * from './upload';
 export * from './user';
+export * from './webrtc';
 

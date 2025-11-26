@@ -5,6 +5,7 @@ import {
   getRepairListLandlord,
   sendMessage,
 } from '@/business';
+import { showToast } from '@/components/ui';
 import {
   ConnectionState,
   LANDLORD,
@@ -17,11 +18,16 @@ import {
   SOCKET_GET_PENDING_LEASE,
   SOCKET_GET_TENANT_LEASE_HOUSE,
   SOCKET_GET_TENANT_REPORT,
+  SOCKET_HANGUP,
   SOCKET_HEARTBEAT,
   SOCKET_HEARTBEAT_INTERVAL,
   SOCKET_HEARTBEAT_TIMEOUT,
   SOCKET_MAX_RECONNECT_ATTEMPTS,
   SOCKET_MAX_RECONNECT_DELAY,
+  SOCKET_WEBRTC_ANSWER,
+  SOCKET_WEBRTC_ANSWER_ICE,
+  SOCKET_WEBRTC_OFFER,
+  SOCKET_WEBRTC_OFFER_ICE,
   TENANT,
 } from '@/constants';
 import emitter from '@/emitter';
@@ -31,9 +37,20 @@ import {
   GET_PENDING_LEASE,
   GET_TENANT_LEASE_HOUSE,
   GET_TENANT_REPORT,
+  WEBRTC_ANSWER,
+  WEBRTC_ANSWER_ICE,
+  WEBRTC_OFFER,
+  WEBRTC_OFFER_ICE,
 } from '@/emitter/event-name';
-import { TIdentity } from '@/global';
-import { authStore, chatStore, socketStore, userStore } from '@/stores';
+import { ISocketMessage, TIdentity } from '@/global';
+import {
+  authStore,
+  chatStore,
+  socketStore,
+  userStore,
+  webrtcStore,
+} from '@/stores';
+import { router } from 'expo-router';
 import { autorun } from 'mobx';
 import { useCallback, useEffect, useRef } from 'react';
 import { AppState } from 'react-native';
@@ -273,14 +290,15 @@ export default function useSocket() {
         processMessageQueue(ws);
       };
 
-      ws.onmessage = ({ data }) => {
+      ws.onmessage = ({ data: $data }) => {
         console.log(
-          `websocket: message received ${data} ${new Date().toLocaleTimeString()}`
+          `websocket: message received ${$data} ${new Date().toLocaleTimeString()}`
         );
         try {
-          const parsedData = JSON.parse(data);
+          const parsedData = JSON.parse($data) as ISocketMessage;
           // process business message
-          const { active } = parsedData;
+          const { active, fromIdentity, fromId, data: _data } = parsedData;
+          const data = _data as any;
           switch (active) {
             case SOCKET_CONNECT:
               console.log('websocket: connected successfully');
@@ -308,6 +326,31 @@ export default function useSocket() {
               break;
             case SOCKET_GET_CHAT_MESSAGE:
               emitter.emit(GET_CHAT_MESSAGE);
+              break;
+            case SOCKET_WEBRTC_OFFER:
+              webrtcStore.setWebrtcOfferIdentity(fromIdentity!);
+              webrtcStore.setWebrtcOfferId(fromId!);
+              emitter.emit(WEBRTC_OFFER, data);
+              break;
+            case SOCKET_WEBRTC_OFFER_ICE:
+              emitter.emit(WEBRTC_OFFER_ICE, data);
+              break;
+            case SOCKET_WEBRTC_ANSWER:
+              emitter.emit(WEBRTC_ANSWER, data);
+              break;
+            case SOCKET_WEBRTC_ANSWER_ICE:
+              emitter.emit(WEBRTC_ANSWER_ICE, data);
+              break;
+            case SOCKET_HANGUP:
+              const { isConnected, role } = webrtcStore;
+              showToast({
+                title: isConnected
+                  ? '对方已挂断'
+                  : role === 'offer'
+                  ? '对方已拒绝'
+                  : '对方已取消',
+              });
+              webrtcStore.setConnectionState('closed');
               break;
           }
         } catch (error) {
@@ -373,7 +416,7 @@ export default function useSocket() {
       emitter.off(GET_PENDING_LEASE);
       emitter.off(GET_LANDLORD_REPORT);
       emitter.off(GET_CHAT_MESSAGE);
-
+      emitter.off(WEBRTC_OFFER);
       // tenant
       if (currentIdentity === TENANT) {
       }
@@ -416,7 +459,12 @@ export default function useSocket() {
         ) {
           setChatMessageList([lastOneMessage, ...(chatMessageList ?? [])]);
         }
-        // start region
+      });
+
+      emitter.on(WEBRTC_OFFER, (data: any) => {
+        webrtcStore.setWebrtcOffer(JSON.parse(data));
+        webrtcStore.setRole('answer');
+        router.push('/chat-webrtc');
       });
     },
     []
@@ -428,6 +476,8 @@ export default function useSocket() {
       'change',
       handleAppStateChange
     );
+    // TODO: listen to network state changes
+
     const disposer = autorun(() => {
       const { identity } = authStore;
       const userId = userStore.user?.id;

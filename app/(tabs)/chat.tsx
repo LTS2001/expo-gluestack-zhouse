@@ -84,7 +84,9 @@ function Chat() {
                     ? lastMessage?.content
                     : lastMessage?.type === ECHAT_MESSAGE_TYPE.IMAGE
                     ? '[图片]'
-                    : '[视频]'}
+                    : lastMessage?.type === ECHAT_MESSAGE_TYPE.VIDEO
+                    ? '[视频]'
+                    : '[视频通话]'}
                 </Text>
               </View>
             </TouchableOpacity>
