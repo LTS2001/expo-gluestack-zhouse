@@ -37,6 +37,15 @@ class SocketStore {
   messageQueue: ISocketMessage[] = [];
 
   /**
+   * trigger reconnection
+   */
+  triggerReconnection: number = 0;
+
+  setTriggerReconnection() {
+    this.triggerReconnection = new Date().valueOf();
+  }
+
+  /**
    * set websocket instance
    * @param instance
    */

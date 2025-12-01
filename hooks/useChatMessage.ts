@@ -21,7 +21,7 @@ import {
 } from '@/constants';
 import { IMediumThumbnail, IVideo, TMessageModel } from '@/global';
 import { putLeaveChatMessageApi } from '@/request';
-import { chatStore } from '@/stores';
+import { chatStore, socketStore } from '@/stores';
 import { handleMediumThumbnail, isLocalPath } from '@/utils';
 import { useNavigation } from '@react-navigation/native';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -142,11 +142,15 @@ export default function useChatMessage(props: IUseChatMessageProps) {
    */
   const sendMessage = useCallback(() => {
     const [toIdentity, toId] = receiverId.split(',');
-    sendWebSocketMessage({
+    const flag = sendWebSocketMessage({
       toIdentity,
       toId: Number(toId),
       active: ESocketMessageActionEnum.GetChatMessage,
     });
+    if (!flag) {
+      // if false is returned, you need to reconnect the socket
+      socketStore.setTriggerReconnection();
+    }
   }, [receiverId]);
 
   /**
@@ -274,8 +278,8 @@ export default function useChatMessage(props: IUseChatMessageProps) {
     const { canceled, assets } = await pickMediumFile({
       mediaTypes: ['images', 'videos'],
       quality: 1,
-      allowsMultipleSelection: true,
-      selectionLimit: 3,
+      // allowsMultipleSelection: true,
+      // selectionLimit: 3,
     });
     if (canceled) return;
 

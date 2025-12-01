@@ -199,7 +199,6 @@ export default function useSocket() {
       setLastConnectedAt(new Date());
       resetReconnectState();
       startHeartbeat();
-      processMessageQueue();
     };
 
     ws.onmessage = ({ data: $data }) => {
@@ -214,6 +213,7 @@ export default function useSocket() {
         switch (active) {
           case ESocketMessageActionEnum.Connect:
             console.log('websocket: connected successfully');
+            processMessageQueue();
             break;
           case ESocketMessageActionEnum.Heartbeat:
             if (heartbeatTimeoutTimer.current) {
@@ -378,5 +378,6 @@ export default function useSocket() {
   return {
     disconnect,
     resetReconnectState,
+    reconnect,
   };
 }

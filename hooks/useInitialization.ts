@@ -5,7 +5,7 @@ import {
   tenantInitialApi,
 } from '@/business';
 import { EUserIdentityEnum } from '@/constants';
-import { authStore, networkStore, userStore } from '@/stores';
+import { authStore, networkStore, socketStore, userStore } from '@/stores';
 import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
 import { reaction } from 'mobx';
 import { useCallback, useEffect, useRef } from 'react';
@@ -17,7 +17,7 @@ export default function useInitialization() {
     useRef<ReturnType<typeof setTimeout>>(undefined);
 
   // initialize websocket
-  const { disconnect, resetReconnectState } = useSocket();
+  const { disconnect, resetReconnectState, reconnect } = useSocket();
   const { isIdentityPage } = useCurrentPage();
 
   /**
@@ -97,4 +97,18 @@ export default function useInitialization() {
       disposer();
     };
   }, [disconnect, isIdentityPage]);
+
+  useEffect(() => {
+    const disposer = reaction(
+      () => {
+        return socketStore.triggerReconnection;
+      },
+      () => {
+        reconnect();
+      }
+    );
+    return () => {
+      disposer();
+    };
+  }, [reconnect]);
 }
