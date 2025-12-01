@@ -18,8 +18,8 @@ import {
   CHAT_INPUT_MIN_HEIGHT,
   CHAT_SIGN_TENANT,
   ECHAT_MESSAGE_TYPE,
+  ESocketMessageActionEnum,
   LANDLORD,
-  SOCKET_GET_CHAT_MESSAGE,
   TENANT,
 } from '@/constants';
 import { IMediumThumbnail, IVideo, TMessageModel } from '@/global';
@@ -36,8 +36,7 @@ interface IUseChatMessageProps {
   title: string;
 }
 export default function useChatMessage(props: IUseChatMessageProps) {
-  const { clearChatMessageList, senderId, receiverId, currentChatSession } =
-    chatStore;
+  const { senderId, receiverId, currentChatSession } = chatStore;
   const { title } = props;
   const chatAreaScrollViewRef = useRef<FlatList>(null);
   const [inputHeight, setInputHeight] = useState(0);
@@ -55,29 +54,19 @@ export default function useChatMessage(props: IUseChatMessageProps) {
     });
   }, [title, navigation]);
 
-  useEffect(
-    () => {
-      /**
-       * Due to the reason of "emitter.emit(GET_CHAT_MESSAGE)", when a page is in a session page or a chat page,
-       * it will be triggered by the acceptance of socket.
-       * The logic of "setchatMessageList" inside is specifically for chat pages,
-       * and it will also be triggered when it is in a session page,
-       * so it is necessary to empty the "chatMessageList" before entering the chat page.
-       */
-      clearChatMessageList();
-      addChatSession();
-      getChatMessageList();
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
+  useEffect(() => {
+    // it is necessary to empty the "chatMessageList" before entering the chat page
+    chatStore.clearChatMessageList();
+    addChatSession();
+    getChatMessageList();
+  }, []);
 
   /**
    * @description when leave chat, execute the following logic
    */
   useBackHandlers(() => {
     chatStore.setContinueGetMessage(true);
-    clearChatMessageList();
+    chatStore.clearChatMessageList();
     putLeaveChatMessageApi({
       sessionId: currentChatSession?.id!,
       senderId,
@@ -159,7 +148,7 @@ export default function useChatMessage(props: IUseChatMessageProps) {
     sendWebSocketMessage({
       toIdentity: identity === CHAT_SIGN_TENANT ? TENANT : LANDLORD,
       toId: Number(id),
-      active: SOCKET_GET_CHAT_MESSAGE,
+      active: ESocketMessageActionEnum.GetChatMessage,
     });
   }, [receiverId]);
 

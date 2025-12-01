@@ -19,9 +19,9 @@ import {
   showToast,
 } from '@/components/ui';
 import {
+  ESocketMessageActionEnum,
   HouseToLeaseMap,
   LANDLORD,
-  SOCKET_GET_PENDING_LEASE,
   TENANT,
 } from '@/constants';
 import { getLeaseHouseTenantApi, postLeaseApi } from '@/request';
@@ -114,7 +114,7 @@ const MarketLookHouse = () => {
       sendMessage({
         toIdentity: LANDLORD,
         toId: landlord?.id!,
-        active: SOCKET_GET_PENDING_LEASE,
+        active: ESocketMessageActionEnum.GetPendingLease,
       });
     }
   };

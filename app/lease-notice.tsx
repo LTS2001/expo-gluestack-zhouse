@@ -12,11 +12,7 @@ import {
   Text,
   View,
 } from '@/components/ui';
-import {
-  HouseToLeaseMap,
-  SOCKET_GET_TENANT_LEASE_HOUSE,
-  TENANT,
-} from '@/constants';
+import { ESocketMessageActionEnum, HouseToLeaseMap, TENANT } from '@/constants';
 import { IPendingLease } from '@/global';
 import { getLeasePendingListApi, putLeaseStatusApi } from '@/request';
 import { leaseStore } from '@/stores';
@@ -50,7 +46,7 @@ function LeaseNotice() {
       sendMessage({
         toIdentity: TENANT,
         toId: currentLease?.tenantId!,
-        active: SOCKET_GET_TENANT_LEASE_HOUSE,
+        active: ESocketMessageActionEnum.GetTenantLeaseHouse,
       });
       // update the landlord's tenant information
       getTenantLeasedListLandlord();

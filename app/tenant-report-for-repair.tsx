@@ -12,7 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from '@/components/ui';
-import { LANDLORD, SOCKET_GET_LANDLORD_REPORT } from '@/constants';
+import { ESocketMessageActionEnum, LANDLORD } from '@/constants';
 import { postRepairApi } from '@/request';
 import { userStore } from '@/stores';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -91,7 +91,7 @@ const TenantReportForRepair = () => {
     sendMessage({
       toIdentity: LANDLORD,
       toId: Number(landlordId),
-      active: SOCKET_GET_LANDLORD_REPORT,
+      active: ESocketMessageActionEnum.GetLandlordRepair,
     });
     router.back();
     showToast({ title: '提交成功', icon: 'success' });

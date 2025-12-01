@@ -1,4 +1,4 @@
-import { ConnectionState } from '@/constants';
+import { EConnectionStateEnum } from '@/constants';
 import { ISocketMessage } from '@/global';
 import { configure, makeAutoObservable } from 'mobx';
 
@@ -19,7 +19,7 @@ class SocketStore {
   /**
    * connection state
    */
-  connectionState: ConnectionState = ConnectionState.DISCONNECTED;
+  connectionState: EConnectionStateEnum = EConnectionStateEnum.Disconnected;
 
   /**
    * reconnect attempts
@@ -29,7 +29,7 @@ class SocketStore {
   /**
    * last connected at
    */
-  lastConnectedAt: Date | null = null;
+  lastConnectedAt: Date | undefined = undefined;
 
   /**
    * message queue
@@ -54,7 +54,7 @@ class SocketStore {
   /**
    * set connection state
    */
-  setConnectionState(state: ConnectionState) {
+  setConnectionState(state: EConnectionStateEnum) {
     this.connectionState = state;
   }
 

@@ -1,93 +1,55 @@
 import {
-  getChatSessionLastOneMessageList,
-  getChatSessionList,
+  getChatMessage,
   getLeasePendingListByLandlord,
   getRepairListLandlord,
   sendMessage,
 } from '@/business';
 import { showToast } from '@/components/ui';
 import {
-  ConnectionState,
-  LANDLORD,
+  EConnectionStateEnum,
+  ESocketHeartbeatEnum,
+  ESocketMessageActionEnum,
+  ESocketReconnectionEnum,
   SERVER_SOCKET_ROOT,
-  SOCKET_ALREADY_CONNECTED,
-  SOCKET_BASE_RECONNECT_DELAY,
-  SOCKET_CONNECT,
-  SOCKET_GET_CHAT_MESSAGE,
-  SOCKET_GET_LANDLORD_REPORT,
-  SOCKET_GET_PENDING_LEASE,
-  SOCKET_GET_TENANT_LEASE_HOUSE,
-  SOCKET_GET_TENANT_REPORT,
-  SOCKET_HANGUP,
-  SOCKET_HEARTBEAT,
-  SOCKET_HEARTBEAT_INTERVAL,
-  SOCKET_HEARTBEAT_TIMEOUT,
-  SOCKET_MAX_RECONNECT_ATTEMPTS,
-  SOCKET_MAX_RECONNECT_DELAY,
-  SOCKET_WEBRTC_ANSWER,
-  SOCKET_WEBRTC_ANSWER_ICE,
-  SOCKET_WEBRTC_OFFER,
-  SOCKET_WEBRTC_OFFER_ICE,
-  TENANT,
 } from '@/constants';
-import emitter from '@/emitter';
-import {
-  GET_CHAT_MESSAGE,
-  GET_LANDLORD_REPORT,
-  GET_PENDING_LEASE,
-  GET_TENANT_LEASE_HOUSE,
-  GET_TENANT_REPORT,
-  WEBRTC_ANSWER,
-  WEBRTC_ANSWER_ICE,
-  WEBRTC_OFFER,
-  WEBRTC_OFFER_ICE,
-} from '@/emitter/event-name';
-import { ISocketMessage, TIdentity } from '@/global';
+import emitter, { EEventNameEnum } from '@/emitter';
+import { ISocketMessage } from '@/global';
 import {
   authStore,
-  chatStore,
+  networkStore,
   socketStore,
   userStore,
   webrtcStore,
 } from '@/stores';
+import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
 import { router } from 'expo-router';
-import { autorun } from 'mobx';
+import { reaction } from 'mobx';
 import { useCallback, useEffect, useRef } from 'react';
-import { AppState } from 'react-native';
+import { AppState, AppStateStatus } from 'react-native';
 
 export default function useSocket() {
-  const reconnectTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
-  const heartbeatTimer = useRef<ReturnType<typeof setInterval>>(undefined);
+  const heartbeatIntervalTimer =
+    useRef<ReturnType<typeof setInterval>>(undefined);
   const heartbeatTimeoutTimer =
     useRef<ReturnType<typeof setTimeout>>(undefined);
-
-  // reconnect counts
-  const reconnectAttempts = useRef(0);
-  const connectionState = useRef<ConnectionState>(ConnectionState.DISCONNECTED);
-  const isManualDisconnect = useRef(false);
-  // debounce: delay connection, aggregate multiple changes in a short time
-  const autorunDebounceTimer = useRef<
-    ReturnType<typeof setTimeout> | undefined
-  >(undefined);
-  // store connect function reference to avoid dependency issues
+  const reconnectTimeoutTimer =
+    useRef<ReturnType<typeof setTimeout>>(undefined);
+  const networkChangeTimeoutTimer =
+    useRef<ReturnType<typeof setTimeout>>(undefined);
+  // store connect/reconnect function reference to avoid dependency issues
   const connectRef = useRef<() => void>(() => {});
-
-  const {
-    setWebsocketInstance,
-    clearWebsocketInstance,
-    setConnectionState,
-    setReconnectAttempts,
-    setLastConnectedAt,
-    clearMessageQueue,
-  } = socketStore;
+  const reconnectRef = useRef<() => void>(() => {});
+  // mark whether the websocket is closed manually
+  const isManualDisconnect = useRef(false);
 
   /**
    * calculate exponential backoff reconnect delay
    */
   const getReconnectDelay = useCallback(() => {
     const delay = Math.min(
-      SOCKET_BASE_RECONNECT_DELAY * Math.pow(2, reconnectAttempts.current),
-      SOCKET_MAX_RECONNECT_DELAY
+      ESocketReconnectionEnum.BaseReconnectionDelay *
+        Math.pow(2, socketStore.reconnectAttempts),
+      ESocketReconnectionEnum.MaxReconnectionDelay
     );
     // add random jitter to avoid multiple clients reconnecting at the same time
     return delay + Math.random() * 1000;
@@ -96,40 +58,44 @@ export default function useSocket() {
   /**
    * start heartbeat detection
    */
-  const startHeartbeat = useCallback((ws: WebSocket) => {
-    // clear previous heartbeat timer
-    if (heartbeatTimer.current) {
-      clearInterval(heartbeatTimer.current);
+  const startHeartbeat = useCallback(() => {
+    const { socketInstance: ws } = socketStore;
+    // clear previous heartbeat interval timer
+    if (heartbeatIntervalTimer.current) {
+      clearInterval(heartbeatIntervalTimer.current);
     }
-    heartbeatTimer.current = setInterval(() => {
+    heartbeatIntervalTimer.current = setInterval(() => {
       // send heartbeat
-      if (ws.readyState === WebSocket.OPEN) {
-        const currentIdentity = authStore.identity;
-        const currentUserId = userStore.user?.id;
-        if (currentIdentity && currentUserId) {
+      if (ws?.readyState === WebSocket.OPEN) {
+        const { identity } = authStore;
+        const { id } = userStore.user || {};
+        if (identity && id) {
           sendMessage({
-            toIdentity: currentIdentity,
-            toId: currentUserId,
-            active: SOCKET_HEARTBEAT,
+            toIdentity: identity,
+            toId: id,
+            active: ESocketMessageActionEnum.Heartbeat,
           });
-
+          if (heartbeatTimeoutTimer.current) {
+            clearTimeout(heartbeatTimeoutTimer.current);
+            heartbeatTimeoutTimer.current = undefined;
+          }
           // set heartbeat timeout detection
           heartbeatTimeoutTimer.current = setTimeout(() => {
             console.log('websocket: heartbeat timeout, reconnecting...');
             ws.close();
-          }, SOCKET_HEARTBEAT_TIMEOUT);
+          }, ESocketHeartbeatEnum.Timeout);
         }
       }
-    }, SOCKET_HEARTBEAT_INTERVAL);
+    }, ESocketHeartbeatEnum.Interval);
   }, []);
 
   /**
    * stop heartbeat detection
    */
   const stopHeartbeat = useCallback(() => {
-    if (heartbeatTimer.current) {
-      clearInterval(heartbeatTimer.current);
-      heartbeatTimer.current = undefined;
+    if (heartbeatIntervalTimer.current) {
+      clearInterval(heartbeatIntervalTimer.current);
+      heartbeatIntervalTimer.current = undefined;
     }
     if (heartbeatTimeoutTimer.current) {
       clearTimeout(heartbeatTimeoutTimer.current);
@@ -140,370 +106,300 @@ export default function useSocket() {
   /**
    * process message queue
    */
-  const processMessageQueue = useCallback(
-    (ws: WebSocket) => {
-      if (ws.readyState === WebSocket.OPEN) {
-        const queue = socketStore.messageQueue;
-        if (queue.length > 0) {
-          console.log(`websocket: processing ${queue.length} queued messages`);
-          /**
-           * todo:
-           * 后续优化
-           * 清空队列，这样子一瞬间清空，后端nodejs服务器可以处理的完吗？会不会丢失
-           */
-          while (queue.length > 0) {
-            const message = queue.shift();
-            if (message) {
-              ws.send(JSON.stringify(message));
-            }
+  const processMessageQueue = useCallback(() => {
+    const { socketInstance: ws } = socketStore;
+    if (ws?.readyState === WebSocket.OPEN) {
+      const { clearMessageQueue, messageQueue: queue } = socketStore;
+      if (queue.length > 0) {
+        console.log(`websocket: processing ${queue.length} queued messages`);
+        queue.forEach((msg) => {
+          if (msg) {
+            ws.send(JSON.stringify(msg));
           }
-          clearMessageQueue();
-        }
+        });
+        clearMessageQueue();
       }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
+    }
+  }, []);
 
   /**
    * reset reconnect state
    */
-  const resetReconnectState = useCallback(
-    () => {
-      reconnectAttempts.current = 0;
-      setReconnectAttempts(0);
-      if (reconnectTimer.current) {
-        clearTimeout(reconnectTimer.current);
-        reconnectTimer.current = undefined;
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
-
-  /**
-   * listen to app state changes (for network reconnection)
-   */
-  const handleAppStateChange = useCallback(
-    (nextAppState: string) => {
-      console.log('websocket: app state changed to ', nextAppState);
-      if (nextAppState === 'active') {
-        // when the app comes back to the foreground, check the actual WebSocket connection status
-        const ws = socketStore.socketInstance;
-        const isConnectionAlive = ws?.readyState === WebSocket.OPEN;
-
-        if (isConnectionAlive) {
-          // the connection is still alive, update the status and resume heartbeat
-          console.log(
-            'websocket: connection still alive, resuming heartbeat...'
-          );
-          connectionState.current = ConnectionState.CONNECTED;
-          setConnectionState(ConnectionState.CONNECTED);
-          startHeartbeat(ws);
-        } else if (connectionState.current !== ConnectionState.CONNECTED) {
-          // the connection is lost, try to reconnect
-          console.log(
-            'websocket: app became active, connection lost, attempting to reconnect...'
-          );
-          resetReconnectState();
-          // delay connection to avoid calling connect function before it's defined
-          setTimeout(() => {
-            connectRef.current();
-          }, 1000);
-        }
-      }
-    },
-    [resetReconnectState, startHeartbeat, setConnectionState]
-  );
+  const resetReconnectState = useCallback(() => {
+    socketStore.setReconnectAttempts(0);
+    if (reconnectTimeoutTimer.current) {
+      clearTimeout(reconnectTimeoutTimer.current);
+      reconnectTimeoutTimer.current = undefined;
+    }
+  }, []);
 
   /**
    * reconnect logic
    */
-  const reconnect = useCallback(
-    () => {
-      if (isManualDisconnect.current) return;
-
-      if (reconnectAttempts.current >= SOCKET_MAX_RECONNECT_ATTEMPTS) {
-        console.log('websocket: max reconnection attempts reached');
-        connectionState.current = ConnectionState.DISCONNECTED;
-        setConnectionState(ConnectionState.DISCONNECTED);
-        return;
-      }
-
-      if (connectionState.current === ConnectionState.RECONNECTING) return;
-
-      connectionState.current = ConnectionState.RECONNECTING;
-      setConnectionState(ConnectionState.RECONNECTING);
-      reconnectAttempts.current++;
-      setReconnectAttempts(reconnectAttempts.current);
-
-      const delay = getReconnectDelay();
-      console.log(
-        `websocket: reconnecting in ${delay}ms (attempt ${reconnectAttempts.current}/${SOCKET_MAX_RECONNECT_ATTEMPTS})`
-      );
+  const reconnect = useCallback(() => {
+    if (isManualDisconnect.current) return;
+    const { setConnectionState, reconnectAttempts, setReconnectAttempts } =
+      socketStore;
+    const handleConnect = (
+      delay: number = ESocketReconnectionEnum.MaxReconnectionDelay
+    ) => {
       // clear previous reconnect timer
-      if (reconnectTimer.current) {
-        clearTimeout(reconnectTimer.current);
-        reconnectTimer.current = undefined;
+      if (reconnectTimeoutTimer.current) {
+        clearTimeout(reconnectTimeoutTimer.current);
+        reconnectTimeoutTimer.current = undefined;
       }
-      reconnectTimer.current = setTimeout(() => {
-        connect();
+      reconnectTimeoutTimer.current = setTimeout(() => {
+        connectRef.current();
+        setReconnectAttempts(reconnectAttempts + 1);
       }, delay);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
+    };
+    if (reconnectAttempts >= ESocketReconnectionEnum.MaxReconnectionAttempts) {
+      console.log('websocket: max reconnection attempts reached');
+      setConnectionState(EConnectionStateEnum.Disconnected);
+      handleConnect();
+      return;
+    }
+
+    const delay = getReconnectDelay();
+    handleConnect(delay);
+    console.log(
+      `websocket: reconnecting in ${delay.toFixed()}ms (attempt ${reconnectAttempts}/${
+        ESocketReconnectionEnum.MaxReconnectionAttempts
+      })`
+    );
+  }, [getReconnectDelay]);
 
   /**
    * connect to websocket
    */
-  const connect = useCallback(
-    () => {
-      const currentIdentity = authStore.identity;
-      const currentUserId = userStore.user?.id;
-      isManualDisconnect.current = false;
-      if (!currentIdentity || !currentUserId) return;
+  const connect = useCallback(() => {
+    const { identity, isLogin } = authStore;
+    const { id } = userStore.user || {};
+    const {
+      connectionState,
+      setConnectionState,
+      setWebsocketInstance,
+      setLastConnectedAt,
+    } = socketStore;
+    isManualDisconnect.current = false;
+    if (
+      !isLogin ||
+      !identity ||
+      !id ||
+      [
+        EConnectionStateEnum.Connecting,
+        EConnectionStateEnum.Connected,
+      ].includes(connectionState)
+    )
+      return;
 
-      // if already connecting, don't reconnect
-      if (
-        [
-          ConnectionState.CONNECTING,
-          ConnectionState.CONNECTED,
-          ConnectionState.RECONNECTING,
-        ].includes(connectionState.current)
-      )
-        return;
+    const ws = new WebSocket(`${SERVER_SOCKET_ROOT}?${identity}=${id}`);
+    setWebsocketInstance(ws);
+    setConnectionState(EConnectionStateEnum.Connecting);
 
-      connectionState.current = ConnectionState.CONNECTING;
+    ws.onopen = () => {
+      setConnectionState(EConnectionStateEnum.Connected);
+      setLastConnectedAt(new Date());
+      resetReconnectState();
+      startHeartbeat();
+      processMessageQueue();
+    };
 
-      const ws = new WebSocket(
-        `${SERVER_SOCKET_ROOT}?${currentIdentity}=${currentUserId}`
+    ws.onmessage = ({ data: $data }) => {
+      console.log(
+        `websocket: message received ${$data} ${new Date().toLocaleTimeString()}`
       );
-      setWebsocketInstance(ws);
-
-      ws.onopen = () => {
-        connectionState.current = ConnectionState.CONNECTED;
-        setConnectionState(ConnectionState.CONNECTED);
-        setLastConnectedAt(new Date());
-        resetReconnectState();
-        startHeartbeat(ws);
-        processMessageQueue(ws);
-      };
-
-      ws.onmessage = ({ data: $data }) => {
-        console.log(
-          `websocket: message received ${$data} ${new Date().toLocaleTimeString()}`
-        );
-        try {
-          const parsedData = JSON.parse($data) as ISocketMessage;
-          // process business message
-          const { active, fromIdentity, fromId, data: _data } = parsedData;
-          const data = _data as any;
-          switch (active) {
-            case SOCKET_CONNECT:
-              console.log('websocket: connected successfully');
-              break;
-            case SOCKET_ALREADY_CONNECTED:
-              console.log('websocket: already connected');
-              break;
-            case SOCKET_HEARTBEAT:
-              if (heartbeatTimeoutTimer.current) {
-                clearTimeout(heartbeatTimeoutTimer.current);
-                heartbeatTimeoutTimer.current = undefined;
-              }
-              break;
-            case SOCKET_GET_TENANT_LEASE_HOUSE:
-              emitter.emit(GET_TENANT_LEASE_HOUSE);
-              break;
-            case SOCKET_GET_TENANT_REPORT:
-              emitter.emit(GET_TENANT_REPORT);
-              break;
-            case SOCKET_GET_PENDING_LEASE:
-              emitter.emit(GET_PENDING_LEASE);
-              break;
-            case SOCKET_GET_LANDLORD_REPORT:
-              emitter.emit(GET_LANDLORD_REPORT);
-              break;
-            case SOCKET_GET_CHAT_MESSAGE:
-              emitter.emit(GET_CHAT_MESSAGE);
-              break;
-            case SOCKET_WEBRTC_OFFER:
-              webrtcStore.setWebrtcOfferIdentity(fromIdentity!);
-              webrtcStore.setWebrtcOfferId(fromId!);
-              emitter.emit(WEBRTC_OFFER, data);
-              break;
-            case SOCKET_WEBRTC_OFFER_ICE:
-              emitter.emit(WEBRTC_OFFER_ICE, data);
-              break;
-            case SOCKET_WEBRTC_ANSWER:
-              emitter.emit(WEBRTC_ANSWER, data);
-              break;
-            case SOCKET_WEBRTC_ANSWER_ICE:
-              emitter.emit(WEBRTC_ANSWER_ICE, data);
-              break;
-            case SOCKET_HANGUP:
-              const { isConnected, role } = webrtcStore;
-              showToast({
-                title: isConnected
-                  ? '对方已挂断'
-                  : role === 'offer'
-                  ? '对方已拒绝'
-                  : '对方已取消',
-              });
-              webrtcStore.setConnectionState('closed');
-              break;
-          }
-        } catch (error) {
-          console.log('websocket: error parsing message ', error);
+      try {
+        const parsedData = JSON.parse($data) as ISocketMessage;
+        // process business message
+        const { active, fromIdentity, fromId, data: _data } = parsedData;
+        const data = _data as any;
+        switch (active) {
+          case ESocketMessageActionEnum.Connect:
+            console.log('websocket: connected successfully');
+            break;
+          case ESocketMessageActionEnum.Heartbeat:
+            if (heartbeatTimeoutTimer.current) {
+              clearTimeout(heartbeatTimeoutTimer.current);
+              heartbeatTimeoutTimer.current = undefined;
+            }
+            break;
+          case ESocketMessageActionEnum.GetTenantLeaseHouse:
+            break;
+          case ESocketMessageActionEnum.GetTenantRepair:
+            break;
+          case ESocketMessageActionEnum.GetPendingLease:
+            if (authStore.identity === 'landlord') {
+              // get the lease request that needs to be processed by the landlord
+              getLeasePendingListByLandlord();
+            }
+            break;
+          case ESocketMessageActionEnum.GetLandlordRepair:
+            if (authStore.identity === 'landlord') {
+              // get the repair request that needs to be processed by the landlord
+              getRepairListLandlord(id);
+            }
+            break;
+          case ESocketMessageActionEnum.GetChatMessage:
+            // someone send message, need to get session list, latest message, other info
+            getChatMessage();
+            break;
+          case ESocketMessageActionEnum.WebrtcOffer:
+            webrtcStore.setWebrtcOfferIdentity(fromIdentity!);
+            webrtcStore.setWebrtcOfferId(fromId!);
+            webrtcStore.setWebrtcOffer(JSON.parse(data));
+            webrtcStore.setRole('answer');
+            router.push('/chat-webrtc');
+            break;
+          case ESocketMessageActionEnum.WebrtcOfferIce:
+            emitter.emit(EEventNameEnum.WebrtcOfferIce, data);
+            break;
+          case ESocketMessageActionEnum.WebrtcAnswer:
+            emitter.emit(EEventNameEnum.WebrtcAnswer, data);
+            break;
+          case ESocketMessageActionEnum.WebrtcAnswerIce:
+            emitter.emit(EEventNameEnum.WebrtcAnswerIce, data);
+            break;
+          case ESocketMessageActionEnum.WebrtcHangup:
+            const { isConnected, role } = webrtcStore;
+            showToast({
+              title: isConnected
+                ? '对方已挂断'
+                : role === 'offer'
+                ? '对方已拒绝'
+                : '对方已取消',
+            });
+            webrtcStore.setConnectionState('closed');
+            break;
         }
-      };
+      } catch (error) {
+        console.log('websocket: error parsing message ', error);
+      }
+    };
 
-      ws.onclose = (event) => {
-        console.log(`websocket: closed ${event.code} ${event.reason}`);
-        connectionState.current = ConnectionState.DISCONNECTED;
-        setConnectionState(ConnectionState.DISCONNECTED);
-        clearWebsocketInstance();
-        stopHeartbeat();
+    const handleReconnect = () => {
+      const { setConnectionState, clearWebsocketInstance } = socketStore;
+      setConnectionState(EConnectionStateEnum.Disconnected);
+      clearWebsocketInstance();
+      stopHeartbeat();
+      reconnectRef.current();
+    };
 
-        // if not manually disconnect, try to reconnect
-        if (!isManualDisconnect.current && event.code !== 1000) {
-          reconnect();
-        }
-      };
+    ws.onclose = (event) => {
+      console.log(`websocket: closed ${event.code}`);
+      handleReconnect();
+    };
 
-      ws.onerror = (error) => {
-        console.log('websocket: error ', error);
-        connectionState.current = ConnectionState.DISCONNECTED;
-        setConnectionState(ConnectionState.DISCONNECTED);
-      };
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
-
-  // update connectRef when connect function changes
-  useEffect(() => {
-    connectRef.current = connect;
-  }, [connect]);
+    ws.onerror = (error: any) => {
+      console.log(`websocket: error ${error.message}`);
+      handleReconnect();
+    };
+  }, [processMessageQueue, startHeartbeat, stopHeartbeat, resetReconnectState]);
 
   /**
    * manually disconnect
    */
-  const disconnect = useCallback(
-    () => {
-      isManualDisconnect.current = true;
-      const ws = socketStore.socketInstance;
-      if (ws) {
-        ws.close(1000, 'Manual disconnect');
+  const disconnect = useCallback(() => {
+    const { setConnectionState, clearWebsocketInstance, socketInstance } =
+      socketStore;
+    isManualDisconnect.current = true;
+    socketInstance?.close();
+    clearWebsocketInstance();
+    setConnectionState(EConnectionStateEnum.Disconnected);
+    stopHeartbeat();
+    resetReconnectState();
+  }, [resetReconnectState, stopHeartbeat]);
+
+  /**
+   * listen to app state changes
+   */
+  const handleAppStateChange = useCallback(
+    (nextAppState: AppStateStatus) => {
+      console.log(`websocket: app state changed to ${nextAppState}`);
+      const { setConnectionState, socketInstance: ws } = socketStore;
+      const isConnectionAlive = ws?.readyState === WebSocket.OPEN;
+      if (nextAppState !== 'active') {
+        isManualDisconnect.current = true;
+        ws?.close();
+        return;
       }
-      stopHeartbeat();
-      resetReconnectState();
-      clearWebsocketInstance();
-      connectionState.current = ConnectionState.DISCONNECTED;
-      setConnectionState(ConnectionState.DISCONNECTED);
-      emitter.all.clear();
+      if (isConnectionAlive) {
+        // the connection is still alive, update the status and resume heartbeat
+        console.log('websocket: connection still alive, resuming heartbeat...');
+        setConnectionState(EConnectionStateEnum.Connected);
+        startHeartbeat();
+      } else {
+        // the connection is lost, try to reconnect
+        console.log(
+          'websocket: app state change, connection lost, try to reconnect...'
+        );
+        resetReconnectState();
+
+        // delay connection to avoid calling connect function before it's defined
+        setTimeout(() => {
+          connectRef.current();
+        }, 1000);
+      }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [resetReconnectState, startHeartbeat]
   );
 
   /**
-   * subscribe websocket event
+   * listen to app network status change
    */
-  const subscribeWebSocketEvent = useCallback(
-    (currentIdentity: TIdentity, currentUserId: number) => {
-      // cancel all websocket events
-      emitter.off(GET_PENDING_LEASE);
-      emitter.off(GET_LANDLORD_REPORT);
-      emitter.off(GET_CHAT_MESSAGE);
-      emitter.off(WEBRTC_OFFER);
-      // tenant
-      if (currentIdentity === TENANT) {
+  const handleAppNetworkChange = useCallback(
+    (state: NetInfoState) => {
+      const { isConnected, type } = state;
+      if (networkChangeTimeoutTimer.current) {
+        clearTimeout(networkChangeTimeoutTimer.current);
+        networkChangeTimeoutTimer.current = undefined;
       }
-      // landlord
-      else if (currentIdentity === LANDLORD) {
-        // get the lease request that needs to be processed by the landlord
-        emitter.on(GET_PENDING_LEASE, () => {
-          getLeasePendingListByLandlord();
-        });
-        // get the repair request that needs to be processed by the landlord
-        emitter.on(GET_LANDLORD_REPORT, () => {
-          getRepairListLandlord(currentUserId);
-        });
-      }
-      // someone send message, need to get session list, latest message, other info
-      emitter.on(GET_CHAT_MESSAGE, async () => {
-        // get session list
-        await getChatSessionList();
-        // get the latest one message in the chat session list
-        await getChatSessionLastOneMessageList();
-
-        /**
-         * The logic of "setchatMessageList" inside is specifically for chat pages
-         */
-        // start region
-        const {
-          currentChatSession: c,
-          chatMessageList,
-          setChatMessageList,
-          chatSessionLastOneMessageList,
-        } = chatStore;
-        const lastOneMessage = chatSessionLastOneMessageList?.find(
-          (i) =>
-            (i?.senderId === c?.senderId && i?.receiverId === c?.receiverId) ||
-            (i?.senderId === c?.receiverId && i?.receiverId === c?.senderId)
-        );
-        if (
-          lastOneMessage?.id &&
-          !chatMessageList?.find((chat) => chat.id === lastOneMessage.id)
-        ) {
-          setChatMessageList([lastOneMessage, ...(chatMessageList ?? [])]);
-        }
-      });
-
-      emitter.on(WEBRTC_OFFER, (data: any) => {
-        webrtcStore.setWebrtcOffer(JSON.parse(data));
-        webrtcStore.setRole('answer');
-        router.push('/chat-webrtc');
-      });
+      networkChangeTimeoutTimer.current = setTimeout(() => {
+        if (!isConnected) return;
+        const { setIsConnected, setNetworkType } = networkStore;
+        setIsConnected(isConnected);
+        setNetworkType(type);
+        resetReconnectState();
+      }, 1000);
     },
-    []
+    [resetReconnectState]
   );
 
   useEffect(() => {
     // listen to app state changes
-    const subscription = AppState.addEventListener(
+    const changeSubscription = AppState.addEventListener(
       'change',
       handleAppStateChange
     );
-    // TODO: listen to network state changes
 
-    const disposer = autorun(() => {
-      const { identity } = authStore;
-      const userId = userStore.user?.id;
-      const { socketInstance } = socketStore;
+    NetInfo.addEventListener(handleAppNetworkChange);
 
-      if (identity && userId && !socketInstance) {
-        // debounce: delay connection, aggregate multiple changes in a short time
-        if (autorunDebounceTimer.current) {
-          clearTimeout(autorunDebounceTimer.current);
-        }
-        autorunDebounceTimer.current = setTimeout(() => {
-          subscribeWebSocketEvent(identity, userId);
-          connect();
-        }, 100);
+    // user login is required to init the websocket, watch the isLogin field change
+    const disposer = reaction(
+      () => {
+        const { user } = userStore;
+        const { isConnected } = networkStore;
+        return { user, networkIsConnected: isConnected };
+      },
+      () => {
+        connect();
+      },
+      {
+        fireImmediately: true,
       }
-    });
+    );
     return () => {
-      subscription?.remove();
-      disconnect();
-      if (autorunDebounceTimer.current) {
-        clearTimeout(autorunDebounceTimer.current);
-        autorunDebounceTimer.current = undefined;
-      }
       disposer();
+      changeSubscription?.remove();
+      disconnect();
     };
-  }, [connect, subscribeWebSocketEvent, disconnect, handleAppStateChange]);
+  }, [connect, disconnect, handleAppStateChange, handleAppNetworkChange]);
+
+  // store connect/reconnect function reference to avoid dependency issues
+  useEffect(() => {
+    connectRef.current = connect;
+    reconnectRef.current = reconnect;
+  }, [connect, reconnect]);
 
   return {
     disconnect,

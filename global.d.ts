@@ -1,4 +1,4 @@
-import { ECHAT_MESSAGE_TYPE, SOCKET_MESSAGES } from '@/constants';
+import { ECHAT_MESSAGE_TYPE, ESocketMessageActionEnum } from '@/constants';
 declare module '@/global' {
   type TIdentity = 'landlord' | 'tenant';
 
@@ -818,18 +818,12 @@ declare module '@/global' {
   }
 
   /**
-   * websocket message types
-   */
-  type SocketMessageActionType =
-    (typeof SOCKET_MESSAGES)[keyof typeof SOCKET_MESSAGES];
-
-  /**
    * websocket message interface
    */
   interface ISocketMessage {
     toIdentity: TIdentity;
     toId: number;
-    active: SocketMessageActionType;
+    active: ESocketMessageActionEnum;
     fromIdentity?: TIdentity;
     fromId?: number;
     data?: string;

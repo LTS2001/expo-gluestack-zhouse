@@ -20,8 +20,7 @@ import {
   TouchableOpacity,
   View,
 } from '@/components/ui';
-import emitter from '@/emitter';
-import { GET_LOCATION } from '@/emitter/event-name';
+import emitter, { EEventNameEnum } from '@/emitter';
 import { ITencentMapLocation } from '@/global';
 import { useKeyboardHeight } from '@/hooks';
 import { postHouseApi, putHouseApi } from '@/request';
@@ -238,13 +237,13 @@ const AddEditHouse = () => {
   const { keyboardHeight } = useKeyboardHeight();
   const [chooseLocation, setChooseLocation] = useState<ITencentMapLocation>();
   useEffect(() => {
-    emitter.on(GET_LOCATION, (data) => {
+    emitter.on(EEventNameEnum.GetLocation, (data) => {
       form.setValue('addressName', data.poiname);
       form.setValue('addressDetail', data.poiaddress);
       setChooseLocation(data);
     });
     return () => {
-      emitter.off(GET_LOCATION);
+      emitter.off(EEventNameEnum.GetLocation);
     };
   }, [form]);
 
@@ -406,7 +405,7 @@ const AddEditHouse = () => {
             router.push({
               pathname: '/choose-location',
               params: {
-                eventName: GET_LOCATION,
+                eventName: EEventNameEnum.GetLocation,
               },
             })
           }

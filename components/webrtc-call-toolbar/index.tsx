@@ -3,8 +3,7 @@ import {
   CHAT_SIGN_LANDLORD,
   CHAT_SIGN_TENANT,
   ECHAT_MESSAGE_TYPE,
-  SOCKET_GET_CHAT_MESSAGE,
-  SOCKET_HANGUP,
+  ESocketMessageActionEnum,
   TENANT,
 } from '@/constants';
 import { chatStore, webrtcStore } from '@/stores';
@@ -153,7 +152,7 @@ function WebrtcCallToolbar() {
               sendMessage({
                 toId: offerId!,
                 toIdentity: offerIdentity!,
-                active: SOCKET_HANGUP,
+                active: ESocketMessageActionEnum.WebrtcHangup,
               });
               await addChatMessage(
                 {
@@ -174,13 +173,13 @@ function WebrtcCallToolbar() {
               sendMessage({
                 toId: offerId!,
                 toIdentity: offerIdentity!,
-                active: SOCKET_GET_CHAT_MESSAGE,
+                active: ESocketMessageActionEnum.GetChatMessage,
               });
             } else {
               sendMessage({
                 toId: answerId!,
                 toIdentity: answerIdentity!,
-                active: SOCKET_HANGUP,
+                active: ESocketMessageActionEnum.WebrtcHangup,
               });
               await addChatMessage(
                 {
@@ -201,7 +200,7 @@ function WebrtcCallToolbar() {
               sendMessage({
                 toId: answerId!,
                 toIdentity: answerIdentity!,
-                active: SOCKET_GET_CHAT_MESSAGE,
+                active: ESocketMessageActionEnum.GetChatMessage,
               });
             }
             setConnectionState('closed');

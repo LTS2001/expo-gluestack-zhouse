@@ -49,10 +49,6 @@ const LandlordHome = observer(() => {
     });
   }, [navigation, isSearchFocused]);
 
-  useEffect(() => {
-    getLandlordHouseList();
-  }, [isLogin]);
-
   /**
    * to add house page
    */

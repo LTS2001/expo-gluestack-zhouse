@@ -1,12 +1,6 @@
 import { closeConnection, handleAnswer, handleIceCandidate } from '@/business';
 import { showToast } from '@/components/ui';
-import emitter from '@/emitter';
-import {
-  WEBRTC_ANSWER,
-  WEBRTC_ANSWER_ICE,
-  WEBRTC_ANSWER_REJECT,
-  WEBRTC_OFFER_ICE,
-} from '@/emitter/event-name';
+import emitter, { EEventNameEnum } from '@/emitter';
 import { webrtcStore } from '@/stores';
 import { router } from 'expo-router';
 import { useEffect, useRef } from 'react';
@@ -115,24 +109,20 @@ export default function useWebrtcLife() {
    * subscribe this events to change peer to peer data each other
    */
   useEffect(() => {
-    emitter.on(WEBRTC_ANSWER, (data: any) => {
+    emitter.on(EEventNameEnum.WebrtcAnswer, (data) => {
       handleAnswer(JSON.parse(data));
     });
-    emitter.on(WEBRTC_OFFER_ICE, (data: any) => {
+    emitter.on(EEventNameEnum.WebrtcOfferIce, (data) => {
       handleIceCandidate(JSON.parse(data));
     });
-    emitter.on(WEBRTC_ANSWER_ICE, (data: any) => {
+    emitter.on(EEventNameEnum.WebrtcAnswerIce, (data) => {
       handleIceCandidate(JSON.parse(data));
-    });
-    emitter.on(WEBRTC_ANSWER_REJECT, () => {
-      webrtcStore.setConnectionState('closed');
     });
 
     return () => {
-      emitter.off(WEBRTC_ANSWER);
-      emitter.off(WEBRTC_OFFER_ICE);
-      emitter.off(WEBRTC_ANSWER_ICE);
-      emitter.off(WEBRTC_ANSWER_REJECT);
+      emitter.off(EEventNameEnum.WebrtcAnswer);
+      emitter.off(EEventNameEnum.WebrtcOfferIce);
+      emitter.off(EEventNameEnum.WebrtcAnswerIce);
     };
   }, []);
 }

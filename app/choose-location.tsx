@@ -5,8 +5,7 @@ import {
   Text,
   TouchableOpacity,
 } from '@/components/ui';
-import emitter from '@/emitter';
-import * as EventName from '@/emitter/event-name';
+import emitter, { EEventNameEnum } from '@/emitter';
 import { ITencentMapLocation } from '@/global';
 import { useNavigation } from '@react-navigation/native';
 import { Asset } from 'expo-asset';
@@ -32,7 +31,7 @@ export default function AddHouse() {
           disabled={!location}
           onPress={() => {
             if (typeof eventName === 'string') {
-              emitter.emit(eventName as keyof typeof EventName, location!);
+              emitter.emit(eventName as EEventNameEnum, location!);
             }
             router.back();
           }}

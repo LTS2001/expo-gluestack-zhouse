@@ -145,7 +145,7 @@ const Landlord = observer(() => {
       </View>
       <Domain domainList={domainList} isLogin={isLogin} />
       <View className='mt-10'>
-        <Logout isLogin={isLogin} />
+        <Logout />
       </View>
     </>
   );
@@ -217,7 +217,7 @@ const Tenant = observer(() => {
         <Domain domainList={domainList} isLogin={isLogin} />
       </View>
       <View className='mt-44'>
-        <Logout isLogin={isLogin} />
+        <Logout />
       </View>
     </>
   );

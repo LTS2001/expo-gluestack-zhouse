@@ -63,7 +63,7 @@ axios.interceptors.response.use(
   },
   // is mean fail to connect server
   (error) => {
-    console.log('axios error', JSON.stringify(error));
+    console.log('axios error', error.message);
     showToast({ title: '请求出错了！', icon: 'error' });
     return Promise.reject(error);
   }

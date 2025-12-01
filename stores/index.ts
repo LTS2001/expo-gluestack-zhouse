@@ -5,6 +5,7 @@ export { default as complaintStore } from './complaint';
 export { default as houseStore } from './house';
 export { default as leaseStore } from './lease';
 export { default as locationStore } from './location';
+export { default as networkStore } from './network';
 export { default as repairStore } from './repair';
 export { default as socketStore } from './socket';
 export { default as userStore } from './user';

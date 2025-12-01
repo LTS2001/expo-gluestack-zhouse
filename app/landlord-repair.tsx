@@ -2,8 +2,8 @@ import { getRepairListLandlord, sendMessage } from '@/business';
 import { Empty, RepairCard } from '@/components';
 import { AlertDialogGroup, Button, ButtonText, View } from '@/components/ui';
 import {
+  ESocketMessageActionEnum,
   HouseToRepairMap,
-  SOCKET_GET_TENANT_REPORT,
   TENANT,
 } from '@/constants';
 import { IBaseHouse, IRepair } from '@/global';
@@ -47,7 +47,7 @@ function LandlordRepair() {
     sendMessage({
       toIdentity: TENANT,
       toId: repairState.tenantId,
-      active: SOCKET_GET_TENANT_REPORT,
+      active: ESocketMessageActionEnum.GetTenantRepair,
     });
     setAlertVisible(false);
   };

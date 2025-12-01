@@ -23,28 +23,29 @@ function Chat() {
       showsVerticalScrollIndicator={false}
     >
       {chatSessionList?.length ? (
-        chatSessionList?.map((chatSession) => {
+        chatSessionList?.map((session) => {
           let receiver: IChatSessionUser | undefined;
-          if (chatSession.senderId === senderId) {
+          if (session.senderId === senderId) {
             receiver = chatReceiverInfoList?.find(
-              (c) => c.receiverId === chatSession.receiverId
+              (c) => c.receiverId === session.receiverId
             );
           } else {
             receiver = chatReceiverInfoList?.find(
-              (c) => c.receiverId === chatSession.senderId
+              (c) => c.receiverId === session.senderId
             );
           }
-          const lastMessage = chatSessionLastOneMessageList?.find((c) => {
-            const { senderId, receiverId } = chatSession;
-            return (
-              (c.senderId === senderId && c.receiverId === receiverId) ||
-              (c.senderId === receiverId && c.receiverId === senderId)
-            );
-          });
-          const _unread = chatSession.unread;
+          const { updatedAt, content, type } =
+            chatSessionLastOneMessageList?.find((c) => {
+              const { senderId, receiverId } = session;
+              return (
+                (c.senderId === senderId && c.receiverId === receiverId) ||
+                (c.senderId === receiverId && c.receiverId === senderId)
+              );
+            }) || {};
+          const _unread = session.unread;
           return (
             <TouchableOpacity
-              key={chatSession.id}
+              key={session.id}
               className='flex-row gap-4 px-5 py-3 bg-background-0 border-b-[0.5px] border-background-200'
               onPress={() => {
                 if (!receiver) return;
@@ -74,17 +75,17 @@ function Chat() {
                     {receiver?.name}
                   </Text>
                   <Text className='text-primary-300'>
-                    {formatChatDate(lastMessage?.updatedAt!, {
+                    {formatChatDate(updatedAt!, {
                       isSession: true,
                     })}
                   </Text>
                 </View>
                 <Text className='text-primary-50 text-base'>
-                  {lastMessage?.type === ECHAT_MESSAGE_TYPE.TEXT
-                    ? lastMessage?.content
-                    : lastMessage?.type === ECHAT_MESSAGE_TYPE.IMAGE
+                  {type === ECHAT_MESSAGE_TYPE.TEXT
+                    ? JSON.parse(content || '""')
+                    : type === ECHAT_MESSAGE_TYPE.IMAGE
                     ? '[图片]'
-                    : lastMessage?.type === ECHAT_MESSAGE_TYPE.VIDEO
+                    : type === ECHAT_MESSAGE_TYPE.VIDEO
                     ? '[视频]'
                     : '[视频通话]'}
                 </Text>

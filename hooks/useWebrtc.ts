@@ -6,9 +6,8 @@ import {
 } from '@/business';
 import {
   CHAT_SIGN_TENANT,
+  ESocketMessageActionEnum,
   LANDLORD,
-  SOCKET_WEBRTC_ANSWER_ICE,
-  SOCKET_WEBRTC_OFFER_ICE,
   TENANT,
   WEBRTC_ICE_SERVERS,
 } from '@/constants';
@@ -53,7 +52,7 @@ export default function useWebrtc() {
             sendMessage({
               toIdentity,
               toId,
-              active: SOCKET_WEBRTC_OFFER_ICE,
+              active: ESocketMessageActionEnum.WebrtcOfferIce,
               data: JSON.stringify(event.candidate),
             });
             setWebrtcAnswerIdentity(toIdentity);
@@ -62,7 +61,7 @@ export default function useWebrtc() {
             sendMessage({
               toIdentity: offerIdentity!,
               toId: offerId!,
-              active: SOCKET_WEBRTC_ANSWER_ICE,
+              active: ESocketMessageActionEnum.WebrtcAnswerIce,
               data: JSON.stringify(event.candidate),
             });
           }

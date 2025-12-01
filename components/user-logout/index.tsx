@@ -1,14 +1,14 @@
 import { userLogout } from '@/business';
+import { authStore, userStore } from '@/stores';
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { AlertDialogGroup } from '../ui/alert-dialog';
 import { Button, ButtonText } from '../ui/button';
 import { showToast } from '../ui/toast';
-interface IProps {
-  isLogin: boolean;
-}
-const UserLogout = (props: IProps) => {
-  const { isLogin } = props;
+
+const UserLogout = () => {
+  const { user } = userStore;
+  const { isLogin } = authStore;
   const [logoutPopupVisible, setLogoutPopupVisible] = useState(false);
   /**
    * 确认退出登录
@@ -23,7 +23,7 @@ const UserLogout = (props: IProps) => {
   };
   return (
     <>
-      {isLogin && (
+      {isLogin && user && (
         <Button
           className='mx-6'
           size='lg'

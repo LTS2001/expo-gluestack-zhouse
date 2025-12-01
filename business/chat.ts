@@ -1,6 +1,7 @@
 import {
   CHAT_MESSAGE_LIMIT,
   CHAT_SIGN_LANDLORD,
+  ESocketMessageActionEnum,
   LANDLORD,
   TENANT,
 } from '@/constants';
@@ -29,9 +30,14 @@ export const sendMessage = (message: ISocketMessage) => {
     ws.send(JSON.stringify(message));
     return true;
   } else {
-    // if connection not established, add message to queue
-    addToMessageQueue(message);
-    console.log('websocket: message queued, waiting for connection');
+    /**
+     * 1. if connection not established, add message to queue.
+     * 2. if it is heartbeat detection, there is no need to queue.
+     */
+    if (message.active !== ESocketMessageActionEnum.Heartbeat) {
+      addToMessageQueue(message);
+      console.log('websocket: message queued, waiting for connection');
+    }
     return false;
   }
 };
@@ -240,4 +246,34 @@ export const getChatSessionReceiverInfoList = async () => {
     })
   );
   setChatReceiverInfoList(receiverList);
+};
+
+/**
+ * get chat message
+ */
+export const getChatMessage = async () => {
+  // get session list
+  await getChatSessionList();
+  // get the latest one message in the chat session list
+  await getChatSessionLastOneMessageList();
+  /**
+   * The logic of "setchatMessageList" inside is specifically for chat pages
+   */
+  const {
+    currentChatSession: c,
+    chatMessageList,
+    setChatMessageList,
+    chatSessionLastOneMessageList,
+  } = chatStore;
+  const lastOneMessage = chatSessionLastOneMessageList?.find(
+    (i) =>
+      (i?.senderId === c?.senderId && i?.receiverId === c?.receiverId) ||
+      (i?.senderId === c?.receiverId && i?.receiverId === c?.senderId)
+  );
+  if (
+    lastOneMessage?.id &&
+    !chatMessageList?.find((chat) => chat.id === lastOneMessage.id)
+  ) {
+    setChatMessageList([lastOneMessage, ...(chatMessageList ?? [])]);
+  }
 };

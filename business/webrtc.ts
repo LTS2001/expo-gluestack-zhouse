@@ -1,8 +1,7 @@
 import {
   CHAT_SIGN_TENANT,
+  ESocketMessageActionEnum,
   LANDLORD,
-  SOCKET_WEBRTC_ANSWER,
-  SOCKET_WEBRTC_OFFER,
   TENANT,
 } from '@/constants';
 import { chatStore, webrtcStore } from '@/stores';
@@ -62,7 +61,7 @@ export const createOffer = async () => {
       fromIdentity:
         senderId.split(',')[0] === CHAT_SIGN_TENANT ? TENANT : LANDLORD,
       fromId: Number(senderId.split(',')[1]),
-      active: SOCKET_WEBRTC_OFFER,
+      active: ESocketMessageActionEnum.WebrtcOffer,
       data: JSON.stringify(offer),
     });
     return offer;
@@ -92,7 +91,7 @@ export const createAnswer = async (offer: any) => {
     sendMessage({
       toIdentity: offerIdentity!,
       toId: offerId!,
-      active: SOCKET_WEBRTC_ANSWER,
+      active: ESocketMessageActionEnum.WebrtcAnswer,
       data: JSON.stringify(answer),
     });
     return answer;
