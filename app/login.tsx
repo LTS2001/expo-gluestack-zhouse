@@ -13,7 +13,7 @@ import {
   TouchableOpacity,
   View,
 } from '@/components/ui';
-import { LANDLORD, TENANT } from '@/constants';
+import { EUserIdentityEnum } from '@/constants';
 import { postLoginApi, postRegistryApi } from '@/request';
 import { authStore } from '@/stores';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -80,9 +80,9 @@ export default function Login() {
    */
   const getIdentityName = () => {
     switch (identity) {
-      case TENANT:
+      case EUserIdentityEnum.Tenant:
         return '租客';
-      case LANDLORD:
+      case EUserIdentityEnum.Landlord:
         return '房东';
       default:
         return '';

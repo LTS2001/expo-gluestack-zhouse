@@ -1,9 +1,4 @@
-import {
-  CHAT_SIGN_LANDLORD,
-  CHAT_SIGN_TENANT,
-  LANDLORD,
-  TENANT,
-} from '@/constants';
+import { EUserIdentityEnum } from '@/constants';
 import { IChatMessage, IChatSession, IChatSessionUser, IUser } from '@/global';
 import { configure, makeAutoObservable } from 'mobx';
 import authStore from './auth';
@@ -103,13 +98,7 @@ class ChatStore {
    */
   setChatSender(sender: IUser) {
     const { identity } = authStore;
-    if (identity === LANDLORD) {
-      // sender is landlord
-      this.senderId = `${CHAT_SIGN_LANDLORD},${sender.id}`;
-    } else if (identity === TENANT) {
-      // sender is tenant
-      this.senderId = `${CHAT_SIGN_TENANT},${sender.id}`;
-    }
+    this.senderId = `${identity},${sender.id}`;
     this.chatSender = sender;
   }
 
@@ -119,12 +108,13 @@ class ChatStore {
    */
   setChatReceiver(receiver: IUser) {
     const { identity } = authStore;
-    if (identity === LANDLORD) {
-      // sender is landlord, receiver is tenant
-      this.receiverId = `${CHAT_SIGN_TENANT},${receiver.id}`;
-    } else if (identity === TENANT) {
-      // sender is tenant, receiver is landlord
-      this.receiverId = `${CHAT_SIGN_LANDLORD},${receiver.id}`;
+    // sender is landlord, receiver is tenant
+    if (identity === EUserIdentityEnum.Landlord) {
+      this.receiverId = `${EUserIdentityEnum.Tenant},${receiver.id}`;
+    }
+    // sender is tenant, receiver is landlord
+    else if (identity === EUserIdentityEnum.Tenant) {
+      this.receiverId = `${EUserIdentityEnum.Landlord},${receiver.id}`;
     }
     this.chatReceiver = receiver;
   }

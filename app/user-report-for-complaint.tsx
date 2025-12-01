@@ -12,7 +12,11 @@ import {
   TouchableOpacity,
   View,
 } from '@/components/ui';
-import { COMPLAINT_LANDLORD, COMPLAINT_TENANT, TENANT } from '@/constants';
+import {
+  COMPLAINT_LANDLORD,
+  COMPLAINT_TENANT,
+  EUserIdentityEnum
+} from '@/constants';
 import { postComplaintApi } from '@/request';
 import { authStore, userStore } from '@/stores';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -78,7 +82,9 @@ const UserReportForComplaint = () => {
   const submitComplaint = async (params: TFormSchema) => {
     const { reason, imgList, video: videoInfo } = params;
     const _identity =
-      identity === TENANT ? COMPLAINT_TENANT : COMPLAINT_LANDLORD;
+      identity === EUserIdentityEnum.Tenant
+        ? COMPLAINT_TENANT
+        : COMPLAINT_LANDLORD;
     await postComplaintApi({
       reason,
       image: JSON.stringify(imgList),

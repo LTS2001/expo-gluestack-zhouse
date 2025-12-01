@@ -12,7 +12,11 @@ import {
   Text,
   View,
 } from '@/components/ui';
-import { ESocketMessageActionEnum, HouseToLeaseMap, TENANT } from '@/constants';
+import {
+  ESocketMessageActionEnum,
+  EUserIdentityEnum,
+  HouseToLeaseMap
+} from '@/constants';
 import { IPendingLease } from '@/global';
 import { getLeasePendingListApi, putLeaseStatusApi } from '@/request';
 import { leaseStore } from '@/stores';
@@ -44,7 +48,7 @@ function LeaseNotice() {
     if (currentStatus === HouseToLeaseMap.leased) {
       // update the tenant's rental housing data
       sendMessage({
-        toIdentity: TENANT,
+        toIdentity: EUserIdentityEnum.Tenant,
         toId: currentLease?.tenantId!,
         active: ESocketMessageActionEnum.GetTenantLeaseHouse,
       });

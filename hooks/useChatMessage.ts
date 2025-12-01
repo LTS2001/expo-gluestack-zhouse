@@ -16,11 +16,8 @@ import {
 import {
   CHAT_INPUT_MAX_HEIGHT,
   CHAT_INPUT_MIN_HEIGHT,
-  CHAT_SIGN_TENANT,
-  ECHAT_MESSAGE_TYPE,
+  EChatMessageTypeEnum,
   ESocketMessageActionEnum,
-  LANDLORD,
-  TENANT,
 } from '@/constants';
 import { IMediumThumbnail, IVideo, TMessageModel } from '@/global';
 import { putLeaveChatMessageApi } from '@/request';
@@ -144,10 +141,10 @@ export default function useChatMessage(props: IUseChatMessageProps) {
    * @description send websocket message to receiver
    */
   const sendMessage = useCallback(() => {
-    const [identity, id] = receiverId.split(',');
+    const [toIdentity, toId] = receiverId.split(',');
     sendWebSocketMessage({
-      toIdentity: identity === CHAT_SIGN_TENANT ? TENANT : LANDLORD,
-      toId: Number(id),
+      toIdentity,
+      toId: Number(toId),
       active: ESocketMessageActionEnum.GetChatMessage,
     });
   }, [receiverId]);
@@ -176,7 +173,7 @@ export default function useChatMessage(props: IUseChatMessageProps) {
             sessionId: currentChatSession?.id!,
             senderId,
             receiverId,
-            type: ECHAT_MESSAGE_TYPE.TEXT,
+            type: EChatMessageTypeEnum.Text,
             content: chatInputVal,
           },
           { msgIdCount: msgIdCount.current++ }
@@ -293,11 +290,11 @@ export default function useChatMessage(props: IUseChatMessageProps) {
       };
 
       let messageId: number | string;
-      let messageType: ECHAT_MESSAGE_TYPE;
+      let messageType: EChatMessageTypeEnum;
       let initialContent: IMediumThumbnail | IVideo;
 
       if (assetType === 'image') {
-        messageType = ECHAT_MESSAGE_TYPE.IMAGE;
+        messageType = EChatMessageTypeEnum.Image;
         initialContent = handleMediumThumbnail(rawContent);
         // add message to list with local path and uploading status
         messageId = await addChatMessage(
@@ -319,7 +316,7 @@ export default function useChatMessage(props: IUseChatMessageProps) {
         // upload image and update message
         await uploadImageAndUpdateMessage(messageId, uri, initialContent);
       } else if (assetType === 'video') {
-        messageType = ECHAT_MESSAGE_TYPE.VIDEO;
+        messageType = EChatMessageTypeEnum.Video;
         let messageId: number | string | undefined;
 
         try {
@@ -426,7 +423,7 @@ export default function useChatMessage(props: IUseChatMessageProps) {
           height,
           aspectRatio: Number((width / height).toFixed(2)),
         }),
-        type: ECHAT_MESSAGE_TYPE.IMAGE,
+        type: EChatMessageTypeEnum.Image,
       });
     }
 
@@ -448,7 +445,7 @@ export default function useChatMessage(props: IUseChatMessageProps) {
 
       const { type, content } = failedMessage;
       const parsedContent =
-        type === ECHAT_MESSAGE_TYPE.TEXT
+        type === EChatMessageTypeEnum.Text
           ? content
           : JSON.parse(content as string);
 
@@ -456,13 +453,13 @@ export default function useChatMessage(props: IUseChatMessageProps) {
       updateChatMessageUploadProgress(messageId, 0, 'uploading');
 
       try {
-        if (type === ECHAT_MESSAGE_TYPE.TEXT) {
+        if (type === EChatMessageTypeEnum.Text) {
           // text message, just resend
           await handleSendMessage({
-            type: ECHAT_MESSAGE_TYPE.TEXT,
+            type: EChatMessageTypeEnum.Text,
             content: parsedContent,
           });
-        } else if (type === ECHAT_MESSAGE_TYPE.IMAGE) {
+        } else if (type === EChatMessageTypeEnum.Image) {
           const imagePath = parsedContent.path;
           const isImageLocal = isLocalPath(imagePath);
           if (isImageLocal) {
@@ -476,7 +473,7 @@ export default function useChatMessage(props: IUseChatMessageProps) {
             // send message to receiver via websocket
             sendMessage();
           }
-        } else if (type === ECHAT_MESSAGE_TYPE.VIDEO) {
+        } else if (type === EChatMessageTypeEnum.Video) {
           const videoPath = parsedContent.path;
           const thumbnailPath = parsedContent.thumbnail?.path;
           // check if video and thumbnail are local paths
@@ -547,7 +544,7 @@ export default function useChatMessage(props: IUseChatMessageProps) {
           } else {
             // if neither are local paths, just resend
             await handleSendMessage({
-              type: ECHAT_MESSAGE_TYPE.VIDEO,
+              type: EChatMessageTypeEnum.Video,
               content: parsedContent,
             });
           }

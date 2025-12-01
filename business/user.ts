@@ -1,9 +1,4 @@
-import {
-  CHAT_SIGN_LANDLORD,
-  CHAT_SIGN_TENANT,
-  LANDLORD,
-  TENANT,
-} from '@/constants';
+import { EUserIdentityEnum } from '@/constants';
 import { IChatSessionUser, IUpdateBaseUserInfo, IUserVerify } from '@/global';
 import {
   getLandlordListByIdListApi,
@@ -41,12 +36,6 @@ export const userLogout = async () => {
   clearUser();
   // clear the house rented by the tenant
   clearTenantLeasedHouseList();
-  // close websocket
-  // websocketInstance?.close();
-  // clear websocket instance
-  // clearWebsocketInstance();
-  // off all events
-  // eventCenter.off();
   clearCurrentChatSession();
   clearChatSessionList();
   // clear tenant report for repair list
@@ -118,15 +107,15 @@ export const getTenantLeasedHouseList = async (tenantId?: number) => {
  * get receiver info list by id list
  */
 export const getReceiverInfoListByIdList = async (
-  params: { id: number; identity: string }[]
+  params: { id: number; identity: EUserIdentityEnum }[]
 ) => {
   const landlordId: number[] = [];
   const tenantId: number[] = [];
   // category the id of the landlord and the tenant
   params.forEach((item) => {
-    if (item.identity === TENANT) {
+    if (item.identity === EUserIdentityEnum.Tenant) {
       tenantId.push(item.id);
-    } else if (item.identity === LANDLORD) {
+    } else if (item.identity === EUserIdentityEnum.Landlord) {
       landlordId.push(item.id);
     }
   });
@@ -143,13 +132,13 @@ export const getReceiverInfoListByIdList = async (
   tenantList.forEach((tenant) => {
     userInfoList.push({
       ...tenant,
-      receiverId: `${CHAT_SIGN_TENANT},${tenant.id}`,
+      receiverId: `${EUserIdentityEnum.Tenant},${tenant.id}`,
     });
   });
   landlordList.forEach((landlord) => {
     userInfoList.push({
       ...landlord,
-      receiverId: `${CHAT_SIGN_LANDLORD},${landlord.id}`,
+      receiverId: `${EUserIdentityEnum.Landlord},${landlord.id}`,
     });
   });
   return userInfoList;

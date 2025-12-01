@@ -1,4 +1,4 @@
-import { ECHAT_MESSAGE_TYPE } from '@/constants';
+import { EChatMessageTypeEnum } from '@/constants';
 import { TMessageModel } from '@/global';
 import { formatChatDate } from '@/utils';
 import cls from 'classnames';
@@ -50,7 +50,7 @@ const Message = memo(
     const getMessageStructure = useMemo(
       () => {
         switch (type) {
-          case ECHAT_MESSAGE_TYPE.TEXT:
+          case EChatMessageTypeEnum.Text:
             return (
               <View
                 className={cls([
@@ -68,7 +68,7 @@ const Message = memo(
                 </Text>
               </View>
             );
-          case ECHAT_MESSAGE_TYPE.IMAGE:
+          case EChatMessageTypeEnum.Image:
             return (
               <View
                 className={cls([
@@ -98,7 +98,7 @@ const Message = memo(
                 ) : null}
               </View>
             );
-          case ECHAT_MESSAGE_TYPE.VIDEO:
+          case EChatMessageTypeEnum.Video:
             return (
               <View className={cls([{ 'self-end': identity === 'sender' }])}>
                 <View className='relative'>
@@ -128,8 +128,7 @@ const Message = memo(
                 </View>
               </View>
             );
-
-          case ECHAT_MESSAGE_TYPE.WEBRTC_VIDEO:
+          case EChatMessageTypeEnum.WebrtcVideo:
             return (
               <View
                 className={cls([

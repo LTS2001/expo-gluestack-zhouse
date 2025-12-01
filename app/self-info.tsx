@@ -17,7 +17,7 @@ import {
   View,
   showToast,
 } from '@/components/ui';
-import { DELETE, NORMAL, STOP_USING, UN_IDENTITY } from '@/constants';
+import { EUserStatusEnum } from '@/constants';
 import { useMediaPreview } from '@/hooks';
 import { userStore } from '@/stores';
 import { formatUtcTime } from '@/utils';
@@ -62,17 +62,13 @@ const SelfInfo = () => {
    */
   const getStatusText = (status: number) => {
     switch (status) {
-      // 正常
-      case NORMAL:
+      case EUserStatusEnum.Normal:
         return '正常';
-      // 停用
-      case STOP_USING:
+      case EUserStatusEnum.StopUsing:
         return '停用';
-      // 删除
-      case DELETE:
+      case EUserStatusEnum.Delete:
         return '删除';
-      // 未实名
-      case UN_IDENTITY:
+      case EUserStatusEnum.UnIdentity:
         return '未实名';
     }
   };
@@ -131,9 +127,12 @@ const SelfInfo = () => {
           className={cls([
             'px-2 py-1 rounded-md',
             {
-              'bg-theme-primary': user?.status === NORMAL,
-              'bg-error-300': [STOP_USING, DELETE].includes(user?.status!),
-              'bg-primary-50': user?.status === UN_IDENTITY,
+              'bg-theme-primary': user?.status === EUserStatusEnum.Normal,
+              'bg-error-300': [
+                EUserStatusEnum.StopUsing,
+                EUserStatusEnum.Delete,
+              ].includes(user?.status!),
+              'bg-primary-50': user?.status === EUserStatusEnum.UnIdentity,
             },
           ])}
         >
@@ -216,8 +215,7 @@ const SelfInfo = () => {
         })}
       </View>
       <View className='bg-background-0 px-4 mt-4 rounded-xl'>
-        {/* 实名信息 */}
-        {user?.status === NORMAL &&
+        {user?.status === EUserStatusEnum.Normal &&
           identityInfoConfig.map((info, idx) => (
             <TouchableOpacity
               className={cls([
@@ -239,7 +237,7 @@ const SelfInfo = () => {
           ))}
       </View>
       {/* real name entry */}
-      {user?.status === UN_IDENTITY && (
+      {user?.status === EUserStatusEnum.UnIdentity && (
         <TouchableOpacity
           className='mx-4 my-10'
           onPress={() => router.push('/identity-verify')}

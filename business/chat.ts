@@ -1,9 +1,7 @@
 import {
   CHAT_MESSAGE_LIMIT,
-  CHAT_SIGN_LANDLORD,
   ESocketMessageActionEnum,
-  LANDLORD,
-  TENANT,
+  EUserIdentityEnum,
 } from '@/constants';
 import {
   IChatMessage,
@@ -240,7 +238,7 @@ export const getChatSessionReceiverInfoList = async () => {
     chatSessionList?.map((session) => {
       const [identity, id] = session.receiverId.split(',');
       return {
-        identity: identity === CHAT_SIGN_LANDLORD ? LANDLORD : TENANT,
+        identity: identity as EUserIdentityEnum,
         id: Number(id),
       };
     })
@@ -252,10 +250,11 @@ export const getChatSessionReceiverInfoList = async () => {
  * get chat message
  */
 export const getChatMessage = async () => {
-  // get session list
+  /**
+   * 1. get session list
+   * 2. get the latest one message in the chat session list
+   */
   await getChatSessionList();
-  // get the latest one message in the chat session list
-  await getChatSessionLastOneMessageList();
   /**
    * The logic of "setchatMessageList" inside is specifically for chat pages
    */

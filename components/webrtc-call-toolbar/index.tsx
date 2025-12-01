@@ -1,10 +1,7 @@
 import { addChatMessage, createAnswer, sendMessage } from '@/business';
 import {
-  CHAT_SIGN_LANDLORD,
-  CHAT_SIGN_TENANT,
-  ECHAT_MESSAGE_TYPE,
-  ESocketMessageActionEnum,
-  TENANT,
+  EChatMessageTypeEnum,
+  ESocketMessageActionEnum
 } from '@/constants';
 import { chatStore, webrtcStore } from '@/stores';
 import { formatVideoDuration } from '@/utils';
@@ -158,12 +155,8 @@ function WebrtcCallToolbar() {
                 {
                   sessionId: webrtcSession?.id!,
                   senderId,
-                  receiverId: `${
-                    offerIdentity === TENANT
-                      ? CHAT_SIGN_TENANT
-                      : CHAT_SIGN_LANDLORD
-                  },${offerId}`,
-                  type: ECHAT_MESSAGE_TYPE.WEBRTC_VIDEO,
+                  receiverId: `${offerIdentity},${offerId}`,
+                  type: EChatMessageTypeEnum.WebrtcVideo,
                   content: isConnected
                     ? `已结束 ${formatVideoDuration(callDuration * 1000)}`
                     : '已拒绝',
@@ -185,12 +178,8 @@ function WebrtcCallToolbar() {
                 {
                   sessionId: webrtcSession?.id!,
                   senderId,
-                  receiverId: `${
-                    answerIdentity === TENANT
-                      ? CHAT_SIGN_TENANT
-                      : CHAT_SIGN_LANDLORD
-                  },${answerId}`,
-                  type: ECHAT_MESSAGE_TYPE.WEBRTC_VIDEO,
+                  receiverId: `${answerIdentity},${answerId}`,
+                  type: EChatMessageTypeEnum.WebrtcVideo,
                   content: isConnected
                     ? `已结束 ${formatVideoDuration(callDuration * 1000)}`
                     : '已取消',

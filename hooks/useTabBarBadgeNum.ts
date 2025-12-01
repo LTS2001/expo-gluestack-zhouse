@@ -1,4 +1,4 @@
-import { LANDLORD, TENANT } from '@/constants';
+import { EUserIdentityEnum } from '@/constants';
 import { authStore, chatStore, leaseStore, repairStore } from '@/stores';
 import { autorun } from 'mobx';
 import { useEffect, useRef, useState } from 'react';
@@ -20,14 +20,14 @@ export default function useTabBarBadgeNum() {
       const { chatUnreadNum } = chatStore;
       autorunDebounceTimer.current = setTimeout(() => {
         if (!isLogin) return;
-        if (identity === LANDLORD) {
+        if (identity === EUserIdentityEnum.Landlord) {
           const _mineNum =
             (landlordPendingLeaseList?.length ?? 0) +
             (landlordPendingRepairList?.length ?? 0);
           setMineNum(_mineNum ? _mineNum : undefined);
-        } else if (identity === TENANT) {
+        } else if (identity === EUserIdentityEnum.Tenant) {
         }
-        
+
         setChatNum(chatUnreadNum);
       }, 100);
     });

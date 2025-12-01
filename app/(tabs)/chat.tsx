@@ -1,6 +1,6 @@
 import { Empty } from '@/components';
 import { Image, Text, TouchableOpacity, View } from '@/components/ui';
-import { ECHAT_MESSAGE_TYPE } from '@/constants';
+import { EChatMessageTypeEnum } from '@/constants';
 import { IChatSessionUser } from '@/global';
 import { chatStore } from '@/stores';
 import { formatChatDate } from '@/utils';
@@ -81,11 +81,11 @@ function Chat() {
                   </Text>
                 </View>
                 <Text className='text-primary-50 text-base'>
-                  {type === ECHAT_MESSAGE_TYPE.TEXT
+                  {type === EChatMessageTypeEnum.Text
                     ? JSON.parse(content || '""')
-                    : type === ECHAT_MESSAGE_TYPE.IMAGE
+                    : type === EChatMessageTypeEnum.Image
                     ? '[图片]'
-                    : type === ECHAT_MESSAGE_TYPE.VIDEO
+                    : type === EChatMessageTypeEnum.Video
                     ? '[视频]'
                     : '[视频通话]'}
                 </Text>

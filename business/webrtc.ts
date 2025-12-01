@@ -1,9 +1,4 @@
-import {
-  CHAT_SIGN_TENANT,
-  ESocketMessageActionEnum,
-  LANDLORD,
-  TENANT,
-} from '@/constants';
+import { ESocketMessageActionEnum } from '@/constants';
 import { chatStore, webrtcStore } from '@/stores';
 import { sendMessage } from './chat';
 
@@ -47,6 +42,8 @@ export const createOffer = async () => {
     return;
   }
   try {
+    const [toIdentity, toId] = receiverId.split(',');
+    const [fromIdentity, fromId] = senderId.split(',');
     const offer = await peerConnection.createOffer({
       offerToReceiveAudio: true,
       offerToReceiveVideo: true,
@@ -55,12 +52,10 @@ export const createOffer = async () => {
     await peerConnection.setLocalDescription(offer);
     // send the offer(sdp) to the receiver through websocket
     sendMessage({
-      toIdentity:
-        receiverId.split(',')[0] === CHAT_SIGN_TENANT ? TENANT : LANDLORD,
-      toId: Number(receiverId.split(',')[1]),
-      fromIdentity:
-        senderId.split(',')[0] === CHAT_SIGN_TENANT ? TENANT : LANDLORD,
-      fromId: Number(senderId.split(',')[1]),
+      toIdentity,
+      toId: Number(toId),
+      fromIdentity,
+      fromId: Number(fromId),
       active: ESocketMessageActionEnum.WebrtcOffer,
       data: JSON.stringify(offer),
     });

@@ -21,7 +21,6 @@ import {
   userStore,
   webrtcStore,
 } from '@/stores';
-import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
 import { router } from 'expo-router';
 import { reaction } from 'mobx';
 import { useCallback, useEffect, useRef } from 'react';
@@ -33,8 +32,6 @@ export default function useSocket() {
   const heartbeatTimeoutTimer =
     useRef<ReturnType<typeof setTimeout>>(undefined);
   const reconnectTimeoutTimer =
-    useRef<ReturnType<typeof setTimeout>>(undefined);
-  const networkChangeTimeoutTimer =
     useRef<ReturnType<typeof setTimeout>>(undefined);
   // store connect/reconnect function reference to avoid dependency issues
   const connectRef = useRef<() => void>(() => {});
@@ -344,35 +341,12 @@ export default function useSocket() {
     [resetReconnectState, startHeartbeat]
   );
 
-  /**
-   * listen to app network status change
-   */
-  const handleAppNetworkChange = useCallback(
-    (state: NetInfoState) => {
-      const { isConnected, type } = state;
-      if (networkChangeTimeoutTimer.current) {
-        clearTimeout(networkChangeTimeoutTimer.current);
-        networkChangeTimeoutTimer.current = undefined;
-      }
-      networkChangeTimeoutTimer.current = setTimeout(() => {
-        if (!isConnected) return;
-        const { setIsConnected, setNetworkType } = networkStore;
-        setIsConnected(isConnected);
-        setNetworkType(type);
-        resetReconnectState();
-      }, 1000);
-    },
-    [resetReconnectState]
-  );
-
   useEffect(() => {
     // listen to app state changes
     const changeSubscription = AppState.addEventListener(
       'change',
       handleAppStateChange
     );
-
-    NetInfo.addEventListener(handleAppNetworkChange);
 
     // user login is required to init the websocket, watch the isLogin field change
     const disposer = reaction(
@@ -393,7 +367,7 @@ export default function useSocket() {
       changeSubscription?.remove();
       disconnect();
     };
-  }, [connect, disconnect, handleAppStateChange, handleAppNetworkChange]);
+  }, [connect, disconnect, handleAppStateChange]);
 
   // store connect/reconnect function reference to avoid dependency issues
   useEffect(() => {
@@ -403,5 +377,6 @@ export default function useSocket() {
 
   return {
     disconnect,
+    resetReconnectState,
   };
 }

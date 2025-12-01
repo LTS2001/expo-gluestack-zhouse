@@ -1,15 +1,15 @@
-import { ECHAT_MESSAGE_TYPE, ESocketMessageActionEnum } from '@/constants';
+import { EChatMessageTypeEnum, ESocketMessageActionEnum } from '@/constants';
 declare module '@/global' {
-  type TIdentity = 'landlord' | 'tenant';
+  type TIdentity = EUserIdentityEnum;
 
   /**
    * message model type
    */
   type TMessageModel =
-    | { type: ECHAT_MESSAGE_TYPE.TEXT; content: string }
-    | { type: ECHAT_MESSAGE_TYPE.IMAGE; content: IMediumThumbnail }
-    | { type: ECHAT_MESSAGE_TYPE.VIDEO; content: IVideo }
-    | { type: ECHAT_MESSAGE_TYPE.WEBRTC_VIDEO; content: string };
+    | { type: EChatMessageTypeEnum.Text; content: string }
+    | { type: EChatMessageTypeEnum.Image; content: IMediumThumbnail }
+    | { type: EChatMessageTypeEnum.Video; content: IVideo }
+    | { type: EChatMessageTypeEnum.WebrtcVideo; content: string };
 
   /**
    * add chat message type

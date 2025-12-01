@@ -4,34 +4,61 @@ import {
   landlordInitialApi,
   tenantInitialApi,
 } from '@/business';
-import { LANDLORD, TENANT } from '@/constants';
+import { EUserIdentityEnum } from '@/constants';
 import { authStore, networkStore, userStore } from '@/stores';
+import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
 import { reaction } from 'mobx';
-import { useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import useCurrentPage from './useCurrentPage';
 import useSocket from './useSocket';
 
 export default function useInitialization() {
+  const networkChangeTimeoutTimer =
+    useRef<ReturnType<typeof setTimeout>>(undefined);
+
   // initialize websocket
-  const { disconnect } = useSocket();
+  const { disconnect, resetReconnectState } = useSocket();
   const { isIdentityPage } = useCurrentPage();
 
+  /**
+   * listen to app network status change
+   */
+  const handleAppNetworkChange = useCallback(
+    (state: NetInfoState) => {
+      const { isConnected, type } = state;
+      if (networkChangeTimeoutTimer.current) {
+        clearTimeout(networkChangeTimeoutTimer.current);
+        networkChangeTimeoutTimer.current = undefined;
+      }
+      networkChangeTimeoutTimer.current = setTimeout(() => {
+        if (!isConnected) return;
+        const { setIsConnected, setNetworkType } = networkStore;
+        setIsConnected(isConnected);
+        setNetworkType(type);
+        resetReconnectState();
+      }, 1000);
+    },
+    [resetReconnectState]
+  );
+
   useEffect(() => {
+    NetInfo.addEventListener(handleAppNetworkChange);
     const disposer = reaction(
       () => {
         const { isConnected, networkType } = networkStore;
         return { isConnected, networkType };
       },
-      () => {
+      (state) => {
+        const { isConnected, networkType } = state;
+        if (!isConnected || !networkType) return;
         getUserInfo();
-      },
-      { fireImmediately: true }
+      }
     );
 
     return () => {
       disposer();
     };
-  }, []);
+  }, [resetReconnectState, handleAppNetworkChange]);
 
   useEffect(() => {
     const disposer = reaction(
@@ -53,10 +80,10 @@ export default function useInitialization() {
          */
         if (!user) return;
         const { identity } = authStore;
-        if (identity === LANDLORD) {
+        if (identity === EUserIdentityEnum.Landlord) {
           landlordInitialApi(user?.id);
         }
-        if (identity === TENANT) {
+        if (identity === EUserIdentityEnum.Tenant) {
           tenantInitialApi(user?.id);
         }
         initializeChat();

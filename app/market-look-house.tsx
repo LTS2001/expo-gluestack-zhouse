@@ -20,9 +20,8 @@ import {
 } from '@/components/ui';
 import {
   ESocketMessageActionEnum,
-  HouseToLeaseMap,
-  LANDLORD,
-  TENANT,
+  EUserIdentityEnum,
+  HouseToLeaseMap
 } from '@/constants';
 import { getLeaseHouseTenantApi, postLeaseApi } from '@/request';
 import { authStore, houseStore, userStore } from '@/stores';
@@ -112,7 +111,7 @@ const MarketLookHouse = () => {
       setLeasePopupVisible(false);
       setLeaseMsgVisible(false);
       sendMessage({
-        toIdentity: LANDLORD,
+        toIdentity: EUserIdentityEnum.Landlord,
         toId: landlord?.id!,
         active: ESocketMessageActionEnum.GetPendingLease,
       });
@@ -140,7 +139,7 @@ const MarketLookHouse = () => {
             houseId={houses?.houseId}
             houseName={houses?.name}
           />
-          {identity === TENANT ? (
+          {identity === EUserIdentityEnum.Tenant ? (
             leaseState === HouseToLeaseMap.rejected ||
             leaseState === HouseToLeaseMap.rented ? (
               <Button action='secondary' onPress={handleClickLeaseBtn}>

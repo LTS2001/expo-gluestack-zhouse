@@ -12,7 +12,10 @@ import {
   TouchableOpacity,
   View,
 } from '@/components/ui';
-import { ESocketMessageActionEnum, LANDLORD } from '@/constants';
+import {
+  ESocketMessageActionEnum,
+  EUserIdentityEnum
+} from '@/constants';
 import { postRepairApi } from '@/request';
 import { userStore } from '@/stores';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -89,7 +92,7 @@ const TenantReportForRepair = () => {
     await getRepairListTenant(user?.id);
     // send message to landlord
     sendMessage({
-      toIdentity: LANDLORD,
+      toIdentity: EUserIdentityEnum.Landlord,
       toId: Number(landlordId),
       active: ESocketMessageActionEnum.GetLandlordRepair,
     });

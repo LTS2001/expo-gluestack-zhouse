@@ -14,7 +14,7 @@ import {
 } from '@/components/ui';
 import {
   CHAT_INPUT_MAX_HEIGHT,
-  ECHAT_MESSAGE_TYPE,
+  EChatMessageTypeEnum,
   SERVER_IMAGE_ROOT,
 } from '@/constants';
 import { IChatMessage, IVideo } from '@/global';
@@ -107,14 +107,14 @@ const ChatMessage = () => {
                 uploadStatus={uploadStatus}
                 uploadProgress={uploadProgress}
                 handleImagePress={(m) => {
-                  if (m.type === ECHAT_MESSAGE_TYPE.IMAGE) {
+                  if (m.type === EChatMessageTypeEnum.Image) {
                     setImages([m.content.path]);
                     setImagePreviewVisible(true);
                     setImagePreviewIndex(0);
                   }
                 }}
                 handleVideoPress={(m) => {
-                  if (m.type === ECHAT_MESSAGE_TYPE.VIDEO) {
+                  if (m.type === EChatMessageTypeEnum.Video) {
                     setVideo(m.content);
                     setVideoPreviewVisible(true);
                   }

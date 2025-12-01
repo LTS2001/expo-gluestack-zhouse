@@ -1,5 +1,5 @@
 import { getCollectHouseStatus, updateCollectHouseStatus } from '@/business';
-import { TENANT } from '@/constants';
+import { EUserIdentityEnum } from '@/constants';
 import { IUser } from '@/global';
 import { authStore, chatStore, houseStore, userStore } from '@/stores';
 import { makePhoneCall } from '@/utils';
@@ -104,7 +104,7 @@ export default function TenantLookHouseTool({
           <Icon as='AntDesign' name='right' size={16} />
         </TouchableOpacity>
       </View>
-      {identity === TENANT && (
+      {identity === EUserIdentityEnum.Tenant && (
         <View className='flex-row items-center gap-8 mt-3'>
           <TouchableOpacity onPress={toChangeHouseCollectStatus}>
             {collected ? (

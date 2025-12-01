@@ -5,10 +5,8 @@ import {
   sendMessage,
 } from '@/business';
 import {
-  CHAT_SIGN_TENANT,
   ESocketMessageActionEnum,
-  LANDLORD,
-  TENANT,
+  EUserIdentityEnum,
   WEBRTC_ICE_SERVERS,
 } from '@/constants';
 import { IChatSessionUser } from '@/global';
@@ -45,9 +43,7 @@ export default function useWebrtc() {
           } = webrtcStore;
           const { receiverId } = chatStore;
           if (role === 'offer') {
-            const [_identity, _id] = receiverId.split(',');
-            const toIdentity =
-              _identity === CHAT_SIGN_TENANT ? TENANT : LANDLORD;
+            const [toIdentity, _id] = receiverId.split(',');
             const toId = Number(_id);
             sendMessage({
               toIdentity,
@@ -161,7 +157,7 @@ export default function useWebrtc() {
         await addChatSession();
       } else if (role === 'offer' && receiverId) {
         const [_identity, _id] = receiverId.split(',');
-        const identity = _identity === CHAT_SIGN_TENANT ? TENANT : LANDLORD;
+        const identity = _identity as EUserIdentityEnum;
         const id = Number(_id);
         const res = await getReceiverInfoListByIdList([{ id, identity }]);
         setAnswerUser(res[0]);

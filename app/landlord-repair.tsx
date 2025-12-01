@@ -3,8 +3,8 @@ import { Empty, RepairCard } from '@/components';
 import { AlertDialogGroup, Button, ButtonText, View } from '@/components/ui';
 import {
   ESocketMessageActionEnum,
+  EUserIdentityEnum,
   HouseToRepairMap,
-  TENANT,
 } from '@/constants';
 import { IBaseHouse, IRepair } from '@/global';
 import { getHouseListByHouseIdsApi, putRepairStatusApi } from '@/request';
@@ -45,7 +45,7 @@ function LandlordRepair() {
     await getRepairListLandlord(user?.id);
     // send message to tenant
     sendMessage({
-      toIdentity: TENANT,
+      toIdentity: EUserIdentityEnum.Tenant,
       toId: repairState.tenantId,
       active: ESocketMessageActionEnum.GetTenantRepair,
     });
