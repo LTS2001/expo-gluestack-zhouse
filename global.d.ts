@@ -52,7 +52,7 @@ declare module '@/global' {
     /**
      * message type 1(text) 2(image) 3(video)
      */
-    type: number;
+    type: EChatMessageTypeEnum;
   }
 
   /**

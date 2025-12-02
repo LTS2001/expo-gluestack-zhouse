@@ -10,6 +10,7 @@ import { IUser } from '@/global';
 import { getTenantLeaseHouseApi } from '@/request';
 import { houseStore } from '@/stores';
 import { useNavigation } from '@react-navigation/native';
+import { router } from 'expo-router';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useMemo, useState } from 'react';
 import { ScrollView } from 'react-native';
@@ -20,10 +21,6 @@ function LandlordLookHouse() {
   // const { setChatReceiver } = chatStore;
   // const { useLeaveChatSession } = useChat();
   const [currentTenant, setCurrentTenant] = useState<IUser | null>();
-  const getCurrentTenant = async (houseId: number) => {
-    const res = await getTenantLeaseHouseApi(houseId);
-    setCurrentTenant(res);
-  };
 
   const isRelease = useMemo(
     () => currentHouse?.status === HouseToStatusMap.release,
@@ -37,16 +34,16 @@ function LandlordLookHouse() {
   // rented
   const rented = Number(currentHouse?.status) === HouseToStatusMap.release;
 
-  // useLeaveChatSession();
-
   useEffect(() => {
-    if (currentHouse?.houseId) {
-      getCurrentTenant(currentHouse.houseId);
-    }
+    if (!currentHouse?.houseId) return;
+    const getCurrentTenant = async (houseId: number) => {
+      const res = await getTenantLeaseHouseApi(houseId);
+      setCurrentTenant(res);
+    };
+    getCurrentTenant(currentHouse.houseId);
     return () => {
       houseStore.clearCurrentHouse();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -56,9 +53,13 @@ function LandlordLookHouse() {
   }, [currentHouse, navigation]);
 
   const lookHouseComment = () => {
-    // navigateTo({
-    //   url: `/pages/houseAllComment/index?houseName=${currentHouse?.name}&houseId=${currentHouse?.houseId}`,
-    // });
+    router.push({
+      pathname: '/house-all-comment',
+      params: {
+        houseName: currentHouse?.name,
+        houseId: currentHouse?.houseId,
+      },
+    });
   };
 
   return (

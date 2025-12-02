@@ -7,6 +7,7 @@ import { formatChatDate } from '@/utils';
 import cls from 'classnames';
 import { router } from 'expo-router';
 import { observer } from 'mobx-react-lite';
+import { useCallback } from 'react';
 import { ScrollView } from 'react-native';
 function Chat() {
   const {
@@ -16,6 +17,24 @@ function Chat() {
     chatReceiverInfoList,
     setChatReceiver,
   } = chatStore;
+
+  const getSessionContectText = useCallback(
+    ({ type, content }: { type?: EChatMessageTypeEnum; content?: string }) => {
+      switch (type) {
+        case EChatMessageTypeEnum.Text:
+          return JSON.parse(content || '""');
+        case EChatMessageTypeEnum.Image:
+          return '[图片]';
+        case EChatMessageTypeEnum.Video:
+          return '[视频]';
+        case EChatMessageTypeEnum.WebrtcVideo:
+          return '[视频通话]';
+        default:
+          return '';
+      }
+    },
+    []
+  );
 
   return (
     <ScrollView
@@ -81,13 +100,7 @@ function Chat() {
                   </Text>
                 </View>
                 <Text className='text-primary-50 text-base'>
-                  {type === EChatMessageTypeEnum.Text
-                    ? JSON.parse(content || '""')
-                    : type === EChatMessageTypeEnum.Image
-                    ? '[图片]'
-                    : type === EChatMessageTypeEnum.Video
-                    ? '[视频]'
-                    : '[视频通话]'}
+                  {getSessionContectText({ type, content })}
                 </Text>
               </View>
             </TouchableOpacity>

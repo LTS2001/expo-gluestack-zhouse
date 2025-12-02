@@ -238,14 +238,12 @@ const SelfInfo = () => {
       </View>
       {/* real name entry */}
       {user?.status === EUserStatusEnum.UnIdentity && (
-        <TouchableOpacity
+        <Button
           className='mx-4 my-10'
           onPress={() => router.push('/identity-verify')}
         >
-          <Button>
-            <ButtonText>去实名</ButtonText>
-          </Button>
-        </TouchableOpacity>
+          <ButtonText>去实名</ButtonText>
+        </Button>
       )}
       <ImagePreview
         srcs={user?.headImg}

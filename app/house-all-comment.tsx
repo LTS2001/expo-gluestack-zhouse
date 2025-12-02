@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
 
 /**
- * TODO: 后续加入点评人
+ * TODO: follow up to join reviewers
  */
 export default function HouseAllComment() {
   const navigation = useNavigation();
@@ -49,8 +49,11 @@ export default function HouseAllComment() {
   }, [houseId, leaseId]);
 
   return (
-    <ScrollView className='flex-1' showsVerticalScrollIndicator={false}>
-      <View className='gap-4 pb-8 pt-4'>
+    <ScrollView
+      contentContainerClassName='flex-grow'
+      showsVerticalScrollIndicator={false}
+    >
+      <View className='gap-4 pb-8 pt-4 flex-1'>
         {allCommentList?.length ? (
           allCommentList?.map((comment: IComment, idx: number) => {
             return (

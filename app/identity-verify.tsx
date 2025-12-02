@@ -139,15 +139,17 @@ const IdentityVerify = () => {
             value={value ? new Date(value) : new Date()}
           />
         ) : (
-          <TouchableOpacity onPress={() => setBornVisible(true)}>
-            <Input variant='underlined' isDisabled={true}>
-              <InputField
-                value={value}
-                placeholder={`请选择出生日期`}
-                className='text-lg'
-              ></InputField>
-            </Input>
-          </TouchableOpacity>
+          <Input
+            variant='underlined'
+            isDisabled={true}
+            onTouchEnd={() => setBornVisible(true)}
+          >
+            <InputField
+              value={value}
+              placeholder={`请选择出生日期`}
+              className='text-lg'
+            ></InputField>
+          </Input>
         ),
     },
     {

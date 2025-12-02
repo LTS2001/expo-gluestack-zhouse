@@ -1,5 +1,6 @@
 import {
   getChatMessage,
+  getChatSessionReceiverInfoList,
   getLeasePendingListByLandlord,
   getRepairListLandlord,
   sendMessage,
@@ -239,7 +240,9 @@ export default function useSocket() {
             break;
           case ESocketMessageActionEnum.GetChatMessage:
             // someone send message, need to get session list, latest message, other info
-            getChatMessage();
+            getChatMessage().then(() => {
+              getChatSessionReceiverInfoList();
+            });
             break;
           case ESocketMessageActionEnum.WebrtcOffer:
             webrtcStore.setWebrtcOfferIdentity(fromIdentity!);

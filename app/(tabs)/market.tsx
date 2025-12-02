@@ -38,11 +38,10 @@ const Market = () => {
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = async () => {
+    const { lat: latitude, lng: longitude } = chooseLocation.latlng;
     setRefreshing(true);
-    // await fetchMarketHouseList();
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1000);
+    await getMarketHouseList({ latitude, longitude });
+    setRefreshing(false);
   };
   useEffect(() => {
     emitter.on(EEventNameEnum.GetLocation, (data) => {

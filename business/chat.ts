@@ -44,7 +44,7 @@ export const sendMessage = (message: ISocketMessage) => {
  * chat initialization logic
  */
 export const initializeChat = async () => {
-  // TODO: 后续将这些接口合并在一起进行优化
+  // TODO: subsequently, these interfaces are merged together for optimization.
   await getChatSessionList();
   getChatSessionReceiverInfoList();
 };
@@ -63,14 +63,17 @@ export const getChatSessionLastOneMessageList = async () => {
  * get chat session list of user(tenant/landlord)
  */
 export const getChatSessionList = async () => {
-  const { senderId, setChatSessionList } = chatStore;
+  const { senderId, setChatSessionList, chatSessionList } = chatStore;
   if (!senderId) return;
   // get chat session information
-  const chatSession = await getChatSessionListApi(senderId);
-  if (!chatSession?.length) return;
+  const _chatSessionList = await getChatSessionListApi(senderId);
+  if (!_chatSessionList?.length) return;
   // get the latest one message in the chat session list
   await getChatSessionLastOneMessageList();
-  setChatSessionList(chatSession);
+  setChatSessionList(_chatSessionList);
+  if (_chatSessionList.length !== chatSessionList?.length) {
+    getChatSessionReceiverInfoList();
+  }
 };
 
 /**
