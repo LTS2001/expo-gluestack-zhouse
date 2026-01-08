@@ -11,14 +11,14 @@ export * from './webrtc';
 /**
  * api server root
  */
-export const SERVER_API_ROOT = `http://172.63.48.66:7002`;
+export const SERVER_API_ROOT = `https://litaosheng.top`;
 
 /**
  * websocket server root
  */
-export const SERVER_SOCKET_ROOT = `ws://172.63.48.66:7003`;
+export const SERVER_SOCKET_ROOT = `wss://litaosheng.top:6003`;
 
 /**
  * image and video server root
  */
-export const SERVER_IMAGE_ROOT = `http://172.63.48.66:3000`;
+export const SERVER_IMAGE_ROOT = `https://litaosheng.top:10000/static`;
