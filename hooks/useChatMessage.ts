@@ -3,8 +3,7 @@ import {
   addChatSession,
   generateVideoThumbnailLocal,
   getChatMessageList,
-  getChatSessionLastOneMessageList,
-  getChatSessionList,
+  leaveChatMessage,
   pickMediumFile,
   sendMessage as sendWebSocketMessage,
   takeMediumFile,
@@ -20,7 +19,6 @@ import {
   ESocketMessageActionEnum,
 } from '@/constants';
 import { IMediumThumbnail, IVideo, TMessageModel } from '@/global';
-import { putLeaveChatMessageApi } from '@/request';
 import { chatStore, socketStore } from '@/stores';
 import { handleMediumThumbnail, isLocalPath } from '@/utils';
 import { useNavigation } from '@react-navigation/native';
@@ -62,15 +60,7 @@ export default function useChatMessage(props: IUseChatMessageProps) {
    * @description when leave chat, execute the following logic
    */
   useBackHandlers(() => {
-    chatStore.setContinueGetMessage(true);
-    chatStore.clearChatMessageList();
-    putLeaveChatMessageApi({
-      sessionId: currentChatSession?.id!,
-      senderId,
-      receiverId,
-    });
-    getChatSessionLastOneMessageList();
-    getChatSessionList();
+    leaveChatMessage();
     return false;
   });
 
