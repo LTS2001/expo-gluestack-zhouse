@@ -78,20 +78,21 @@ export default function useWebrtcLife() {
       setIsConnected(false);
       switch (connectionState) {
         case 'closed':
+          closeConnection();
+          if (isWebrtcPage) {
+            // check whether you can return to avoid the error when the navigation stack is empty
+            if (router.canGoBack()) {
+              router.back();
+            } else {
+              // if not, navigate to the chat list page
+              router.replace('/(tabs)/chat');
+            }
+          }
           break;
         case 'failed':
+          webrtcStore.setConnectionState('closed');
           showToast({ title: '网络连接失败' });
           break;
-      }
-      closeConnection();
-      if (isWebrtcPage) {
-        // check whether you can return to avoid the error when the navigation stack is empty
-        if (router.canGoBack()) {
-          router.back();
-        } else {
-          // if not, navigate to the chat list page
-          router.replace('/(tabs)/chat');
-        }
       }
     }
 

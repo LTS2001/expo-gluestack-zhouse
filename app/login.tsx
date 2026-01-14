@@ -150,7 +150,7 @@ export default function Login() {
                 <InputField
                   placeholder='请输入手机号'
                   onChangeText={onChange}
-                  value={value || '1536172193'}
+                  value={value}
                   keyboardType='phone-pad'
                   maxLength={11}
                 />
@@ -172,7 +172,7 @@ export default function Login() {
                   placeholder='请输入密码'
                   type={passwordVisible ? 'text' : 'password'}
                   onChangeText={onChange}
-                  value={value || '12345'}
+                  value={value}
                   keyboardType='number-pad'
                 />
                 {passwordVisible ? (

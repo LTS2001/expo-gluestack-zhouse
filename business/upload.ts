@@ -2,6 +2,7 @@ import { showToast } from '@/components/ui';
 import { IMediumThumbnail, IVideo } from '@/global';
 import { postUploadImgVideoApi, postUploadUserHeadImgApi } from '@/request';
 import * as ImagePicker from 'expo-image-picker';
+import { MediaType } from 'expo-image-picker';
 import * as VideoThumbnails from 'expo-video-thumbnails';
 import { getUserInfo } from './user';
 
@@ -31,13 +32,14 @@ export const takeMediumFile = async (
 
 /**
  * pick medium file
- * @param options image picker options
+ * @param options image picker options and maxSize (the unit is MB)
  * @returns image picker result
  */
 export const pickMediumFile = async (
-  options: ImagePicker.ImagePickerOptions
+  _options: ImagePicker.ImagePickerOptions & { maxSize?: number }
 ): Promise<ImagePicker.ImagePickerResult> => {
   try {
+    const { maxSize = 2, ...options } = _options;
     // request permission
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
@@ -46,6 +48,14 @@ export const pickMediumFile = async (
     }
     // open medium picker
     const result = await ImagePicker.launchImageLibraryAsync(options);
+    if (
+      !result.canceled &&
+      (result.assets[0]?.fileSize ?? 0) > maxSize * 1024 * 1024
+    ) {
+      const title = `不得超过${maxSize}MB`;
+      showToast({ title });
+      return Promise.reject(title);
+    }
     return Promise.resolve(result);
   } catch (error) {
     console.log('pickMediumFile error:', error);
@@ -139,7 +149,7 @@ export const uploadImage = async (
   options: ImagePicker.ImagePickerOptions,
   onProgress?: (progress: number) => void
 ) => {
-  const result = await pickMediumFile(options);
+  const result = await pickMediumFile({ maxSize: 10, ...options });
   if (!result.canceled) {
     const uri = result.assets[0].uri;
     return await uploadImageToServer({ uri, onProgress });
@@ -162,7 +172,7 @@ export const generateVideoThumbnailLocal = async (
       videoUri,
       {
         time: timeMs,
-        quality: 1, 
+        quality: 1,
       }
     );
     return {
@@ -179,10 +189,10 @@ export const generateVideoThumbnailLocal = async (
 
 /**
  * generate video thumbnail and upload to server
+ * use generateVideoThumbnailLocal and uploadImageToServer separately
  * @param videoUri video file uri
  * @param timeMs specified time point (milliseconds), default 1 second
  * @returns thumbnail info (contains src, dimensions and aspect ratio)
- * @deprecated use generateVideoThumbnailLocal and uploadImageToServer separately
  */
 export const generateVideoThumbnail = async (
   videoUri: string,
@@ -266,22 +276,21 @@ export interface IUploadVideoParams {
 export const uploadVideo = async (
   props: IUploadVideoParams
 ): Promise<Omit<IVideo, 'thumbnail'>> => {
-  const {
-    options = {
-      mediaTypes: ['videos'],
-      quality: 1,
-    },
-    onProgress,
-    onThumbnailGenerated,
-  } = props;
+  const { options: _opts = {}, onProgress, onThumbnailGenerated } = props;
 
   try {
-    const result = await pickMediumFile(options);
+    const options = {
+      mediaTypes: 'videos' as MediaType,
+      quality: 1,
+      ..._opts,
+    };
+    const result = await pickMediumFile({ maxSize: 50, ...options });
     if (!result.canceled) {
-      const { uri, width, height, duration } = result.assets[0];
+      const { uri, duration } = result.assets[0];
       // generate video thumbnail
       const thumbnail = await generateVideoThumbnail(uri);
       onThumbnailGenerated?.(thumbnail);
+      const { width, height } = thumbnail;
       // upload video to server
       const path = await uploadVideoToServer({ uri, onProgress });
       return {
@@ -295,7 +304,10 @@ export const uploadVideo = async (
     return Promise.reject();
   } catch (error) {
     console.log('uploadVideo error:', error);
-    showToast({ title: '上传视频失败，请重试', icon: 'error' });
+    showToast({
+      title: typeof error === 'string' ? error : '上传视频失败，请重试',
+      icon: 'error',
+    });
     return Promise.reject(error);
   }
 };

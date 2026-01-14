@@ -35,62 +35,67 @@ function TenantRefundHistory() {
   };
 
   return (
-    <ScrollView contentContainerClassName='flex-grow' showsVerticalScrollIndicator={false}>
-      <View className='gap-6 pb-8 pt-4'>
+    <View className='flex-1'>
+      <ScrollView
+        contentContainerClassName='flex-grow'
+        showsVerticalScrollIndicator={false}
+      >
         {tenantLeaseRefundList?.length ? (
-          tenantLeaseRefundList?.map(
-            (leaseRefund: IHouseLease, idx: number) => {
-              const {
-                houseName,
-                landlordImg,
-                landlordName,
-                houseImg,
-                price,
-                updatedAt,
-                provinceName,
-                cityName,
-                areaName,
-                addressInfo,
-                leaseId,
-              } = leaseRefund;
-              const currentComment = tenantCommentList?.find(
-                (c) => c.leaseId === leaseId
-              );
-              return (
-                <HouseCard
-                  key={idx}
-                  houseName={houseName}
-                  landlordImg={landlordImg}
-                  landlordName={landlordName}
-                  houseImg={JSON.parse(houseImg)[0]}
-                  housePrice={price}
-                  date={updatedAt}
-                  dateText='退租时间：'
-                  statusText='已退租'
-                  address={`${provinceName}${cityName}${areaName}${addressInfo}`}
-                  footerSlotNode={
-                    <View className='flex justify-center mt-4'>
-                      <Button
-                        onPress={() =>
-                          toCommentHouse(leaseRefund, !!currentComment)
-                        }
-                        action={currentComment ? 'secondary' : 'primary'}
-                      >
-                        <ButtonText>
-                          {currentComment ? '查看评论' : '去评论'}
-                        </ButtonText>
-                      </Button>
-                    </View>
-                  }
-                />
-              );
-            }
-          )
+          <View className='gap-6 pb-8 pt-4'>
+            {tenantLeaseRefundList?.map(
+              (leaseRefund: IHouseLease, idx: number) => {
+                const {
+                  houseName,
+                  landlordImg,
+                  landlordName,
+                  houseImg,
+                  price,
+                  updatedAt,
+                  provinceName,
+                  cityName,
+                  areaName,
+                  addressInfo,
+                  leaseId,
+                } = leaseRefund;
+                const currentComment = tenantCommentList?.find(
+                  (c) => c.leaseId === leaseId
+                );
+                return (
+                  <HouseCard
+                    key={idx}
+                    houseName={houseName}
+                    landlordImg={landlordImg}
+                    landlordName={landlordName}
+                    houseImg={JSON.parse(houseImg)[0]}
+                    housePrice={price}
+                    date={updatedAt}
+                    dateText='退租时间：'
+                    statusText='已退租'
+                    address={`${provinceName}${cityName}${areaName}${addressInfo}`}
+                    footerSlotNode={
+                      <View className='flex justify-center mt-4'>
+                        <Button
+                          onPress={() =>
+                            toCommentHouse(leaseRefund, !!currentComment)
+                          }
+                          action={currentComment ? 'secondary' : 'primary'}
+                        >
+                          <ButtonText>
+                            {currentComment ? '查看评论' : '去评论'}
+                          </ButtonText>
+                        </Button>
+                      </View>
+                    }
+                  />
+                );
+              }
+            )}
+          </View>
         ) : (
           <Empty text='暂无租房历史' />
         )}
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 

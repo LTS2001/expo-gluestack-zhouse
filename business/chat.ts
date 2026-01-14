@@ -15,6 +15,7 @@ import {
   getChatSessionListApi,
   postChatMessageApi,
   postChatSessionApi,
+  putLeaveChatMessageApi,
 } from '@/request';
 import { chatStore, socketStore } from '@/stores';
 import { getReceiverInfoListByIdList } from './user';
@@ -278,4 +279,23 @@ export const getChatMessage = async () => {
   ) {
     setChatMessageList([lastOneMessage, ...(chatMessageList ?? [])]);
   }
+};
+
+export const leaveChatMessage = () => {
+  const {
+    setContinueGetMessage,
+    clearChatMessageList,
+    currentChatSession,
+    senderId,
+    receiverId,
+  } = chatStore;
+  setContinueGetMessage(true);
+  clearChatMessageList();
+  putLeaveChatMessageApi({
+    sessionId: currentChatSession?.id!,
+    senderId,
+    receiverId,
+  });
+  getChatSessionLastOneMessageList();
+  getChatSessionList();
 };

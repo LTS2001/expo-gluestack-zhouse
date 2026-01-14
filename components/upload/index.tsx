@@ -86,18 +86,27 @@ export const UploadImages = ({
       {/* image list */}
       {value && Array.isArray(value) && value.length > 0
         ? value.map((item, index) => (
-            <TouchableOpacity
-              key={index}
-              onPress={() => {
-                setImagePreviewVisible(true);
-                setImagePreviewIndex(index);
-              }}
-            >
-              <Image
-                src={item}
-                className='w-32 h-20 rounded-md border-[1px] border-secondary-300'
-              />
-            </TouchableOpacity>
+            <View key={index} className='relative'>
+              <TouchableOpacity
+                onPress={() => {
+                  setImagePreviewVisible(true);
+                  setImagePreviewIndex(index);
+                }}
+              >
+                <Image
+                  src={item}
+                  className='w-32 h-20 rounded-md border-[1px] border-secondary-300'
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                className='absolute -top-3 -right-2'
+                onPress={() => {
+                  onChange?.(value.filter((v) => v !== item));
+                }}
+              >
+                <Icon as='Fontisto' name='close' size={16} />
+              </TouchableOpacity>
+            </View>
           ))
         : null}
       {/* add image */}
