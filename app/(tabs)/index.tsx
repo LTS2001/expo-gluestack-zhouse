@@ -46,6 +46,11 @@ const LandlordHome = observer(() => {
           onChangeFocus={setIsSearchFocused}
         />
       ),
+      headerLeft: () => (
+        <TouchableOpacity onPress={() => router.push('/amap')}>
+          <Icon as='FontAwesome6' name='arrow-left' size={24} color='black' />
+        </TouchableOpacity>
+      ),
     });
   }, [navigation, isSearchFocused]);
 
@@ -137,7 +142,7 @@ const LandlordHome = observer(() => {
               const isPublish = status === notLeaseReleased;
               // waiting for rent (not lease not released or published)
               const forRent = [notLeaseNotReleased, notLeaseReleased].includes(
-                status
+                status,
               );
               return (
                 <HouseCard
@@ -154,8 +159,8 @@ const LandlordHome = observer(() => {
                             forRent
                               ? 'bg-theme-tertiary'
                               : rented
-                              ? 'bg-theme-primary'
-                              : 'bg-theme-secondary'
+                                ? 'bg-theme-primary'
+                                : 'bg-theme-secondary'
                           }
                           expand
                         />

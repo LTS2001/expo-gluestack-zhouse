@@ -44,7 +44,7 @@
     <meta-data android:name="expo.modules.updates.EXPO_UPDATES_CHECK_ON_LAUNCH"
       android:value="ALWAYS" />
     <meta-data android:name="expo.modules.updates.EXPO_UPDATES_LAUNCH_WAIT_MS" android:value="0" />
-    <meta-data android:name="com.amap.api.v2.apikey" android:value="你的高德地图API Key" />
+    <meta-data android:name="com.amap.api.v2.apikey" android:value="99cc2364043e4a6ebbadfb9f2ea0889c" />
     <service android:name="expo.modules.video.playbackService.ExpoVideoPlaybackService"
       android:exported="false" android:foregroundServiceType="mediaPlayback">
       <intent-filter>

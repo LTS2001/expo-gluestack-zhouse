@@ -147,6 +147,12 @@ android {
     }
 }
 
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+}
+
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
@@ -175,5 +181,14 @@ dependencies {
         implementation jscFlavor
     }
 
-    implementation("com.amap.api:map3d:latest.integration")
+    // implementation("com.amap.api:map3d:latest.integration")
+    // implementation("com.amap.api:location:6.4.0")
+    // 高德 SDK 本地依赖AMap3DMap_11.1.001_AMapSearch_9.7.4_AMapLocation_11.1.001_20260402.aar
+    /**
+     * 高德 SDK 本地依赖
+     * 下载源文件名称为：amap3DMap_11.1.001_AMapSearch_9.7.4_AMapLocation_11.1.001_20260402.aar
+     * 依赖文件：libs/amap-11.1.001.aar
+     * 来源：高德官网下载 AAR 合包
+     */
+    implementation(name: 'amap-11.1.001', ext: 'aar')
 }
