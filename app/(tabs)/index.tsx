@@ -47,8 +47,8 @@ const LandlordHome = observer(() => {
         />
       ),
       headerLeft: () => (
-        <TouchableOpacity onPress={() => router.push('/amap')}>
-          <Icon as='FontAwesome6' name='arrow-left' size={24} color='black' />
+        <TouchableOpacity onPress={() => router.push('/amap')} className='ml-4'>
+          <Icon as='FontAwesome5' name='map-marked-alt' size={24} color='#888' />
         </TouchableOpacity>
       ),
     });

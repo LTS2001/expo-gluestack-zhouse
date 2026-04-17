@@ -52,7 +52,7 @@ class MainApplication : Application(), ReactApplication {
       load()
     }
     ApplicationLifecycleDispatcher.onApplicationCreate(this)
-
+    android.util.Log.d("MainApplication", "onCreate")
     // ✅ 地图隐私合规
     MapsInitializer.updatePrivacyShow(this, true, true)
     MapsInitializer.updatePrivacyAgree(this, true)

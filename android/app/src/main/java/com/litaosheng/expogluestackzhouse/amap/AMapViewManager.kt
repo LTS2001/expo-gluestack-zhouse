@@ -38,6 +38,7 @@ class AMapViewManager : SimpleViewManager<MapView>() {
     locationClient.setLocationOption(locationOption)
 
     locationClient.setLocationListener { location ->
+        android.util.Log.d("AMapViewManager", "定位结果: $location")
         if (location != null && location.errorCode == 0) {
             val lat = location.latitude
             val lng = location.longitude

@@ -48,7 +48,7 @@ export default function RootLayout() {
         <KeyboardProvider>
           <Stack
             initialRouteName='identity'
-            screenOptions={{ headerTitleAlign: 'center' }}
+            screenOptions={{ headerTitleAlign: 'center', animation: 'fade' }}
           >
             <Stack.Screen name='identity' options={{ headerShown: false }} />
             <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
@@ -105,6 +105,7 @@ export default function RootLayout() {
             <Stack.Screen name='house-all-comment' />
             <Stack.Screen name='chat-webrtc' options={{ headerShown: false }} />
             <Stack.Screen name='+not-found' />
+            <Stack.Screen name='amap' options={{ headerShown: false }} />
           </Stack>
           <StatusBar style='auto' />
           <Toast />
