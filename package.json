@@ -3,12 +3,16 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
+    "lint": "expo lint",
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
-    "android": "DARK_MODE=media npx expo run:android --device",
-    "ios": "DARK_MODE=media expo start --ios",
-    "web": "DARK_MODE=media expo start --web",
-    "lint": "expo lint"
+    "gen:env": "node scripts/generate-env-types.js",
+    "postinstall": "npm run gen:env",
+    "preandroid:dev": "npm run gen:env",
+    "android:dev": "cross-env APP_ENV=dev npx expo run:android",
+    "android:prod": "cross-env APP_ENV=prod npx expo run:android",
+    "android:build:apk": "cd android && ./gradlew assembleRelease -PAPP_ENV=prod",
+    "android:build:aab": "cd android && ./gradlew bundleRelease -PAPP_ENV=prod"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
@@ -80,9 +84,12 @@
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@types/react": "~19.0.10",
+    "cross-env": "^10.1.0",
+    "dotenv": "^17.4.2",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~9.2.0",
     "jscodeshift": "0.15.2",
+    "react-native-dotenv": "^3.4.11",
     "typescript": "~5.8.3"
   },
   "private": true

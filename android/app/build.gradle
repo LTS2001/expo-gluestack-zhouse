@@ -81,6 +81,29 @@ def enableProguardInReleaseBuilds = (findProperty('android.enableProguardInRelea
  */
 def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 
+def loadEnvFile() {
+    def env = System.getenv('APP_ENV') ?: findProperty('APP_ENV') ?: 'dev'
+    def props = new Properties()
+    def file = rootProject.file("gradle.${env}.properties")
+    if (!file.exists()) {
+        throw new RuntimeException("❌ File gradle.${env}.properties not found")
+    } 
+    props.load(file.newInputStream())
+    def requiredKeys = ['SIGNING_STORE_FILE', 'SIGNING_STORE_PASSWORD', 'SIGNING_KEY_ALIAS', 'SIGNING_KEY_PASSWORD']
+    def missingKeys = []
+    requiredKeys.each { key ->
+        def values = props.getProperty(key)
+        if (values === null || values.trim().isEmpty()) {
+            missingKeys.add(key)
+        }
+    }
+    if (!missingKeys.isEmpty()) {
+        throw new RuntimeException("❌ File gradle.${env}.properties is missing required properties:  ${missingKeys.join(', ')}")
+    }
+    return props
+}
+def envVariable = loadEnvFile()
+
 android {
     ndkVersion rootProject.ext.ndkVersion
 
@@ -97,10 +120,16 @@ android {
     }
     signingConfigs {
         debug {
-            storeFile file('debug.keystore')
-            storePassword 'android'
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
+            storeFile file(envVariable['SIGNING_STORE_FILE'])
+            storePassword envVariable['SIGNING_STORE_PASSWORD']
+            keyAlias envVariable['SIGNING_KEY_ALIAS']
+            keyPassword envVariable['SIGNING_KEY_PASSWORD']
+        }
+        release {
+            storeFile file(envVariable['SIGNING_STORE_FILE'])
+            storePassword envVariable['SIGNING_STORE_PASSWORD']
+            keyAlias envVariable['SIGNING_KEY_ALIAS']
+            keyPassword envVariable['SIGNING_KEY_PASSWORD']
         }
     }
     buildTypes {
@@ -110,7 +139,7 @@ android {
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
             shrinkResources (findProperty('android.enableShrinkResourcesInReleaseBuilds')?.toBoolean() ?: false)
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"

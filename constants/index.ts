@@ -1,3 +1,8 @@
+import {
+  APP_SERVER_API_ROOT,
+  APP_SERVER_IMAGE_ROOT,
+  APP_SERVER_SOCKET_ROOT,
+} from '@env';
 export * from './auth';
 export * from './chat';
 export * from './code';
@@ -8,17 +13,18 @@ export * from './image';
 export * from './map';
 export * from './socket';
 export * from './webrtc';
+
 /**
  * api server root
  */
-export const SERVER_API_ROOT = `https://litaosheng.top`;
+export const SERVER_API_ROOT = APP_SERVER_API_ROOT;
 
 /**
  * websocket server root
  */
-export const SERVER_SOCKET_ROOT = `wss://litaosheng.top:6003`;
+export const SERVER_SOCKET_ROOT = APP_SERVER_SOCKET_ROOT;
 
 /**
  * image and video server root
  */
-export const SERVER_IMAGE_ROOT = `https://litaosheng.top:10000/static`;
+export const SERVER_IMAGE_ROOT = APP_SERVER_IMAGE_ROOT;
