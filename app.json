@@ -2,9 +2,7 @@
   "expo": {
     "name": "行间小筑",
     "slug": "expo-gluestack-zhouse",
-    "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
     "scheme": "expogluestackzhouse",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -13,18 +11,7 @@
       "bundleIdentifier": "com.litaosheng.expogluestackzhouse"
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": true,
-      "package": "com.litaosheng.expogluestackzhouse",
-      "permissions": ["CALL_PHONE", "READ_PHONE_STATE", "READ_PHONE_NUMBERS"]
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "package": "com.litaosheng.expogluestackzhouse"
     },
     "plugins": [
       "expo-router",
