@@ -3,12 +3,18 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
+    "lint": "expo lint",
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
-    "android": "DARK_MODE=media npx expo run:android --device",
-    "ios": "DARK_MODE=media expo start --ios",
-    "web": "DARK_MODE=media expo start --web",
-    "lint": "expo lint"
+    "gen:env": "node scripts/generate-env.js",
+    "preandroid:dev": "cross-env APP_ENV=dev npm run gen:env",
+    "android:dev": "cross-env APP_ENV=dev npx expo run:android --device",
+    "preandroid:prod": "cross-env APP_ENV=prod npm run gen:env",
+    "android:prod": "cross-env APP_ENV=prod npx expo run:android --device",
+    "android:build:apk": "cross-env APP_ENV=prod npm run gen:env && npm run android:gradle:apk",
+    "android:build:aab": "cross-env APP_ENV=prod npm run gen:env && npm run android:gradle:aab",
+    "android:gradle:apk": "cd android && cross-env APP_ENV=prod ./gradlew assembleRelease",
+    "android:gradle:aab": "cd android && cross-env APP_ENV=prod ./gradlew bundleRelease"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
@@ -80,6 +86,8 @@
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@types/react": "~19.0.10",
+    "cross-env": "^10.1.0",
+    "dotenv": "^17.4.2",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~9.2.0",
     "jscodeshift": "0.15.2",
