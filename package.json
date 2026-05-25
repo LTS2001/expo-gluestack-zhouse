@@ -17,9 +17,11 @@
     "android:gradle:aab": "cd android && cross-env APP_ENV=prod ./gradlew bundleRelease"
   },
   "dependencies": {
+    "@expo/html-elements": "^0.12.5",
     "@expo/vector-icons": "^14.1.0",
     "@gluestack-ui/alert-dialog": "^0.1.38",
     "@gluestack-ui/button": "^1.0.14",
+    "@gluestack-ui/core": "^3.0.20",
     "@gluestack-ui/divider": "^0.1.10",
     "@gluestack-ui/form-control": "^0.1.19",
     "@gluestack-ui/image": "^0.1.17",
@@ -33,6 +35,7 @@
     "@gluestack-ui/spinner": "^0.1.15",
     "@gluestack-ui/textarea": "^0.1.25",
     "@gluestack-ui/toast": "^1.0.9",
+    "@gluestack-ui/utils": "^3.0.21",
     "@hookform/resolvers": "^5.1.1",
     "@legendapp/motion": "^2.4.0",
     "@react-native-async-storage/async-storage": "^2.1.2",

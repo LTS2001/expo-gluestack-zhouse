@@ -1,4 +1,4 @@
-import { ITencentMapLocation } from '@/global';
+import { ITencentMapLocation, TAMapLocation } from '@/global';
 import mitt from 'mitt';
 
 export enum EEventNameEnum {
@@ -18,7 +18,7 @@ export enum EEventNameEnum {
 }
 
 const emitter = mitt<{
-  [EEventNameEnum.GetLocation]: ITencentMapLocation;
+  [EEventNameEnum.GetLocation]: ITencentMapLocation | TAMapLocation;
   [EEventNameEnum.WebrtcOfferIce]: string;
   [EEventNameEnum.WebrtcAnswer]: string;
   [EEventNameEnum.WebrtcAnswerIce]: string;

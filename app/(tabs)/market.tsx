@@ -6,11 +6,12 @@ import emitter, { EEventNameEnum } from '@/emitter';
 import { IHouse, ITencentMapLocation, IUser } from '@/global';
 import { getCollectHouseNumApi, getLandlordListApi } from '@/request';
 import { houseStore, userStore } from '@/stores';
+import { requestLocationPermission } from '@/utils/location';
 import { useNavigation } from '@react-navigation/native';
 import { router } from 'expo-router';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
-import { Dimensions, RefreshControl, ScrollView } from 'react-native';
+import { Dimensions, Platform, RefreshControl, ScrollView } from 'react-native';
 
 const screenWidth = Dimensions.get('window').width;
 const halfScreenWidth = screenWidth / 2;
@@ -64,14 +65,19 @@ const Market = () => {
         : () => (
             <TouchableOpacity
               className='flex-row items-center gap-2 py-3 ml-4 absolute left-0'
-              onPress={() =>
-                router.push({
-                  pathname: '/choose-location',
-                  params: {
-                    eventName: EEventNameEnum.GetLocation,
-                  },
-                })
-              }
+              onPress={async () => {
+                if (Platform.OS === 'android') {
+                  await requestLocationPermission();
+                  router.push('/amap');
+                } else {
+                  router.push({
+                    pathname: '/choose-location',
+                    params: {
+                      eventName: EEventNameEnum.GetLocation,
+                    },
+                  });
+                }
+              }}
             >
               <Icon
                 as='Octicons'

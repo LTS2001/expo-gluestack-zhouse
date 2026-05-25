@@ -818,6 +818,11 @@ declare module '@/global' {
   }
 
   /**
+   * amap location
+   */
+  type TAMapLocation = ITencentMapLocation;
+
+  /**
    * websocket message interface
    */
   interface ISocketMessage {
