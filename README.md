@@ -123,7 +123,14 @@ SIGNING_KEY_ALIAS=****
 SIGNING_KEY_PASSWORD=****
 ```
 
-## 1.2 🚩 项目运行
+## 1.2 👹 高德地图配置
+
+在`android/app/src/main/AndroidManifest.xml`文件中，找到`<meta-data android:name="com.amap.api.v2.apikey" android:value="替换成你的高德map key" />`，在android:value中替换成你在高德地图开放平台申请到的key。
+
+[我的应用 | 高德控制台](https://console.amap.com/dev/key/app)
+
+## 1.3 🚩 项目运行
+
 ```json
 {
   "scripts": {

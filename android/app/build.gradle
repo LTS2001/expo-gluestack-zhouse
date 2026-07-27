@@ -178,6 +178,12 @@ android {
     }
 }
 
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+}
+
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
@@ -205,4 +211,12 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+
+    /**
+     * Gaode SDK local dependence
+     * The download source file name: amap3DMap_11.1.001_AMapSearch_9.7.4_AMapLocation_11.1.001_20260402.aar
+     * Dependent file: libs/amap-11.1.001.aar
+     * Source: Gao De official website Download AAR Package
+     */
+    implementation(name: 'amap-11.1.001', ext: 'aar')
 }

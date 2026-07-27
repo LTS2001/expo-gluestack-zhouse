@@ -1,4 +1,4 @@
-import { OverlayProvider } from '@gluestack-ui/overlay';
+import { OverlayProvider } from '@gluestack-ui/core/overlay/creator';
 import { ToastProvider } from '@gluestack-ui/toast';
 import { useColorScheme } from 'nativewind';
 import React, { useEffect } from 'react';

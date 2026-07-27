@@ -1,0 +1,5 @@
+<resources>
+    <item name="map_location" type="id" />
+    <item name="map_location_client" type="id" />
+    <item name="map_is_programmatic_move" type="id" />
+</resources>
