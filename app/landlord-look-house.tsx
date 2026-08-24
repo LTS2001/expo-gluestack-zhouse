@@ -9,8 +9,8 @@ import { HouseToStatusMap } from '@/constants';
 import { IUser } from '@/global';
 import { getTenantLeaseHouseApi } from '@/request';
 import { houseStore } from '@/stores';
-import { useNavigation } from '@react-navigation/native';
 import { router } from 'expo-router';
+import { useNavigation } from 'expo-router/react-navigation';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useMemo, useState } from 'react';
 import { ScrollView } from 'react-native';
@@ -24,7 +24,7 @@ function LandlordLookHouse() {
 
   const isRelease = useMemo(
     () => currentHouse?.status === HouseToStatusMap.release,
-    [currentHouse]
+    [currentHouse],
   );
   // waiting for rent (not lease not released or published)
   const forRent = [
@@ -92,8 +92,8 @@ function LandlordLookHouse() {
               forRent
                 ? 'bg-theme-tertiary'
                 : rented
-                ? 'bg-theme-primary'
-                : 'bg-theme-secondary'
+                  ? 'bg-theme-primary'
+                  : 'bg-theme-secondary'
             }
             expand
           />

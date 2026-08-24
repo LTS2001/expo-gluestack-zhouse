@@ -1,4 +1,4 @@
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from 'expo-router/react-navigation';
 import { useCallback, useEffect, useRef } from 'react';
 import { BackHandler } from 'react-native';
 
@@ -28,7 +28,7 @@ type TBackHandlerProps = () => boolean;
  * Listen for all return key events
  */
 export default function useBackHandlers(
-  props: IBackHandlerProps | TBackHandlerProps
+  props: IBackHandlerProps | TBackHandlerProps,
 ) {
   let options: IBackHandlerProps = {};
   let isSingleFunction = false;
@@ -78,10 +78,10 @@ export default function useBackHandlers(
 
       const subscription = BackHandler.addEventListener(
         'hardwareBackPress',
-        onBackPress
+        onBackPress,
       );
       return () => subscription.remove();
-    }, [onHardwareBack, isSingleFunction])
+    }, [onHardwareBack, isSingleFunction]),
   );
 
   // Listen for all navigation events

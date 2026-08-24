@@ -21,7 +21,7 @@ import {
 import { IMediumThumbnail, IVideo, TMessageModel } from '@/global';
 import { chatStore, socketStore } from '@/stores';
 import { handleMediumThumbnail, isLocalPath } from '@/utils';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from 'expo-router/react-navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FlatList, Keyboard } from 'react-native';
 import useBackHandlers from './useBackHandlers';
@@ -89,9 +89,9 @@ export default function useChatMessage(props: IUseChatMessageProps) {
     () =>
       Math.min(
         Math.max(inputHeight || CHAT_INPUT_MIN_HEIGHT, CHAT_INPUT_MIN_HEIGHT),
-        CHAT_INPUT_MAX_HEIGHT
+        CHAT_INPUT_MAX_HEIGHT,
       ),
-    [inputHeight]
+    [inputHeight],
   );
 
   /**
@@ -159,7 +159,7 @@ export default function useChatMessage(props: IUseChatMessageProps) {
             receiverId,
             ...messageModel,
           },
-          { msgIdCount: msgIdCount.current++ }
+          { msgIdCount: msgIdCount.current++ },
         );
       else
         await addChatMessage(
@@ -170,7 +170,7 @@ export default function useChatMessage(props: IUseChatMessageProps) {
             type: EChatMessageTypeEnum.Text,
             content: chatInputVal,
           },
-          { msgIdCount: msgIdCount.current++ }
+          { msgIdCount: msgIdCount.current++ },
         );
       sendMessage();
       // scroll to bottom after sending message
@@ -185,7 +185,7 @@ export default function useChatMessage(props: IUseChatMessageProps) {
       chatInputVal,
       handleChatAreaScrollToBottom,
       sendMessage,
-    ]
+    ],
   );
 
   /**
@@ -195,7 +195,7 @@ export default function useChatMessage(props: IUseChatMessageProps) {
     async (
       messageId: number | string,
       imageUri: string,
-      initialContent: IMediumThumbnail
+      initialContent: IMediumThumbnail,
     ) => {
       try {
         const imageUrl = await uploadImageToServer({
@@ -217,7 +217,7 @@ export default function useChatMessage(props: IUseChatMessageProps) {
         throw error;
       }
     },
-    [sendMessage]
+    [sendMessage],
   );
 
   /**
@@ -228,7 +228,7 @@ export default function useChatMessage(props: IUseChatMessageProps) {
       messageId: number | string,
       videoUri: string,
       thumbnailUri: string,
-      initialContent: IVideo
+      initialContent: IVideo,
     ) => {
       try {
         const [thumbnailUrl, videoUrl] = await Promise.all([
@@ -258,7 +258,7 @@ export default function useChatMessage(props: IUseChatMessageProps) {
         throw error;
       }
     },
-    [sendMessage]
+    [sendMessage],
   );
 
   /**
@@ -302,7 +302,7 @@ export default function useChatMessage(props: IUseChatMessageProps) {
           {
             msgIdCount: msgIdCount.current++,
             skipApiCall: true, // call API after upload completes
-          }
+          },
         );
         // set uploading status
         updateChatMessageUploadProgress(messageId, 0, 'uploading');
@@ -335,7 +335,7 @@ export default function useChatMessage(props: IUseChatMessageProps) {
             {
               msgIdCount: msgIdCount.current++,
               skipApiCall: true,
-            }
+            },
           );
           // set upload status
           updateChatMessageUploadProgress(messageId, 0, 'uploading');
@@ -345,7 +345,7 @@ export default function useChatMessage(props: IUseChatMessageProps) {
             messageId,
             uri,
             localThumbnail.path,
-            initialContent
+            initialContent,
           );
         } catch {
           // error already handled in uploadVideoAndUpdateMessage
@@ -372,7 +372,7 @@ export default function useChatMessage(props: IUseChatMessageProps) {
                 {
                   msgIdCount: msgIdCount.current++,
                   skipApiCall: true,
-                }
+                },
               );
               updateChatMessageUploadProgress(messageId, 0, 'failed');
             } catch (err) {
@@ -461,7 +461,7 @@ export default function useChatMessage(props: IUseChatMessageProps) {
             await uploadImageAndUpdateMessage(
               messageId,
               imagePath,
-              parsedContent
+              parsedContent,
             );
           } else {
             // send message to receiver via websocket
@@ -487,7 +487,7 @@ export default function useChatMessage(props: IUseChatMessageProps) {
                 messageId,
                 finalVideoUri,
                 finalThumbnailUri,
-                parsedContent
+                parsedContent,
               );
             } else if (finalVideoUri) {
               // only upload video (thumbnail is already server path)
@@ -497,7 +497,7 @@ export default function useChatMessage(props: IUseChatMessageProps) {
                   updateChatMessageUploadProgress(
                     messageId,
                     progress,
-                    'uploading'
+                    'uploading',
                   );
                 },
               });
@@ -508,7 +508,7 @@ export default function useChatMessage(props: IUseChatMessageProps) {
               };
               await updateChatMessageContent(
                 messageId,
-                JSON.stringify(finalContent)
+                JSON.stringify(finalContent),
               );
 
               sendMessage();
@@ -530,7 +530,7 @@ export default function useChatMessage(props: IUseChatMessageProps) {
               };
               await updateChatMessageContent(
                 messageId,
-                JSON.stringify(finalContent)
+                JSON.stringify(finalContent),
               );
 
               sendMessage();
@@ -553,7 +553,7 @@ export default function useChatMessage(props: IUseChatMessageProps) {
       uploadImageAndUpdateMessage,
       uploadVideoAndUpdateMessage,
       sendMessage,
-    ]
+    ],
   );
 
   return {

@@ -21,13 +21,13 @@ import {
 import {
   ESocketMessageActionEnum,
   EUserIdentityEnum,
-  HouseToLeaseMap
+  HouseToLeaseMap,
 } from '@/constants';
 import { getLeaseHouseTenantApi, postLeaseApi } from '@/request';
 import { authStore, houseStore, userStore } from '@/stores';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigation } from '@react-navigation/native';
 import { router } from 'expo-router';
+import { useNavigation } from 'expo-router/react-navigation';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -74,23 +74,18 @@ const MarketLookHouse = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /**
-   * get current house lease status
-   */
-  const getCurrentHouseLeaseStatue = async () => {
-    // not login
-    if (!authStore.isLogin) return;
-    if (houses?.houseId && user?.id) {
-      const res = await getLeaseHouseTenantApi(houses?.houseId, user?.id);
-      res?.status && setLeaseState(res.status);
-    }
-  };
-
   // tenant not login, click collect or lease
   useEffect(() => {
-    getCurrentHouseLeaseStatue();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [houses, user]);
+    (async () => {
+      // not login
+      if (!authStore.isLogin) return;
+      //  get current house lease status
+      if (houses?.houseId && user?.id) {
+        const res = await getLeaseHouseTenantApi(houses?.houseId, user?.id);
+        res?.status && setLeaseState(res.status);
+      }
+    })();
+  }, [houses?.houseId, user?.id]);
 
   /**
    * send lease request to landlord

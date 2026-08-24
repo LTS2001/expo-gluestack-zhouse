@@ -15,8 +15,8 @@ import {
 } from '@/components/ui';
 import { postCommentApi } from '@/request';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigation } from '@react-navigation/native';
 import { router, useLocalSearchParams } from 'expo-router';
+import { useNavigation } from 'expo-router/react-navigation';
 import { useEffect, useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { ScrollView } from 'react-native';

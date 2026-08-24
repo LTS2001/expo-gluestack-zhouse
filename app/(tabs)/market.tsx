@@ -7,8 +7,8 @@ import { IHouse, ITencentMapLocation, IUser } from '@/global';
 import { getCollectHouseNumApi, getLandlordListApi } from '@/request';
 import { houseStore, userStore } from '@/stores';
 import { requestLocationPermission } from '@/utils/location';
-import { useNavigation } from '@react-navigation/native';
 import { router } from 'expo-router';
+import { useNavigation } from 'expo-router/react-navigation';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import { Dimensions, Platform, RefreshControl, ScrollView } from 'react-native';
@@ -102,10 +102,10 @@ const Market = () => {
     const getLandlordById = async () => {
       if (marketHouseList?.length) {
         const landlordIds: number[] = marketHouseList?.map(
-          (item) => item.landlordId
+          (item) => item.landlordId,
         );
         const landlordList = await getLandlordListApi(
-          [...new Set(landlordIds)].join(',')
+          [...new Set(landlordIds)].join(','),
         );
         setLandlordList((l) => [...l, ...landlordList]);
       }
@@ -115,7 +115,7 @@ const Market = () => {
       const { houseCollectList, setHouseCollectList } = houseStore;
       if (marketHouseList instanceof Array && marketHouseList[0]?.houseId) {
         const collectList = await getCollectHouseNumApi(
-          marketHouseList.map((house) => house?.houseId).join(',')!
+          marketHouseList.map((house) => house?.houseId).join(',')!,
         );
         setHouseCollectList([
           ...(houseCollectList || []),
@@ -206,7 +206,7 @@ const Market = () => {
                       <View className='flex-row items-center gap-1'>
                         <Text className='text-lg'>
                           {houseCollectList?.find(
-                            (c) => c.houseId === house.houseId
+                            (c) => c.houseId === house.houseId,
                           )?.count || 0}
                         </Text>
                         <Text>收藏</Text>

@@ -8,51 +8,45 @@ import com.facebook.react.uimanager.events.Event
 import com.facebook.react.uimanager.events.RCTModernEventEmitter
 
 class AMapEvent(
-        surfaceId: Int,
-        viewId: Int,
-        private val eventName: String,
-        private val eventData: WritableMap?
+    surfaceId: Int,
+    viewId: Int,
+    private val name: String,
+    private val eventData: WritableMap?
 ) : Event<AMapEvent>(surfaceId, viewId) {
 
-  override fun getEventName(): String {
-    return eventName
-  }
+    override fun getEventName(): String {
+        return name
+    }
 
-  override fun dispatchModern(rctEventEmitter: RCTModernEventEmitter) {
+    override fun getEventData(): WritableMap? {
+        return eventData
+    }
 
-    rctEventEmitter.receiveEvent(
-            surfaceId,
-            viewTag,
-            eventName,
-            canCoalesce(),
-            coalescingKey.toInt(),
-            eventData,
-            eventCategory
-    )
-  }
+    override fun canCoalesce(): Boolean {
+        return false
+    }
 
-  companion object {
+    companion object {
+        const val ON_POI_SEARCH = "onPoiSearch"
+        const val ON_POI_SEARCH_START = "onPoiSearchStart"
 
-    const val ON_POI_SEARCH = "onPoiSearch"
-
-    const val ON_POI_SEARCH_START = "onPoiSearchStart"
-
-    fun sendEvent(
+        fun sendEvent(
             mapView: MapView,
             reactContext: ThemedReactContext,
             eventName: String,
             params: WritableMap? = null
-    ) {
-
-      UIManagerHelper.getEventDispatcherForReactTag(reactContext, mapView.id)
-              ?.dispatchEvent(
-                      AMapEvent(
-                              UIManagerHelper.getSurfaceId(reactContext),
-                              mapView.id,
-                              eventName,
-                              params
-                      )
-              )
+        ) {
+            UIManagerHelper.getEventDispatcherForReactTag(
+                reactContext,
+                mapView.id
+            )?.dispatchEvent(
+                AMapEvent(
+                    UIManagerHelper.getSurfaceId(reactContext),
+                    mapView.id,
+                    eventName,
+                    params
+                )
+            )
+        }
     }
-  }
 }

@@ -3,8 +3,8 @@ import { Image, Text, TouchableOpacity, View } from '@/components/ui';
 import { IComment } from '@/global';
 import { useMediaPreview } from '@/hooks';
 import { getHouseCommentListApi } from '@/request';
-import { useNavigation } from '@react-navigation/native';
 import { useLocalSearchParams } from 'expo-router';
+import { useNavigation } from 'expo-router/react-navigation';
 import { useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
 
@@ -37,7 +37,7 @@ export default function HouseAllComment() {
           }
         });
         const currentTenantComment = JSON.parse(
-          JSON.stringify(res.find((r) => r.leaseId === Number(leaseId)))
+          JSON.stringify(res.find((r) => r.leaseId === Number(leaseId))),
         );
         res.splice(currentTenantCommentIndex, 1);
         res.unshift(currentTenantComment);
@@ -96,7 +96,7 @@ export default function HouseAllComment() {
                             />
                           </TouchableOpacity>
                         );
-                      }
+                      },
                     )}
                   </View>
                 </View>
