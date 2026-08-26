@@ -122,7 +122,7 @@ export default function Login() {
       <View className='items-center'>
         <Image source={require('@/assets/images/icon.png')} size='xl' />
       </View>
-      <View className='mx-8 mt-4'>
+      <View className='m-4'>
         <View className='flex-row items-end'>
           <Text className='text-xl'>您好，</Text>
           <Text className='text-2xl font-bold text-theme-primary'>
@@ -131,7 +131,7 @@ export default function Login() {
         </View>
         <View className='flex-row justify-end mt-2 items-end'>
           <Text className='text-xl'>欢迎使用</Text>
-          <Text className='text-2xl font-bold text-theme-tertiary italic'>
+          <Text className='text-2xl font-bold text-theme-primary'>
             LTS行间小筑
           </Text>
         </View>
@@ -153,6 +153,7 @@ export default function Login() {
                   value={value}
                   keyboardType='phone-pad'
                   maxLength={11}
+                  className='p-0 px-2'
                 />
               </Input>
             )}
@@ -167,13 +168,14 @@ export default function Login() {
             control={control}
             render={({ field: { onChange, value } }) => (
               <Input variant='underlined'>
-                <Icon as='AntDesign' name='lock' className='mx-1.5' />
+                <Icon as='AntDesign' name='lock' className='mx-1.5' size={20} />
                 <InputField
                   placeholder='请输入密码'
                   type={passwordVisible ? 'text' : 'password'}
                   onChangeText={onChange}
                   value={value}
                   keyboardType='number-pad'
+                  className='p-0 px-2'
                 />
                 {passwordVisible ? (
                   <Icon
@@ -206,13 +208,19 @@ export default function Login() {
               control={control}
               render={({ field: { onChange, value } }) => (
                 <Input variant='underlined'>
-                  <Icon as='AntDesign' name='lock' className='mx-1.5' />
+                  <Icon
+                    as='AntDesign'
+                    name='lock'
+                    className='mx-1.5'
+                    size={20}
+                  />
                   <InputField
                     placeholder='请再次输入密码'
                     type={checkPasswordVisible ? 'text' : 'password'}
                     onChangeText={onChange}
                     value={value}
                     keyboardType='number-pad'
+                    className='p-0 px-2'
                   />
                   {checkPasswordVisible ? (
                     <Icon

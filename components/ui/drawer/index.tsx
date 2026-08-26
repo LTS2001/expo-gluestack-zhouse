@@ -1,66 +1,44 @@
-'use client';
-import { createModal as createDrawer } from '@gluestack-ui/modal';
-import type { VariantProps } from '@gluestack-ui/nativewind-utils';
-import { tva } from '@gluestack-ui/nativewind-utils/tva';
+import { createModal as createDrawer } from '@gluestack-ui/core/modal/creator';
+import type { VariantProps } from '@gluestack-ui/utils/nativewind-utils';
 import {
+  tva,
   useStyleContext,
   withStyleContext,
-} from '@gluestack-ui/nativewind-utils/withStyleContext';
-import {
-  AnimatePresence,
-  createMotionAnimatedComponent,
-  Motion,
-  MotionComponentProps,
-} from '@legendapp/motion';
-import { cssInterop } from 'nativewind';
+} from '@gluestack-ui/utils/nativewind-utils';
 import React, { ReactNode } from 'react';
-import {
-  Dimensions,
-  Pressable,
-  ScrollView,
-  View,
-  ViewStyle,
-} from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
+import Animated, {
+  Easing,
+  FadeIn,
+  FadeOut,
+  SlideInDown,
+  SlideInLeft,
+  SlideInRight,
+  SlideInUp,
+  SlideOutDown,
+  SlideOutLeft,
+  SlideOutRight,
+  SlideOutUp,
+} from 'react-native-reanimated';
 import { Button, ButtonText } from '../button';
 import { Icon } from '../icon';
 import { Text } from '../text';
 import { TouchableOpacity } from '../touchable-opacity';
 
-type IAnimatedPressableProps = React.ComponentProps<typeof Pressable> &
-  MotionComponentProps<typeof Pressable, ViewStyle, unknown, unknown, unknown>;
-
-const AnimatedPressable = createMotionAnimatedComponent(
-  Pressable
-) as React.ComponentType<IAnimatedPressableProps>;
-
 const SCOPE = 'MODAL';
-const screenWidth = Dimensions.get('window').width;
-const screenHeight = Dimensions.get('window').height;
-const sizes: { [key: string]: number } = {
-  sm: 0.25,
-  md: 0.5,
-  lg: 0.75,
-  full: 1,
-};
 
-type IMotionViewProps = React.ComponentProps<typeof View> &
-  MotionComponentProps<typeof View, ViewStyle, unknown, unknown, unknown>;
-
-const MotionView = Motion.View as React.ComponentType<IMotionViewProps>;
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+const AnimatedView = Animated.createAnimatedComponent(View);
 
 const UIDrawer = createDrawer({
-  Root: withStyleContext(View, SCOPE),
+  Root: withStyleContext(View as any, SCOPE),
   Backdrop: AnimatedPressable,
-  Content: MotionView,
+  Content: AnimatedView,
   Body: ScrollView,
   CloseButton: Pressable,
   Footer: View,
   Header: View,
-  AnimatePresence: AnimatePresence,
 });
-
-cssInterop(AnimatedPressable, { className: 'style' });
-cssInterop(MotionView, { className: 'style' });
 
 const drawerStyle = tva({
   base: 'w-full h-full web:pointer-events-none relative',
@@ -205,24 +183,8 @@ const DrawerBackdrop = React.forwardRef<
   return (
     <UIDrawer.Backdrop
       ref={ref}
-      initial={{
-        opacity: 0,
-      }}
-      animate={{
-        opacity: 0.5,
-      }}
-      exit={{
-        opacity: 0,
-      }}
-      transition={{
-        type: 'spring',
-        damping: 18,
-        stiffness: 250,
-        opacity: {
-          type: 'timing',
-          duration: 250,
-        },
-      }}
+      entering={FadeIn.duration(200).easing(Easing.in(Easing.cubic))}
+      exiting={FadeOut.duration(150)}
       {...props}
       className={drawerBackdropStyle({
         class: className,
@@ -237,42 +199,43 @@ const DrawerContent = React.forwardRef<
 >(function DrawerContent({ className, ...props }, ref) {
   const { size: parentSize, anchor: parentAnchor } = useStyleContext(SCOPE);
 
-  const drawerHeight = screenHeight * (sizes[parentSize] || sizes.md);
-  const drawerWidth = screenWidth * (sizes[parentSize] || sizes.md);
+  // Calculate positioning classes
+  const customClass =
+    parentAnchor === 'left' || parentAnchor === 'right'
+      ? `top-0 ${parentAnchor === 'left' ? 'left-0' : 'right-0'}`
+      : `left-0 ${parentAnchor === 'top' ? 'top-0' : 'bottom-0'}`;
 
-  const isHorizontal = parentAnchor === 'left' || parentAnchor === 'right';
+  // Select entering and exiting animations based on anchor
+  const enteringAnimation =
+    parentAnchor === 'left'
+      ? SlideInLeft.duration(200).easing(Easing.in(Easing.cubic))
+      : parentAnchor === 'right'
+        ? SlideInRight.duration(200)
+        : parentAnchor === 'top'
+          ? SlideInUp.duration(200)
+          : SlideInDown.duration(200);
 
-  const initialObj = isHorizontal
-    ? { x: parentAnchor === 'left' ? -drawerWidth : drawerWidth }
-    : { y: parentAnchor === 'top' ? -drawerHeight : drawerHeight };
-
-  const animateObj = isHorizontal ? { x: 0 } : { y: 0 };
-
-  const exitObj = isHorizontal
-    ? { x: parentAnchor === 'left' ? -drawerWidth : drawerWidth }
-    : { y: parentAnchor === 'top' ? -drawerHeight : drawerHeight };
-
-  const customClass = isHorizontal
-    ? `top-0 ${parentAnchor === 'left' ? 'left-0' : 'right-0'}`
-    : `left-0 ${parentAnchor === 'top' ? 'top-0' : 'bottom-0'}`;
+  const exitingAnimation =
+    parentAnchor === 'left'
+      ? SlideOutLeft.duration(200)
+      : parentAnchor === 'right'
+        ? SlideOutRight.duration(200)
+        : parentAnchor === 'top'
+          ? SlideOutUp.duration(200)
+          : SlideOutDown.duration(200);
 
   return (
     <UIDrawer.Content
       ref={ref}
-      initial={initialObj}
-      animate={animateObj}
-      exit={exitObj}
-      transition={{
-        type: 'timing',
-        duration: 300,
-      }}
+      entering={enteringAnimation}
+      exiting={exitingAnimation}
       {...props}
       className={drawerContentStyle({
         parentVariants: {
           size: parentSize,
           anchor: parentAnchor,
         },
-        class: `${className} ${customClass}`,
+        class: `${className || ''} ${customClass}`,
       })}
       pointerEvents='auto'
     />

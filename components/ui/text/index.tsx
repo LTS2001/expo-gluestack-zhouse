@@ -1,7 +1,7 @@
-import { type VariantProps } from '@gluestack-ui/nativewind-utils';
-import { tva } from '@gluestack-ui/nativewind-utils/tva';
+import { tva, type VariantProps } from '@gluestack-ui/utils/nativewind-utils';
 import React from 'react';
 import { Text as RNText } from 'react-native';
+
 export const textStyle = tva({
   base: `text-typography-700 font-body`,
 
@@ -20,11 +20,11 @@ export const textStyle = tva({
     },
     size: {
       '2xs': 'text-2xs',
-      'xs': 'text-xs',
-      'sm': 'text-sm',
-      'md': 'text-base',
-      'lg': 'text-lg',
-      'xl': 'text-xl',
+      xs: 'text-xs',
+      sm: 'text-sm',
+      md: 'text-base',
+      lg: 'text-lg',
+      xl: 'text-xl',
       '2xl': 'text-2xl',
       '3xl': 'text-3xl',
       '4xl': 'text-4xl',
@@ -60,7 +60,7 @@ const Text = React.forwardRef<React.ComponentRef<typeof RNText>, ITextProps>(
       highlight,
       ...props
     },
-    ref
+    ref,
   ) {
     return (
       <RNText
@@ -79,7 +79,7 @@ const Text = React.forwardRef<React.ComponentRef<typeof RNText>, ITextProps>(
         ref={ref}
       />
     );
-  }
+  },
 );
 
 Text.displayName = 'Text';

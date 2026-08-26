@@ -8,7 +8,7 @@ import {
 import emitter, { EEventNameEnum } from '@/emitter';
 import { ITencentMapLocation } from '@/global';
 import { Asset } from 'expo-asset';
-import { readAsStringAsync } from 'expo-file-system';
+import { readAsStringAsync } from 'expo-file-system/legacy';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useNavigation } from 'expo-router/react-navigation';
 import { useEffect, useState } from 'react';

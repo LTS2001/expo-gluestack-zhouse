@@ -1,5 +1,4 @@
-import { type VariantProps } from '@gluestack-ui/nativewind-utils';
-import { tva } from '@gluestack-ui/nativewind-utils/tva';
+import { tva, type VariantProps } from '@gluestack-ui/utils/nativewind-utils';
 import React from 'react';
 import {
   TouchableOpacity as RNTouchableOpacity,
@@ -21,7 +20,7 @@ const TouchableOpacity = React.forwardRef<
   ITouchableOpacityProps
 >(function TouchableOpacity(
   { className, style: _style, activeOpacity = 1, ...props },
-  ref
+  ref,
 ) {
   return (
     <RNTouchableOpacity

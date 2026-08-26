@@ -15,8 +15,7 @@ import {
   SimpleLineIcons,
   Zocial,
 } from '@expo/vector-icons';
-import { type VariantProps } from '@gluestack-ui/nativewind-utils';
-import { tva } from '@gluestack-ui/nativewind-utils/tva';
+import { tva, type VariantProps } from '@gluestack-ui/utils/nativewind-utils';
 import React from 'react';
 import { View as RNView, useColorScheme, ViewProps } from 'react-native';
 
@@ -80,7 +79,7 @@ export const Icon = React.forwardRef<
       position,
       ...props
     },
-    ref
+    ref,
   ) => {
     const theme = useColorScheme();
     const IconComponent = IconComponents[as];
@@ -101,7 +100,7 @@ export const Icon = React.forwardRef<
         />
       </RNView>
     );
-  }
+  },
 );
 
 Icon.displayName = 'Icon';

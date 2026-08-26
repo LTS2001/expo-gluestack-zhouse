@@ -142,9 +142,9 @@ const MarketLookHouse = () => {
               </Button>
             ) : (
               <View className='flex-row items-center gap-2 justify-center'>
-                <View className='h-[1px] bg-primary-0 flex-1'></View>
+                <View className='h-px bg-primary-0 flex-1'></View>
                 <Text className='text'>已向房东发送租赁请求</Text>
-                <View className='h-[1px] bg-primary-0 flex-1'></View>
+                <View className='h-px bg-primary-0 flex-1'></View>
               </View>
             )
           ) : null}

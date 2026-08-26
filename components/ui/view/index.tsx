@@ -1,5 +1,4 @@
-import { type VariantProps } from '@gluestack-ui/nativewind-utils';
-import { tva } from '@gluestack-ui/nativewind-utils/tva';
+import { tva, type VariantProps } from '@gluestack-ui/utils/nativewind-utils';
 import React from 'react';
 import { View as RNView, useColorScheme, ViewProps } from 'react-native';
 const viewStyle = tva({});
@@ -31,11 +30,11 @@ const View = React.forwardRef<React.ComponentRef<typeof RNView>, IViewProps>(
                 elevation: 8,
               }
             : {},
-          _style
+          _style,
         )}
       />
     );
-  }
+  },
 );
 
 View.displayName = 'View';

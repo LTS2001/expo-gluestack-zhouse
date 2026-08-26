@@ -43,7 +43,7 @@ export default function RootLayout() {
   }
 
   return (
-    <GluestackUIProvider mode={colorScheme ?? 'light'}>
+    <GluestackUIProvider mode={colorScheme}>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <KeyboardProvider>
           <Stack

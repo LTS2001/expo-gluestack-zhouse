@@ -1,9 +1,8 @@
-'use client';
 import { SERVER_IMAGE_ROOT } from '@/constants';
-import { isLocalPath } from '@/utils/image';
-import { createImage } from '@gluestack-ui/image';
-import type { VariantProps } from '@gluestack-ui/nativewind-utils';
-import { tva } from '@gluestack-ui/nativewind-utils/tva';
+import { isLocalPath } from '@/utils';
+import { createImage } from '@gluestack-ui/core/image/creator';
+import type { VariantProps } from '@gluestack-ui/utils/nativewind-utils';
+import { tva } from '@gluestack-ui/utils/nativewind-utils';
 import React from 'react';
 import { Platform, Image as RNImage, useColorScheme } from 'react-native';
 
@@ -50,7 +49,7 @@ const Image = React.forwardRef<
     src = '/common/male.png',
     ...props
   },
-  ref
+  ref,
 ) {
   const colorSchema = useColorScheme();
   const uri = (isLocalPath(src) ? src : SERVER_IMAGE_ROOT + src) || '';
@@ -75,7 +74,7 @@ const Image = React.forwardRef<
                 : {}),
             }
           : {},
-        _style
+        _style,
       )}
     />
   );

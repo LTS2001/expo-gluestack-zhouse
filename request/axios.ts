@@ -2,8 +2,8 @@ import { showToast } from '@/components/ui';
 import { NOT_LOGIN_ERROR, SERVER_API_ROOT, SUCCESS } from '@/constants';
 import { BaseRes } from '@/global';
 import { authStore } from '@/stores';
-import _, { AxiosResponse } from 'axios';
-const axios = _.create({
+import { AxiosResponse, create } from 'axios';
+const axios = create({
   baseURL: SERVER_API_ROOT,
   timeout: 30000,
 });
@@ -17,10 +17,9 @@ axios.interceptors.request.use(
       config.headers['Content-Type'] = 'multipart/form-data';
     }
     console.log(
-      `${config.method} => ${config.url} => ${
-        config.data
-          ? JSON.stringify(config.data)
-          : JSON.stringify(config.params)
+      `${config.method} => ${config.url} => ${config.data
+        ? JSON.stringify(config.data)
+        : JSON.stringify(config.params)
       }`
     );
     return config;

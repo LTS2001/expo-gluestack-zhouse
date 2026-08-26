@@ -1,11 +1,10 @@
-'use client';
-import type { VariantProps } from '@gluestack-ui/nativewind-utils';
-import { tva } from '@gluestack-ui/nativewind-utils/tva';
+import { createRadio } from '@gluestack-ui/core/radio/creator';
+import type { VariantProps } from '@gluestack-ui/utils/nativewind-utils';
 import {
+  tva,
   useStyleContext,
   withStyleContext,
-} from '@gluestack-ui/nativewind-utils/withStyleContext';
-import { createRadio } from '@gluestack-ui/radio';
+} from '@gluestack-ui/utils/nativewind-utils';
 import React from 'react';
 import { Platform, Pressable, Text, View } from 'react-native';
 import { Icon } from '../icon';
@@ -85,7 +84,7 @@ const Radio = React.forwardRef<React.ComponentRef<typeof UIRadio>, IRadioProps>(
         context={{ size }}
       />
     );
-  }
+  },
 );
 
 type IRadioGroupProps = React.ComponentProps<typeof UIRadio.Group> &

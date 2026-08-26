@@ -1,12 +1,11 @@
-'use client';
 import { AntDesign } from '@expo/vector-icons';
-import { createButton } from '@gluestack-ui/button';
-import type { VariantProps } from '@gluestack-ui/nativewind-utils';
-import { tva } from '@gluestack-ui/nativewind-utils/tva';
+import { createButton } from '@gluestack-ui/core/button/creator';
 import {
+  tva,
   useStyleContext,
   withStyleContext,
-} from '@gluestack-ui/nativewind-utils/withStyleContext';
+  type VariantProps,
+} from '@gluestack-ui/utils/nativewind-utils';
 import React from 'react';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 
@@ -105,7 +104,7 @@ const buttonStyle = tva({
 });
 
 const buttonTextStyle = tva({
-  base: 'text-typography-0 font-semibold web:select-none',
+  base: 'text-typography-0 font-semibold',
   parentVariants: {
     action: {
       primary:
@@ -243,11 +242,11 @@ const buttonGroupStyle = tva({
   base: '',
   variants: {
     space: {
-      'xs': 'gap-1',
-      'sm': 'gap-2',
-      'md': 'gap-3',
-      'lg': 'gap-4',
-      'xl': 'gap-5',
+      xs: 'gap-1',
+      sm: 'gap-2',
+      md: 'gap-3',
+      lg: 'gap-4',
+      xl: 'gap-5',
       '2xl': 'gap-6',
       '3xl': 'gap-7',
       '4xl': 'gap-8',
@@ -256,8 +255,8 @@ const buttonGroupStyle = tva({
       true: 'gap-0',
     },
     flexDirection: {
-      'row': 'flex-row',
-      'column': 'flex-col',
+      row: 'flex-row',
+      column: 'flex-col',
       'row-reverse': 'flex-row-reverse',
       'column-reverse': 'flex-col-reverse',
     },
@@ -275,7 +274,7 @@ const Button = React.forwardRef<
   IButtonProps
 >(function Button(
   { className, variant = 'solid', size = 'md', action = 'primary', ...props },
-  ref
+  ref,
 ) {
   return (
     <UIButton
@@ -339,13 +338,16 @@ const ButtonIcon = React.forwardRef<
   } = useStyleContext(SCOPE);
 
   // 根据父级大小设置图标大小
-  const iconSize = size || {
-    xs: 14,
-    sm: 16,
-    md: 18,
-    lg: 20,
-    xl: 22
-  }[parentSize as keyof typeof buttonIconStyle.variants.size] || 18;
+  const iconSize =
+    size ||
+    {
+      xs: 14,
+      sm: 16,
+      md: 18,
+      lg: 20,
+      xl: 22,
+    }[parentSize as keyof typeof buttonIconStyle.variants.size] ||
+    18;
 
   return (
     <UIButton.Icon
@@ -359,7 +361,7 @@ const ButtonIcon = React.forwardRef<
           size: parentSize,
           action: parentAction,
         },
-        class: className
+        class: className,
       })}
       ref={ref}
     />
@@ -380,7 +382,7 @@ const ButtonGroup = React.forwardRef<
     flexDirection = 'column',
     ...props
   },
-  ref
+  ref,
 ) {
   return (
     <UIButton.Group
@@ -403,4 +405,3 @@ ButtonIcon.displayName = 'ButtonIcon';
 ButtonGroup.displayName = 'ButtonGroup';
 
 export { Button, ButtonGroup, ButtonIcon, ButtonSpinner, ButtonText };
-

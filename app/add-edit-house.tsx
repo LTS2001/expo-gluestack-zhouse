@@ -174,6 +174,7 @@ const GenerateForm = ({ config }: { config: IFormConfig[] }) => {
                                 placeholder={
                                   halfWidth ? '' : `请输入${c.label}`
                                 }
+                                className='p-0 px-2'
                               />
                               {c.rightSlot && (
                                 <View className='mr-2'>{c.rightSlot}</View>
@@ -272,7 +273,7 @@ const AddEditHouse = () => {
       form.setValue('addressName', currentHouse.addressName);
       form.setValue(
         'addressDetail',
-        `${currentHouse.provinceName}${currentHouse.cityName}${currentHouse.areaName}${currentHouse.addressInfo}`
+        `${currentHouse.provinceName}${currentHouse.cityName}${currentHouse.areaName}${currentHouse.addressInfo}`,
       );
       form.setValue('note', currentHouse.note || '');
       form.setValue('houseImg', JSON.parse(currentHouse.houseImg));

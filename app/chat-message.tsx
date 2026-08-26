@@ -85,7 +85,7 @@ const ChatMessage = () => {
                 {isCertainMinuteAge(
                   createdAt,
                   nextDate ?? createdAt,
-                  3 * 60 * 1000
+                  3 * 60 * 1000,
                 ) || idx === (chatMessageList?.length ?? 0) - 1 ? (
                   <Text>{formatChatDate(createdAt)}</Text>
                 ) : null}
@@ -125,9 +125,9 @@ const ChatMessage = () => {
           );
         }}
       />
-      <View className='bg-background-50 pb-6 pt-3 px-4 flex-row items-center justify-between gap-4 border-t-[1px] border-background-200'>
+      <View className='bg-background-50 pb-6 pt-3 px-4 flex-row items-center justify-between gap-4 border-t border-background-200'>
         <Textarea
-          className='flex-1 h-auto border-[1px] rounded-md data-[focus=true]:border-primary-50'
+          className='flex-1 h-auto border rounded-md data-[focus=true]:border-primary-50'
           style={{ height: composedHeight + 2 }}
         >
           <TextareaInput
@@ -159,7 +159,7 @@ const ChatMessage = () => {
         )}
       </View>
       {showControlPanel && (
-        <View className='h-60 border-t-[1px] border-background-200 bg-background-50 -mt-3 py-6 px-8 flex-row gap-8 items-start'>
+        <View className='h-60 border-t border-background-200 bg-background-50 -mt-3 py-6 px-8 flex-row gap-8 items-start'>
           <TouchableOpacity
             className='bg-background-0 rounded-md p-3'
             onPress={handleTakePhoto}

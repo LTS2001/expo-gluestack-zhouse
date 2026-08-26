@@ -1,15 +1,13 @@
-'use client';
 import { AntDesign } from '@expo/vector-icons';
-import { createInput } from '@gluestack-ui/input';
-import type { VariantProps } from '@gluestack-ui/nativewind-utils';
-import { tva } from '@gluestack-ui/nativewind-utils/tva';
+import { createInput } from '@gluestack-ui/core/input/creator';
+import type { VariantProps } from '@gluestack-ui/utils/nativewind-utils';
 import {
+  tva,
   useStyleContext,
   withStyleContext,
-} from '@gluestack-ui/nativewind-utils/withStyleContext';
+} from '@gluestack-ui/utils/nativewind-utils';
 import React from 'react';
 import { Pressable, TextInput, View } from 'react-native';
-// import { PrimitiveIcon, UIIcon } from '@gluestack-ui/icon';
 
 const SCOPE = 'INPUT';
 
@@ -19,19 +17,6 @@ const UIInput = createInput({
   Slot: Pressable,
   Input: TextInput,
 });
-
-// cssInterop(PrimitiveIcon, {
-//   className: {
-//     target: 'style',
-//     nativeStyleToProp: {
-//       height: true,
-//       width: true,
-//       fill: true,
-//       color: 'classNameColor',
-//       stroke: true,
-//     },
-//   },
-// });
 
 const inputStyle = tva({
   base: 'border-background-300 flex-row overflow-hidden content-center data-[hover=true]:border-outline-400 data-[focus=true]:border-primary-700 data-[focus=true]:hover:border-primary-700 data-[disabled=true]:opacity-40 data-[disabled=true]:hover:border-background-300 items-center',
@@ -76,7 +61,7 @@ const inputSlotStyle = tva({
 });
 
 const inputFieldStyle = tva({
-  base: 'flex-1 text-typography-900 py-0 px-3 placeholder:text-typography-500 h-full ios:leading-[0px] web:cursor-text web:data-[disabled=true]:cursor-not-allowed',
+  base: 'flex-1 text-typography-900 py-0 px-3 placeholder:text-typography-500 h-full ios:leading-[0px]',
 
   parentVariants: {
     variant: {
@@ -106,7 +91,7 @@ type IInputProps = React.ComponentProps<typeof UIInput> &
 const Input = React.forwardRef<React.ComponentRef<typeof UIInput>, IInputProps>(
   function Input(
     { className, variant = 'outline', size = 'md', ...props },
-    ref
+    ref,
   ) {
     return (
       <UIInput
@@ -116,7 +101,7 @@ const Input = React.forwardRef<React.ComponentRef<typeof UIInput>, IInputProps>(
         context={{ variant, size }}
       />
     );
-  }
+  },
 );
 
 type IInputIconProps = React.ComponentProps<typeof UIInput.Icon> &

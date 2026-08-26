@@ -1,6 +1,5 @@
-'use client';
-import type { VariantProps } from '@gluestack-ui/nativewind-utils';
-import { tva } from '@gluestack-ui/nativewind-utils/tva';
+import type { VariantProps } from '@gluestack-ui/utils/nativewind-utils';
+import { tva } from '@gluestack-ui/utils/nativewind-utils';
 import React from 'react';
 import { Dimensions, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -207,7 +206,7 @@ const Toast = (props: ToastProps) => {
                     icon === 'success' ? (
                       <Icon
                         as='AntDesign'
-                        name='smileo'
+                        name='smile'
                         size={16}
                         lightColor='white'
                         darkColor='black'
@@ -215,7 +214,7 @@ const Toast = (props: ToastProps) => {
                     ) : icon === 'error' ? (
                       <Icon
                         as='AntDesign'
-                        name='frowno'
+                        name='frown'
                         size={16}
                         lightColor='white'
                         darkColor='black'
@@ -227,7 +226,7 @@ const Toast = (props: ToastProps) => {
                 ) : (
                   <Icon
                     as='AntDesign'
-                    name='exclamationcircle'
+                    name='exclamation-circle'
                     size={16}
                     lightColor='white'
                     darkColor='black'
@@ -282,7 +281,7 @@ const showToast = (
       | 'topOffset'
       | 'bottomOffset'
       | 'props'
-    >
+    >,
 ) => {
   const {
     position,
@@ -312,4 +311,3 @@ const showToast = (
 };
 
 export { showToast, Toast };
-

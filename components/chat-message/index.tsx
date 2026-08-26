@@ -54,7 +54,7 @@ const Message = memo(
             return (
               <View
                 className={cls([
-                  'bg-background-0 rounded-md py-2 px-3 self-start border-[1px] border-background-100',
+                  'bg-background-0 rounded-md py-2 px-3 self-start border border-background-100',
                   { 'bg-background-800 self-end': identity === 'sender' },
                 ])}
               >
@@ -132,7 +132,7 @@ const Message = memo(
             return (
               <View
                 className={cls([
-                  'bg-background-0 rounded-md py-2 px-3 self-start border-[1px] border-background-100 flex-row items-center gap-2',
+                  'bg-background-0 rounded-md py-2 px-3 self-start border border-background-100 flex-row items-center gap-2',
                   { 'bg-background-800 self-end': identity === 'sender' },
                 ])}
               >
@@ -157,7 +157,7 @@ const Message = memo(
         }
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      [type, content, identity, isUploading, uploadProgress, isFailed, model]
+      [type, content, identity, isUploading, uploadProgress, isFailed, model],
     );
 
     return (
@@ -222,7 +222,7 @@ const Message = memo(
       prevProps.uploadStatus === nextProps.uploadStatus &&
       prevProps.uploadProgress === nextProps.uploadProgress
     );
-  }
+  },
 );
 
 Message.displayName = 'Message';
