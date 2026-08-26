@@ -1,26 +1,26 @@
 'use client';
-import React from 'react';
-import { createModal } from '@gluestack-ui/modal';
-import { Pressable, View, ScrollView, ViewStyle } from 'react-native';
-import {
-  Motion,
-  AnimatePresence,
-  createMotionAnimatedComponent,
-  MotionComponentProps,
-} from '@legendapp/motion';
+import { createModal } from '@gluestack-ui/core/modal/creator';
+import type { VariantProps } from '@gluestack-ui/nativewind-utils';
 import { tva } from '@gluestack-ui/nativewind-utils/tva';
 import {
-  withStyleContext,
   useStyleContext,
+  withStyleContext,
 } from '@gluestack-ui/nativewind-utils/withStyleContext';
+import {
+  AnimatePresence,
+  createMotionAnimatedComponent,
+  Motion,
+  MotionComponentProps,
+} from '@legendapp/motion';
 import { cssInterop } from 'nativewind';
-import type { VariantProps } from '@gluestack-ui/nativewind-utils';
+import React from 'react';
+import { Pressable, ScrollView, View, ViewStyle } from 'react-native';
 
 type IAnimatedPressableProps = React.ComponentProps<typeof Pressable> &
   MotionComponentProps<typeof Pressable, ViewStyle, unknown, unknown, unknown>;
 
 const AnimatedPressable = createMotionAnimatedComponent(
-  Pressable
+  Pressable,
 ) as React.ComponentType<IAnimatedPressableProps>;
 const SCOPE = 'MODAL';
 
@@ -115,11 +115,11 @@ const Modal = React.forwardRef<React.ComponentRef<typeof UIModal>, IModalProps>(
     <UIModal
       ref={ref}
       {...props}
-      pointerEvents="box-none"
+      pointerEvents='box-none'
       className={modalStyle({ size, class: className })}
       context={{ size }}
     />
-  )
+  ),
 );
 
 const ModalBackdrop = React.forwardRef<
@@ -192,7 +192,7 @@ const ModalContent = React.forwardRef<
         size,
         class: className,
       })}
-      pointerEvents="auto"
+      pointerEvents='auto'
     />
   );
 });
@@ -268,9 +268,10 @@ ModalCloseButton.displayName = 'ModalCloseButton';
 export {
   Modal,
   ModalBackdrop,
-  ModalContent,
-  ModalCloseButton,
-  ModalHeader,
   ModalBody,
+  ModalCloseButton,
+  ModalContent,
   ModalFooter,
+  ModalHeader
 };
+

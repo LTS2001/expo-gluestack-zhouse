@@ -1,5 +1,5 @@
 'use client';
-import { createModal as createDrawer } from '@gluestack-ui/modal';
+import { createModal as createDrawer } from '@gluestack-ui/core/modal/creator';
 import type { VariantProps } from '@gluestack-ui/nativewind-utils';
 import { tva } from '@gluestack-ui/nativewind-utils/tva';
 import {
@@ -30,7 +30,7 @@ type IAnimatedPressableProps = React.ComponentProps<typeof Pressable> &
   MotionComponentProps<typeof Pressable, ViewStyle, unknown, unknown, unknown>;
 
 const AnimatedPressable = createMotionAnimatedComponent(
-  Pressable
+  Pressable,
 ) as React.ComponentType<IAnimatedPressableProps>;
 
 const SCOPE = 'MODAL';
